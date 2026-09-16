@@ -1,16 +1,88 @@
 /**
- * The one-line seam between the render lane and the simulation lane.
+ * The seam between the interface and the simulation.
  *
- * Today this re-exports the local development stub (./stub-sim.js), because
- * src/sim/core/match.js and src/sim/state/snapshot.js do not exist yet. Once the
- * simulation lane lands them, swap the two lines below for:
+ * The two sides were built in parallel and did not agree on every name, which is the
+ * ordinary result of parallel work rather than a mistake by either of them. Rather
+ * than making the simulation adopt interface vocabulary or the interface adopt
+ * simulation vocabulary, the mismatch is resolved in exactly one file: here.
  *
- *   export { createMatch, submitCommand, tick } from '../sim/core/match.js';
- *   export { snapshot } from '../sim/state/snapshot.js';
+ * Three differences are reconciled:
  *
- * and delete stub-sim.js. Nothing else in src/render or src/ui imports the stub
- * directly — every consumer imports from this file — so that swap is the entire
- * migration as long as the real modules match the shape documented in
- * sim-interface.js.
+ * 1. The simulation hands back a match handle carrying its own command queue. The
+ *    interface only ever wants to pass that handle straight back, so it is opaque.
+ * 2. The interface names commands in camel case; the simulation names them in Pascal
+ *    case. The map below is the whole translation, and an unknown name throws here
+ *    rather than being silently dropped somewhere deeper.
+ * 3. `snapshot` reads a state, not a match, so this unwraps it.
+ *
+ * Keeping the adapter thin matters: anything clever in this file becomes untestable
+ * behaviour sitting between two well-tested halves.
  */
-export { createMatch, submitCommand, tick, snapshot, getStubGameData as getGameData } from './stub-sim.js';
+
+import {
+  createMatch as createSimMatch,
+  submitCommand as submitSimCommand,
+  tick as tickSim,
+} from '../sim/core/match.js';
+import { snapshot as snapshotState } from '../sim/state/snapshot.js';
+import { loadGameData } from '../data/loader.js';
+
+/** Interface command names to simulation command names. */
+const COMMAND_KINDS = Object.freeze({
+  placeTower: 'PlaceTower',
+  upgradeTower: 'UpgradeTower',
+  sellTower: 'SellTower',
+  setTargetingMode: 'SetTargeting',
+  castAbility: 'UseAbility',
+  skipIntermission: 'SkipIntermission',
+});
+
+/**
+ * @param {{ seed: number, mapId: string, difficultyId: string, gameData?: any }} options
+ * @returns {any} an opaque match handle
+ */
+export function createMatch(options) {
+  const gameData = options.gameData ?? loadGameData();
+  return createSimMatch({
+    gameData,
+    seed: options.seed,
+    mapId: options.mapId,
+    difficultyId: options.difficultyId,
+  });
+}
+
+/**
+ * @param {any} match
+ * @param {{ kind: string } & Record<string, any>} command
+ */
+export function submitCommand(match, command) {
+  const kind = COMMAND_KINDS[/** @type {keyof typeof COMMAND_KINDS} */ (command.kind)];
+  if (!kind) {
+    // Loudly, because a command name that quietly does nothing is the worst kind of
+    // interface defect: the button appears to work and the world never changes.
+    throw new Error('unknown command from the interface: ' + command.kind);
+  }
+  const { kind: _ignored, ...payload } = command;
+  return submitSimCommand(match, kind, payload);
+}
+
+/**
+ * @param {any} match
+ */
+export function tick(match) {
+  return tickSim(match);
+}
+
+/**
+ * @param {any} match
+ */
+export function snapshot(match) {
+  return snapshotState(match.state);
+}
+
+/**
+ * @returns {any}
+ */
+export function getGameData() {
+  return loadGameData();
+}

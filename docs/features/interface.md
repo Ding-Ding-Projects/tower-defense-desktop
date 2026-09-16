@@ -165,3 +165,10 @@ the centering branch). Both were watched red, fixed, and watched green again.
 `cycleTargetingMode` was also deliberately sabotaged (the wrap-around branch
 short-circuited to always return the current mode) to confirm its guard
 actually fails when the implementation is wrong, then restored.
+
+## Suggested articles
+
+- [The deterministic simulation and replay](simulation-and-replay.md) — what the interface is actually reading, and why it may only read.
+- [Towers and upgrades](towers-and-upgrades.md) — where the shop's costs, stats and disabled reasons come from.
+- [Maps and placement](maps-and-placement.md) — the terrain rules behind every refused placement.
+- [Accessibility](accessibility.md) — the keyboard, focus and motion rules this surface has to meet.
