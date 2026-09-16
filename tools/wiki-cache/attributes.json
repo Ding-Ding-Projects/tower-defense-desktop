@@ -83,6 +83,7 @@
       "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "farm",
       "displayName": "Farm",
       "url": "https://tds.fandom.com/wiki/Farm",
@@ -106,8 +107,7 @@
       "baseCost": 300,
       "baseSell": 100,
       "refundRatio": 0.3333,
-      "immunities": "Stun Immune",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Stun Immune"
     },
     {
       "retrievedAt": "2026-09-16",
@@ -486,6 +486,33 @@
       "baseSell": 2583,
       "refundRatio": 0.3333,
       "immunities": "Partial Debuff"
+    },
+    {
+      "id": "warden",
+      "displayName": "Warden",
+      "url": "https://tds.fandom.com/wiki/Warden",
+      "hidden": {
+        "fromLevel": 1,
+        "never": false,
+        "raw": "Level 1+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "footprint": 1,
+      "footprintRaw": "Small (1)",
+      "baseCost": 1850,
+      "baseSell": 616,
+      "refundRatio": 0.333,
+      "immunities": "Stun Immune",
+      "retrievedAt": "2026-09-16"
     }
   ]
 }

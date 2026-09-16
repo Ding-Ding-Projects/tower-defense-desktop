@@ -52,6 +52,7 @@ const OVERLAY = {
   demoman: { terrain: ['ground'], pool: 'default', max: null },
   mortar: { terrain: ['ground'], pool: 'default', max: null },
   rocketeer: { terrain: ['ground'], pool: 'default', max: null },
+  warden: { terrain: ['ground'], pool: 'default', max: null },
   // The shared economy cap, which is what the placementPool field exists for: farms
   // compete with each other for a limited number of slots rather than with the guns.
   farm: { terrain: ['ground'], pool: 'economy', max: 8 },
@@ -120,6 +121,10 @@ function toLevel(row, overlay, attributes, source) {
     },
   };
   if (row.incomePerWave) level.incomePerWave = row.incomePerWave;
+  if (row.critDamage && row.critEveryNthHit) {
+    level.critDamage = row.critDamage;
+    level.critEveryNthHit = row.critEveryNthHit;
+  }
   if (row.aoeRadius) level.aoeRadius = row.aoeRadius;
   if (row.spinUpSeconds) level.spinUpSeconds = row.spinUpSeconds;
   if (row.burstCount && row.burstCount > 1) {
@@ -161,6 +166,33 @@ function toLevel(row, overlay, attributes, source) {
     level.chainRadius = overlay.chainRadius ?? 8;
   }
   return level;
+}
+
+/**
+ * How often a critical hit lands, solved from the page's own arithmetic.
+ *
+ * The frequency is the one figure the table does not print, but it follows from three
+ * that it does. If a crit lands every N hits, the average damage per hit is
+ * `damage + (critDamage - damage) / N`, and the published damage per second is that
+ * average divided by the swing interval. Rearranged, N falls out.
+ *
+ * Solved rather than assumed, and required to land on a whole number, because a
+ * fractional answer would mean the model is wrong rather than that the tower crits
+ * every two-and-a-half swings. Warden solves to 2.9985, 2.9985, 3.0030, 3.0004 and
+ * 2.9996 across its five levels, which is three with the page's own rounding.
+ *
+ * @param {{ damage: number, critDamage?: number, shotIntervalSeconds: number, pageDps?: number }} row
+ * @returns {number|null}
+ */
+function solveCritInterval(row) {
+  if (!row.critDamage || !row.pageDps || !(row.shotIntervalSeconds > 0)) return null;
+  const averagePerHit = row.pageDps * row.shotIntervalSeconds;
+  const lift = averagePerHit - row.damage;
+  if (lift <= 0) return null;
+  const solved = (row.critDamage - row.damage) / lift;
+  const rounded = Math.round(solved);
+  if (rounded < 2 || Math.abs(solved - rounded) > 0.05) return null;
+  return rounded;
 }
 
 const cachePath = join(ROOT, 'tools', 'wiki-cache', 'towers.json');
@@ -242,9 +274,10 @@ for (const scraped of cache.results) {
     targetingModes: ALL_MODES,
     // Level 0 is the placed tower, so its cost is the placement cost and the level
     // entry itself charges nothing further.
-    levels: scraped.levels.map((l, i) =>
-      toLevel(i === 0 ? { ...l, cost: 0 } : l, overlay, attributes, source),
-    ),
+    levels: scraped.levels.map((l, i) => {
+      const withCrit = { ...l, critEveryNthHit: solveCritInterval(l) ?? undefined };
+      return toLevel(i === 0 ? { ...withCrit, cost: 0 } : withCrit, overlay, attributes, source);
+    }),
     source: {
       ...source,
       notes:

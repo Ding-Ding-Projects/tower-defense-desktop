@@ -196,11 +196,32 @@ once the income column is read it is a data row like any other. The validator's 
 that a fire rate of zero never shoots now asks whether the tower earns instead, and
 still bites for anything that is supposed to shoot.
 
+### The critical-hit model, added for a tower that still does not ship
+
+Warden's published damage per second is 1.1667 times what its damage and swing rate
+alone produce, and the reason is a critical hit the table prints the damage of but not
+the frequency of. That frequency follows from three figures the page does print: if a
+crit lands every N hits the average per hit is `damage + (critDamage - damage) / N`, and
+the published rate is that average over the swing interval. Solving across Warden's five
+levels gives 2.9985, 2.9985, 3.0030, 3.0004 and 2.9996.
+
+So a crit lands on a **cadence**, every third hit, not on a die roll. That is not a
+concession to determinism: the simulation has a seeded stream and could roll
+reproducibly. A probability would not produce the same integer at five different levels.
+
+The engine uses the page's own crit damage rather than multiplying, because at Warden's
+level 2 the listed crit is 23 where 15 times 1.5 is 22.5, and it is the 23 that
+reproduces the published rate. A damage aura scales the crit in proportion, so a support
+tower does not quietly stop helping on every third swing.
+
+The tower itself is held back by the contradiction above. The mechanic is implemented,
+checked, and waiting.
+
 ### Blocked on an engine feature, not on data
 
 | Tower | What it needs |
 | --- | --- |
-| Warden | A critical-hit model. Its listed DPS is 1.1667x what damage and swing rate alone produce, because the page averages in a crit multiplier. Shipping the damage column alone would silently understate it by a sixth. |
+| Warden | **The engine can model it now; the source contradicts itself.** Its upgrade table lists $1,000 to place with 6 base damage, and its own infobox lists $1,850 with 12. A row built from two readings that disagree is a row nobody can trust, so it does not ship and the generator refuses it by name. |
 | Accelerator | A charge-up beam. Its table has no rate column at all, only charge-up, tick and overcharge. |
 | Pyromancer | Burn damage, burn time, tick rate and defence melt as one coherent status. The status registry can carry a burn, but not the defence melt. |
 | Military Base | Friendly units. It spawns them; nothing in the simulation fights on the player's side. |

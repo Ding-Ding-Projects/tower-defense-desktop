@@ -113,6 +113,20 @@ for (const raw of RAW.towers) {
       earnsInsteadOfShooting || level.fireRate > 0,
       lw + ': a fire rate of zero never shoots, and this tower has no income to earn instead',
     );
+    // Half a critical-hit specification is the dangerous shape: a crit figure with no
+    // cadence, or a cadence with no figure, is a row that silently does nothing or
+    // silently crits on every swing depending on which half is missing.
+    const hasCritDamage = level.critDamage != null;
+    const hasCritCadence = level.critEveryNthHit != null;
+    must(
+      hasCritDamage === hasCritCadence,
+      lw + ': a critical hit needs both its damage and how often it lands, and has only one',
+    );
+    if (hasCritDamage && hasCritCadence) {
+      must(level.critDamage > level.damage, lw + ': a critical hit that deals no more than an ordinary one');
+      must(level.critEveryNthHit >= 2, lw + ': a critical hit every hit is not a critical hit');
+    }
+
     must(
       !earnsInsteadOfShooting || level.range === 0,
       lw + ': a tower that earns rather than shoots should have no range; it never acquires a target',

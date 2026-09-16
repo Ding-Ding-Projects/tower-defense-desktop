@@ -230,6 +230,11 @@ export function extractLevels(html) {
     // tower that is supposed to take a second to get going opens fire instantly.
     const iSpin = firstCol('spin time', 'charge-up');
 
+    // The damage a critical hit deals, taken as its own figure rather than computed
+    // from the multiplier beside it. At Warden's level 2 the listed crit is 23 where
+    // 15 times 1.5 is 22.5, and it is the 23 that reproduces the published rate.
+    const iCrit = col('critical damage');
+
     const levels = [];
     for (const row of rows.slice(1)) {
       const level = money(row[iLevel]);
@@ -245,6 +250,10 @@ export function extractLevels(html) {
       if (iAoe >= 0) {
         const aoe = money(row[iAoe]);
         if (aoe !== null && aoe > 0) entry.aoeRadius = aoe;
+      }
+      if (iCrit >= 0) {
+        const crit = money(row[iCrit]);
+        if (crit !== null && crit > 0) entry.critDamage = crit;
       }
       if (iSpin >= 0) {
         const spin = money(row[iSpin]);

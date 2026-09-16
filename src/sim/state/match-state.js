@@ -48,6 +48,7 @@ import { secondsToTicks } from '../core/constants.js';
  * @property {number} cooldownTicks   ticks until the next shot is allowed
  * @property {number} spinUpTicks     ticks of continuous target contact so far
  * @property {number} burstLeft
+ * @property {number} hitsLanded        total shots fired, for the critical-hit cadence
  * @property {number} reloadTicks
  * @property {number} abilityCooldownTicks
  * @property {number} totalSpent      what a sale refunds a percentage of

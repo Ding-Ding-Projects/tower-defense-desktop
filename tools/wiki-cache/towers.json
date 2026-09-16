@@ -173,6 +173,7 @@
       ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "kind": "income",
       "id": "farm",
       "displayName": "Farm",
@@ -208,8 +209,7 @@
           "cost": 4500,
           "incomePerWave": 1500
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
       "retrievedAt": "2026-09-16",
@@ -974,6 +974,60 @@
           "pageDps": 566.67
         }
       ]
+    },
+    {
+      "kind": "attack",
+      "id": "warden",
+      "displayName": "Warden",
+      "url": "https://tds.fandom.com/wiki/Warden",
+      "levels": [
+        {
+          "level": 0,
+          "cost": 1000,
+          "damage": 6,
+          "shotIntervalSeconds": 0.65,
+          "range": 6,
+          "critDamage": 9,
+          "pageDps": 10.77
+        },
+        {
+          "level": 1,
+          "cost": 350,
+          "damage": 8,
+          "shotIntervalSeconds": 0.65,
+          "range": 6,
+          "critDamage": 12,
+          "pageDps": 14.36
+        },
+        {
+          "level": 2,
+          "cost": 1250,
+          "damage": 15,
+          "shotIntervalSeconds": 0.6,
+          "range": 7,
+          "critDamage": 23,
+          "pageDps": 29.44
+        },
+        {
+          "level": 3,
+          "cost": 4500,
+          "damage": 34,
+          "shotIntervalSeconds": 0.6,
+          "range": 7,
+          "critDamage": 51,
+          "pageDps": 66.11
+        },
+        {
+          "level": 4,
+          "cost": 17500,
+          "damage": 80,
+          "shotIntervalSeconds": 0.5,
+          "range": 7.5,
+          "critDamage": 120,
+          "pageDps": 186.67
+        }
+      ],
+      "retrievedAt": "2026-09-16"
     }
   ]
 }

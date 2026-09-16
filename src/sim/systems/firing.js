@@ -98,8 +98,9 @@ export function fireTowers(state, gameData) {
  * @param {import('../state/match-state.js').Enemy} target
  */
 function shoot(state, gameData, tower, level, stats, target) {
+  const damage = damageForThisHit(tower, level, stats.damage);
   if (!level.projectileSpeed) {
-    resolveHit(state, gameData, tower.seq, target, stats.damage, level);
+    resolveHit(state, gameData, tower.seq, target, damage, level);
     return;
   }
   state.projectiles.push({
@@ -109,13 +110,43 @@ function shoot(state, gameData, tower, level, stats, target) {
     yFixed: tower.yFixed,
     targetSeq: target.seq,
     speedFixed: toFixed(level.projectileSpeed * TICK_SECONDS),
-    damage: stats.damage,
+    damage,
     aoeRadiusFixed: level.aoeRadius ? toFixed(level.aoeRadius) : 0,
     pierceLeft: level.pierceCount ?? 1,
     appliesStatuses: level.appliesStatuses ?? [],
     statusTicks: level.statusDurationSeconds ? secondsToTicks(level.statusDurationSeconds) : 0,
     bonusVsTag: level.bonusVsTag ?? null,
   });
+}
+
+/**
+ * The damage this particular shot carries, counting critical hits.
+ *
+ * A crit lands on a fixed cadence rather than on a die roll. That is not a
+ * simplification for determinism's sake -- the simulation has a seeded stream and could
+ * roll -- it is what the source's own numbers describe. Warden lists 6 damage, a
+ * critical hit of 9, and 10.77 damage per second at a 0.65 second swing; 6 over 0.65 is
+ * 9.23, and the published figure is reached exactly when every third swing deals the 9.
+ * The same holds at all five of its levels, which a probability would not do.
+ *
+ * Using the page's OWN critical damage rather than multiplying is deliberate: at level
+ * 2 the listed crit is 23 where 15 times 1.5 is 22.5, and it is the 23 that reproduces
+ * the published rate.
+ *
+ * @param {import('../state/match-state.js').Tower} tower
+ * @param {import('../../data/schema/types.js').TowerLevel} level
+ * @param {number} baseDamage  after auras and buffs
+ * @returns {number}
+ */
+function damageForThisHit(tower, level, baseDamage) {
+  tower.hitsLanded = (tower.hitsLanded ?? 0) + 1;
+  const every = level.critEveryNthHit ?? 0;
+  if (every < 2 || !level.critDamage) return baseDamage;
+  if (tower.hitsLanded % every !== 0) return baseDamage;
+  // Scaled by whatever the buffs did to the base, so a damage aura lifts a crit too
+  // rather than being silently dropped on every third swing.
+  const scale = level.damage > 0 ? baseDamage / level.damage : 1;
+  return Math.round(level.critDamage * scale);
 }
 
 /**

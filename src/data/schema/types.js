@@ -60,6 +60,8 @@
  * @property {boolean} hitsAir
  * @property {number} [spinUpSeconds]   time to reach full fire rate after acquiring
  * @property {number} [burstCount]      shots per burst
+ * @property {number} [critDamage]       damage on a critical hit, replacing `damage`
+ * @property {number} [critEveryNthHit]  how often a hit crits: 3 means every third one
  * @property {number} [reloadSeconds]   pause after a burst
  * @property {number} [projectileSpeed] map units per second; omitted means hitscan
  * @property {number} [aoeRadius]
