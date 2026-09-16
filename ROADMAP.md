@@ -112,43 +112,46 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 
 ## Known open gaps
 
-- [ ] Most of `src/render` and `src/ui` are still outside the TypeScript check. They
-  were written while it covered the simulation and its data only, and bringing the
-  whole of both directories in at once reports 800 errors: about 520 are missing
-  annotations rather than defects, and roughly 280 are real (values used without a null
-  check, properties read off the wrong shape, types that do not flow through). They are
-  covered by behaviour checks, which is not the same thing.
+- [ ] Thirteen of the forty-three files in `src/render` and `src/ui` are still outside
+  the TypeScript check: `app.js`, the Material Design component wrappers, and a handful
+  of smaller interface modules. Thirty are in, including the whole art directory, the
+  whole interface layer and the renderer.
 
-  It is now a ratchet rather than an open hole. `tsconfig.render.json` carries an
-  explicit list of the files that DO pass, runs as part of `npm run typecheck`, and
-  `tests/ui/typecheck-ratchet.test.js` refuses to let a file be quietly dropped from
-  that list to make a red check green. Twenty of the forty-three are in, including the
-  whole of the interface's own widget, overlay, top-bar and accessibility-mirror code.
-  The rest go in one at a time; `renderer.js` alone is 388 of the remainder, and the
-  shop and tower panel pull in the art modules behind them.
+  It is a ratchet, not an open hole. `tsconfig.render.json` lists the files that pass,
+  runs as part of `npm run typecheck`, and `tests/ui/typecheck-ratchet.test.js` refuses
+  to let one be quietly dropped from that list to make a red check green.
 
-  Bringing them in keeps paying for itself, and none of what it found was an
-  annotation problem:
+  Nothing it found was a missing annotation. The full list, because each is the kind of
+  defect that produces no error and no red check:
 
   - `sim-interface.js` had a `@typedef` whose type expression spanned several lines,
-    which does not parse. The compiler stopped at the first line break and then could
-    not find `Command` at all, so every signature mentioning it had silently lost its
-    type.
+    which does not parse. The compiler stopped at the first line break and could not
+    find `Command` at all, so every signature mentioning it had silently lost its type.
+  - `renderer.js` read the 2D context from the canvas and never checked it. Every one
+    of its methods was reaching into something that can be null.
+  - `renderer.js` set `dpr`, `cssWidth` and `cssHeight` only in `resize()`, so drawing
+    before the first resize computes with undefined, and undefined arithmetic gives NaN
+    coordinates: a blank frame with nothing to say about it.
+  - An effect's lifetime was optional in its shape and divided by unconditionally.
+    Dividing by undefined gives NaN, which compares false against every threshold, so
+    the effect would never expire and would be redrawn forever.
   - `object-pool.js` declared its type parameter on the constructor, which TypeScript
     rejects outright. `T` then existed nowhere, so both pools in `particles.js` were
-    handing out untyped objects with nothing objecting.
-  - `Widget` never declared the `_draw` its own `draw` calls, so a subclass that
-    forgot to provide one would have failed at run time in silence.
+    handing out untyped objects.
+  - `Widget` never declared the `_draw` its own `draw` calls, so a subclass that forgot
+    to provide one would have failed at run time in silence.
   - `Button` took its parameter types from its own default values, so `action` was
     typed `null` and every real action assigned to it was an error nobody was shown.
-  - `hash2` was annotated as taking a numeric seed while callers pass a composed
-    string to get two independent streams out of one seed.
-  - Fixed-point coordinates were declared as plain numbers with the truth in a comment
-    beside them.
+  - The tower panel built a control with a label of `x ? undefined : undefined`,
+    overwritten on the next line, which left every control appended after it a type
+    error.
+  - The shop's entry map declared five of the seven fields the code actually stores.
   - `colorDistance` had adopted `mixColors`' documentation, because it was inserted
-    directly beneath that block and a doc comment attaches to whatever follows it. It
-    was documented as taking a `t` it does not have and returning a string when it
-    returns a number.
+    directly beneath that block and a doc comment attaches to whatever follows it.
+  - `hash2` was annotated as taking a numeric seed while callers pass composed strings.
+  - `fbm2D` derived each octave's seed with `seed + o * 101`, which is addition for a
+    number and concatenation for a string: two derivations behind one expression.
+  - Fixed-point coordinates were declared as plain numbers with the truth in a comment.
 
 ## Deliberately not doing
 
