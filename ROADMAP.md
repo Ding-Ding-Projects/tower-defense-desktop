@@ -35,7 +35,10 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 ## Phase 3: the roster
 
 - [x] Status effect rows, each cited
-- [x] First tranche of towers, each cited (12 of roughly 40)
+- [x] First tranche of towers, each cited (17 of roughly 40)
+- [x] Tower detection, footprint and sell refund read off the page instead of hand-written
+- [x] Every shipped level cross-checked against its page's own damage-per-second column
+      (83 levels; Cowboy excluded by name, with its arithmetic recorded)
 - [x] First tranche of enemies including bosses, each cited (10, including 3 bosses)
 - [x] Two maps with real lanes and placement zones
 - [x] Every difficulty as its own row
@@ -48,6 +51,8 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] Canvas renderer with interpolation decoupled from the simulation rate
 - [x] Procedural sprites cached to offscreen canvases, with pooled projectiles
 - [x] Material Design 3 interface: shop, tower panel, heads-up display
+- [x] Shop cards and the upgrade panel draw the real tower sprite, not a lettered box
+- [x] Every tower visually distinct, including towers sharing all mechanical stats
 - [x] Every state real: wave start, clear, victory, defeat, pause, settings
 - [ ] Frameless window with a custom title bar
 - [ ] Verified at 100, 125, 150 and 200 percent display scale with no clipping
