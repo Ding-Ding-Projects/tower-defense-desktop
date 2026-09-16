@@ -187,3 +187,29 @@ test('every shipped level reproduces the damage per second its page states', () 
     );
   }
 });
+
+test('the farm earns rather than shoots, and its income is the page figure', () => {
+  // The first tower in the roster that deals no damage at all. It is a data row like
+  // any other, but only once the scraper reads the right column: its table has no
+  // damage, rate or range column, so the main extractor passed straight over it and
+  // reported the page as having no statistics at all.
+  const farm = RAW.towers.find((t) => t.id === 'farm');
+  assert.ok(farm, 'the farm is not in the roster');
+
+  for (const level of farm.levels) {
+    assert.equal(level.damage, 0, 'a farm deals no damage');
+    assert.equal(level.fireRate, 0, 'and never fires');
+    assert.equal(level.range, 0, 'and never acquires a target');
+    assert.ok(level.incomePerWave > 0, 'level ' + level.level + ' earns nothing, so it does nothing at all');
+  }
+
+  // The exact figures off the page, so a silently rescaled economy turns this red.
+  assert.equal(farm.baseCost, 300);
+  assert.deepEqual(
+    farm.levels.map((l) => l.incomePerWave),
+    [60, 100, 225, 500, 900, 1500],
+  );
+  // It competes with other farms for slots, not with the guns.
+  assert.equal(farm.placementPool, 'economy');
+  assert.equal(farm.maxCount, 8);
+});

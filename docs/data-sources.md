@@ -183,10 +183,18 @@ a line of data and others need the engine to grow a feature it does not have.
 
 ### Shipped since
 
-Paintballer, Demoman, Mortar and Rocketeer are in the game. Their tables head the damage
+Paintballer, Demoman, Mortar and Rocketeer are in the game, and so is Farm. Their tables head the damage
 column "Splash Damage" and carry the blast size in "Explosion Range", which is read
 rather than hand-written, and each reproduces its page's damage-per-second column at
 every level.
+
+Farm needed a second reader rather than a wider column list. Its table carries no
+damage, no rate and no range at all, so the damage-shaped extractor passed straight
+over it and reported the page as having no statistics; it is not a tower with missing
+numbers, it is a different kind of tower. The engine already had `incomePerWave`, so
+once the income column is read it is a data row like any other. The validator's rule
+that a fire rate of zero never shoots now asks whether the tower earns instead, and
+still bites for anything that is supposed to shoot.
 
 ### Blocked on an engine feature, not on data
 
@@ -197,7 +205,6 @@ every level.
 | Pyromancer | Burn damage, burn time, tick rate and defence melt as one coherent status. The status registry can carry a burn, but not the defence melt. |
 | Military Base | Friendly units. It spawns them; nothing in the simulation fights on the player's side. |
 | Medic | Healing and shield recharge for other towers. Auras can buff a stat; nothing repairs. |
-| Farm | No damage at all, only income. The schema has `incomePerWave`, so this is the closest of the group, but the scraper is shaped around a damage table and would need its own reader. |
 
 ### Page layout not yet understood
 

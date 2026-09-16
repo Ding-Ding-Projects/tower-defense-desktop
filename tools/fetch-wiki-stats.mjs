@@ -273,11 +273,62 @@ export function extractLevels(html) {
  * @param {string} name
  * @returns {{ id: string, displayName: string, url: string, levels: Array<Record<string, number>> }}
  */
+/**
+ * Read a support tower's table: the ones that earn money rather than deal damage.
+ *
+ * Farm has no damage column, no rate column and no range column, so the main extractor
+ * passes straight over its table and reports the page as having none. That reads like a
+ * missing source and is really a different KIND of tower: the engine already carries
+ * `incomePerWave`, so a farm is a data row like any other once somebody reads the right
+ * column.
+ *
+ * @param {string} html
+ * @returns {Array<Record<string, number>>}
+ */
+export function extractIncomeLevels(html) {
+  const tables = html.match(/<table[\s\S]*?<\/table>/g) || [];
+  for (const table of tables) {
+    const rows = tableToRows(table).filter((r) => r.length > 0);
+    if (rows.length < 2) continue;
+    const header = rows[0].map(normaliseHeader);
+    const iLevel = header.indexOf('level');
+    const iCost = header.indexOf('cost');
+    const iIncome = header.indexOf('income');
+    if (iLevel < 0 || iCost < 0 || iIncome < 0) continue;
+
+    const levels = [];
+    for (const row of rows.slice(1)) {
+      const level = money(row[iLevel]);
+      const cost = money(row[iCost]);
+      const income = money(row[iIncome]);
+      if (level === null || cost === null || income === null) continue;
+      levels.push({ level, cost, incomePerWave: income });
+    }
+    if (levels.length > 0) return levels;
+  }
+  return [];
+}
+
+/**
+ * @param {string} name
+ * @returns {{ id: string, displayName: string, url: string, levels: Array<Record<string, number>>, kind: string }}
+ */
 export function scrapeTower(name) {
   const url = 'https://tds.fandom.com/wiki/' + encodeURIComponent(name.replace(/ /g, '_'));
   const html = fetchPage(url);
-  const levels = extractLevels(html);
+  let kind = 'attack';
+  let levels = extractLevels(html);
+  if (levels.length === 0) {
+    // Falls back rather than giving up. A page with no damage table is not necessarily
+    // a page with no statistics; it may simply be a tower that does not shoot.
+    const income = extractIncomeLevels(html);
+    if (income.length > 0) {
+      levels = income;
+      kind = 'income';
+    }
+  }
   return {
+    kind,
     id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     displayName: name,
     url,

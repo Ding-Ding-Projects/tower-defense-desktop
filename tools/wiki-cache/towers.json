@@ -2,6 +2,7 @@
   "retrievedAt": "2026-09-16",
   "results": [
     {
+      "retrievedAt": "2026-09-16",
       "id": "cowboy",
       "displayName": "Cowboy",
       "url": "https://tds.fandom.com/wiki/Cowboy",
@@ -60,10 +61,10 @@
           "spinUpSeconds": 1,
           "pageDps": 59.38
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "demoman",
       "displayName": "Demoman",
       "url": "https://tds.fandom.com/wiki/Demoman",
@@ -113,10 +114,10 @@
           "aoeRadius": 5.5,
           "pageDps": 35
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "electroshocker",
       "displayName": "Electroshocker",
       "url": "https://tds.fandom.com/wiki/Electroshocker",
@@ -169,10 +170,49 @@
           "range": 15,
           "pageDps": 36
         }
+      ]
+    },
+    {
+      "kind": "income",
+      "id": "farm",
+      "displayName": "Farm",
+      "url": "https://tds.fandom.com/wiki/Farm",
+      "levels": [
+        {
+          "level": 0,
+          "cost": 300,
+          "incomePerWave": 60
+        },
+        {
+          "level": 1,
+          "cost": 200,
+          "incomePerWave": 100
+        },
+        {
+          "level": 2,
+          "cost": 600,
+          "incomePerWave": 225
+        },
+        {
+          "level": 3,
+          "cost": 1250,
+          "incomePerWave": 500
+        },
+        {
+          "level": 4,
+          "cost": 2500,
+          "incomePerWave": 900
+        },
+        {
+          "level": 5,
+          "cost": 4500,
+          "incomePerWave": 1500
+        }
       ],
       "retrievedAt": "2026-09-16"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "freezer",
       "displayName": "Freezer",
       "url": "https://tds.fandom.com/wiki/Freezer",
@@ -222,10 +262,10 @@
           "burstCount": 8,
           "reloadSeconds": 0.6
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "gatling-gun",
       "displayName": "Gatling Gun",
       "url": "https://tds.fandom.com/wiki/Gatling_Gun",
@@ -300,10 +340,10 @@
           "burstCount": 600,
           "reloadSeconds": 6
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "hunter",
       "displayName": "Hunter",
       "url": "https://tds.fandom.com/wiki/Hunter",
@@ -348,10 +388,10 @@
           "range": 27.5,
           "pageDps": 125
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "militant",
       "displayName": "Militant",
       "url": "https://tds.fandom.com/wiki/Militant",
@@ -396,10 +436,10 @@
           "range": 20,
           "pageDps": 68.57
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "minigunner",
       "displayName": "Minigunner",
       "url": "https://tds.fandom.com/wiki/Minigunner",
@@ -444,10 +484,10 @@
           "range": 21,
           "pageDps": 160
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "mortar",
       "displayName": "Mortar",
       "url": "https://tds.fandom.com/wiki/Mortar",
@@ -506,10 +546,10 @@
           "aoeRadius": 9,
           "pageDps": 85.45
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "paintballer",
       "displayName": "Paintballer",
       "url": "https://tds.fandom.com/wiki/Paintballer",
@@ -568,10 +608,10 @@
           "aoeRadius": 5,
           "pageDps": 28.57
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "ranger",
       "displayName": "Ranger",
       "url": "https://tds.fandom.com/wiki/Ranger",
@@ -616,10 +656,10 @@
           "range": 70,
           "aoeRadius": 5
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "rocketeer",
       "displayName": "Rocketeer",
       "url": "https://tds.fandom.com/wiki/Rocketeer",
@@ -670,10 +710,10 @@
           "pageDps": 84.44,
           "burstCount": 4
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "scout",
       "displayName": "Scout",
       "url": "https://tds.fandom.com/wiki/Scout",
@@ -718,10 +758,10 @@
           "range": 16,
           "pageDps": 24.62
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "shotgunner",
       "displayName": "Shotgunner",
       "url": "https://tds.fandom.com/wiki/Shotgunner",
@@ -771,10 +811,10 @@
           "pageDps": 210,
           "burstCount": 12
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "sniper",
       "displayName": "Sniper",
       "url": "https://tds.fandom.com/wiki/Sniper",
@@ -819,10 +859,10 @@
           "range": 45,
           "pageDps": 31.25
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "soldier",
       "displayName": "Soldier",
       "url": "https://tds.fandom.com/wiki/Soldier",
@@ -877,10 +917,10 @@
           "burstCount": 12,
           "reloadSeconds": 0.4
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "turret",
       "displayName": "Turret",
       "url": "https://tds.fandom.com/wiki/Turret",
@@ -933,8 +973,7 @@
           "range": 27,
           "pageDps": 566.67
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     }
   ]
 }

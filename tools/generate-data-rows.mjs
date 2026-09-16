@@ -52,6 +52,9 @@ const OVERLAY = {
   demoman: { terrain: ['ground'], pool: 'default', max: null },
   mortar: { terrain: ['ground'], pool: 'default', max: null },
   rocketeer: { terrain: ['ground'], pool: 'default', max: null },
+  // The shared economy cap, which is what the placementPool field exists for: farms
+  // compete with each other for a limited number of slots rather than with the guns.
+  farm: { terrain: ['ground'], pool: 'economy', max: 8 },
 };
 
 const ALL_MODES = ['first', 'last', 'closest', 'strongest', 'weakest'];
@@ -96,15 +99,27 @@ function toLevel(row, overlay, attributes, source) {
   const level = {
     level: row.level,
     cost: row.cost,
-    damage: row.damage,
+    // A support tower has no damage, rate or range column at all, and zero is the
+    // honest value rather than a missing one: a farm genuinely deals no damage and
+    // genuinely has no reach. The simulation already treats a zero-range tower as one
+    // that never acquires a target.
+    damage: row.damage ?? 0,
     // The wiki column is a cooldown in seconds; the simulation wants shots per
     // second. One division, in exactly one place, so it cannot be applied twice.
     fireRate: row.shotIntervalSeconds > 0 ? Number((1 / row.shotIntervalSeconds).toFixed(4)) : 0,
-    range: row.range,
+    range: row.range ?? 0,
     detectsHidden: detectionAtLevel(attributes.hidden, row.level),
     hitsAir: detectionAtLevel(attributes.flying, row.level),
-    source: { ...source, notes: 'upgrade table; firerate column read as a cooldown in seconds' },
+    source: {
+      ...source,
+      notes: row.incomePerWave
+        // A support tower's table has no firerate column to misread, and saying it did
+        // would be a citation for a column that is not on the page.
+        ? 'upgrade table; the income column is the cash paid at the end of each wave'
+        : 'upgrade table; firerate column read as a cooldown in seconds',
+    },
   };
+  if (row.incomePerWave) level.incomePerWave = row.incomePerWave;
   if (row.aoeRadius) level.aoeRadius = row.aoeRadius;
   if (row.spinUpSeconds) level.spinUpSeconds = row.spinUpSeconds;
   if (row.burstCount && row.burstCount > 1) {

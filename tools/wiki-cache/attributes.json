@@ -2,6 +2,7 @@
   "retrievedAt": "2026-09-16",
   "results": [
     {
+      "retrievedAt": "2026-09-16",
       "id": "cowboy",
       "displayName": "Cowboy",
       "url": "https://tds.fandom.com/wiki/Cowboy",
@@ -25,10 +26,10 @@
       "baseCost": 550,
       "baseSell": 183,
       "refundRatio": 0.3327,
-      "immunities": "Partial Debuff",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Partial Debuff"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "demoman",
       "displayName": "Demoman",
       "url": "https://tds.fandom.com/wiki/Demoman",
@@ -52,10 +53,10 @@
       "baseCost": 700,
       "baseSell": 233,
       "refundRatio": 0.3329,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "electroshocker",
       "displayName": "Electroshocker",
       "url": "https://tds.fandom.com/wiki/Electroshocker",
@@ -79,10 +80,37 @@
       "baseCost": 650,
       "baseSell": 216,
       "refundRatio": 0.3323,
-      "immunities": "None",
+      "immunities": "None"
+    },
+    {
+      "id": "farm",
+      "displayName": "Farm",
+      "url": "https://tds.fandom.com/wiki/Farm",
+      "hidden": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1.75,
+      "footprintRaw": "Above Average (1.75)",
+      "baseCost": 300,
+      "baseSell": 100,
+      "refundRatio": 0.3333,
+      "immunities": "Stun Immune",
       "retrievedAt": "2026-09-16"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "freezer",
       "displayName": "Freezer",
       "url": "https://tds.fandom.com/wiki/Freezer",
@@ -106,10 +134,10 @@
       "baseCost": 450,
       "baseSell": 150,
       "refundRatio": 0.3333,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "gatling-gun",
       "displayName": "Gatling Gun",
       "url": "https://tds.fandom.com/wiki/Gatling_Gun",
@@ -133,10 +161,10 @@
       "baseCost": 5250,
       "baseSell": 1750,
       "refundRatio": 0.3333,
-      "immunities": "Stun",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Stun"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "hunter",
       "displayName": "Hunter",
       "url": "https://tds.fandom.com/wiki/Hunter",
@@ -160,10 +188,10 @@
       "baseCost": 1625,
       "baseSell": 541,
       "refundRatio": 0.3329,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "militant",
       "displayName": "Militant",
       "url": "https://tds.fandom.com/wiki/Militant",
@@ -187,10 +215,10 @@
       "baseCost": 600,
       "baseSell": 200,
       "refundRatio": 0.3333,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "minigunner",
       "displayName": "Minigunner",
       "url": "https://tds.fandom.com/wiki/Minigunner",
@@ -214,10 +242,10 @@
       "baseCost": 1850,
       "baseSell": 616,
       "refundRatio": 0.333,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "mortar",
       "displayName": "Mortar",
       "url": "https://tds.fandom.com/wiki/Mortar",
@@ -241,10 +269,10 @@
       "baseCost": 1000,
       "baseSell": 333,
       "refundRatio": 0.333,
-      "immunities": "Stun",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Stun"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "paintballer",
       "displayName": "Paintballer",
       "url": "https://tds.fandom.com/wiki/Paintballer",
@@ -268,10 +296,10 @@
       "baseCost": 100,
       "baseSell": 33,
       "refundRatio": 0.33,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "ranger",
       "displayName": "Ranger",
       "url": "https://tds.fandom.com/wiki/Ranger",
@@ -295,10 +323,10 @@
       "baseCost": 4500,
       "baseSell": 1500,
       "refundRatio": 0.3333,
-      "immunities": "Stun",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Stun"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "rocketeer",
       "displayName": "Rocketeer",
       "url": "https://tds.fandom.com/wiki/Rocketeer",
@@ -322,10 +350,10 @@
       "baseCost": 2000,
       "baseSell": 666,
       "refundRatio": 0.333,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "scout",
       "displayName": "Scout",
       "url": "https://tds.fandom.com/wiki/Scout",
@@ -349,10 +377,10 @@
       "baseCost": 125,
       "baseSell": 41,
       "refundRatio": 0.328,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "shotgunner",
       "displayName": "Shotgunner",
       "url": "https://tds.fandom.com/wiki/Shotgunner",
@@ -376,10 +404,10 @@
       "baseCost": 1500,
       "baseSell": 500,
       "refundRatio": 0.3333,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "sniper",
       "displayName": "Sniper",
       "url": "https://tds.fandom.com/wiki/Sniper",
@@ -403,10 +431,10 @@
       "baseCost": 450,
       "baseSell": 150,
       "refundRatio": 0.3333,
-      "immunities": "Stun",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Stun"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "soldier",
       "displayName": "Soldier",
       "url": "https://tds.fandom.com/wiki/Soldier",
@@ -430,10 +458,10 @@
       "baseCost": 400,
       "baseSell": 133,
       "refundRatio": 0.3325,
-      "immunities": "None",
-      "retrievedAt": "2026-09-16"
+      "immunities": "None"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "turret",
       "displayName": "Turret",
       "url": "https://tds.fandom.com/wiki/Turret",
@@ -457,8 +485,7 @@
       "baseCost": 7750,
       "baseSell": 2583,
       "refundRatio": 0.3333,
-      "immunities": "Partial Debuff",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Partial Debuff"
     }
   ]
 }

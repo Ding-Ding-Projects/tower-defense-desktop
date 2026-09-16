@@ -105,7 +105,18 @@ for (const raw of RAW.towers) {
     must(level.range >= 0, lw + ': negative range');
     must(level.cost >= 0, lw + ': negative cost');
     must(i === 0 || level.cost > 0, lw + ': an upgrade that costs nothing is free power');
-    must(level.fireRate > 0, lw + ': a fire rate of zero never shoots');
+    // A support tower earns money and never fires, so zero is its honest rate. The rule
+    // still bites for anything that is supposed to shoot: a gun with a rate of zero is
+    // a gun that silently does nothing, which is exactly what this was written to catch.
+    const earnsInsteadOfShooting = (level.incomePerWave ?? 0) > 0 && level.damage === 0;
+    must(
+      earnsInsteadOfShooting || level.fireRate > 0,
+      lw + ': a fire rate of zero never shoots, and this tower has no income to earn instead',
+    );
+    must(
+      !earnsInsteadOfShooting || level.range === 0,
+      lw + ': a tower that earns rather than shoots should have no range; it never acquires a target',
+    );
     for (const statusId of level.appliesStatuses ?? []) {
       must(data.statuses.has(statusId), lw + ': applies unknown status ' + statusId);
     }
