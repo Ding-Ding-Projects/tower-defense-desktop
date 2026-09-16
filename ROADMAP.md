@@ -70,7 +70,19 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
       pre-scale coordinates against the full window, so every scale above 1 passed
       trivially. Once it was measuring the right thing it found real clipping, and the
       sidebar now gives the upgrade panel the height it measures instead of half
-- [ ] Keyboard reachable end to end with visible focus and correct roles
+- [x] Keyboard reachable end to end, checked by `tests/hud/keyboard-reach.test.js`.
+      The interface is painted on a canvas, so nothing in it is focusable on its own
+      and reachability rests entirely on the hidden mirror of real buttons. The check
+      sweeps the viewport with hit tests and asserts that every action a click can
+      produce is also one the mirror offers, which is the one failure the arrangement
+      invites: a control added to the drawing and forgotten in the mirror works
+      perfectly with a mouse and does not exist at all without one. Proven by removing
+      the tower panel from the mirror and watching it name the three controls that
+      became unreachable. It also checks every mirrored control is a real button with a
+      usable name, that a disabled control is announced as disabled rather than only
+      greyed, that the pause control renames itself so its name matches what it does,
+      and that a modal overlay replaces the controls behind it rather than leaving them
+      reachable
 
 ## Phase 5: shipping
 
