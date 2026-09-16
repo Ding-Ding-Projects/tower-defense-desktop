@@ -93,6 +93,11 @@ export function wrappedTextHeight(lineCount, lineHeight) {
   return Math.max(1, lineCount) * lineHeight;
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('./layout.js').Rect} rect
+ * @param {number} radius
+ */
 function traceRoundedRect(ctx, rect, radius) {
   const r = Math.max(0, Math.min(radius, rect.width / 2, rect.height / 2));
   const { x, y, width: w, height: h } = rect;
@@ -141,6 +146,11 @@ class Widget {
     this._draw(ctx, rect, state);
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean}
+   */
   contains(x, y) {
     return containsPoint(this.rect, x, y);
   }
@@ -148,7 +158,12 @@ class Widget {
 
 /** A bevelled panel with an inner shadow and a hairline border. */
 export class Panel extends Widget {
-  /** @override */
+  /**
+   * @override
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {any} state
+   */
   _draw(ctx, rect, state) {
     const { radius = 10, elevated = false } = state;
     ctx.save();
@@ -213,7 +228,12 @@ export class Button extends Widget {
     this.pressed = false;
   }
 
-  /** @override */
+  /**
+   * @override
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {any} state
+   */
   _draw(ctx, rect, state) {
     const visual = resolveButtonVisualState({ disabled: state.disabled, pressed: state.pressed ?? this.pressed, hovered: state.hovered ?? this.hovered });
     ctx.save();
@@ -259,7 +279,12 @@ export class Button extends Widget {
 
 /** A horizontal progress bar (used for hp readouts, cooldowns, XP-style meters). */
 export class ProgressBar extends Widget {
-  /** @override */
+  /**
+   * @override
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {any} state
+   */
   _draw(ctx, rect, state) {
     const ratio = Math.min(1, Math.max(0, state.ratio ?? 0));
     ctx.save();
@@ -290,7 +315,12 @@ export class ProgressBar extends Widget {
  * because an empty bevelled box is worse than an initial.
  */
 export class IconSlot extends Widget {
-  /** @override */
+  /**
+   * @override
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {any} state
+   */
   _draw(ctx, rect, state) {
     ctx.save();
     traceRoundedRect(ctx, rect, 6);
@@ -351,7 +381,12 @@ export class IconSlot extends Widget {
  * it never draws outside `state.bounds` when supplied.
  */
 export class Tooltip extends Widget {
-  /** @override */
+  /**
+   * @override
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {any} state
+   */
   _draw(ctx, rect, state) {
     const text = state.text ?? '';
     if (!text) return;

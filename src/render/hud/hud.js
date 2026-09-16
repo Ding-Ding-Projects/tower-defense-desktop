@@ -19,6 +19,18 @@ const BUTTON_WIDTH = 130;
 const BUTTON_HEIGHT = 30;
 const ROW_HEIGHT = 32;
 
+/**
+ * What the top bar says the match is currently doing.
+ * @typedef {{
+ *   cash: number, lives: number, waveIndex: number, totalWaves: number,
+ *   phase: string, intermissionSecondsRemaining: number, paused: boolean,
+ * }} HudState
+ */
+
+/**
+ * @param {HudState} state
+ * @returns {string}
+ */
 function phaseLabel(state) {
   if (state.phase === 'intermission') return `Next wave in ${Math.ceil(state.intermissionSecondsRemaining)}s`;
   if (state.phase === 'active') return 'Wave in progress';
@@ -34,6 +46,10 @@ export class GameHud {
     this._skipDisabled = true;
   }
 
+  /**
+   * @param {HudState} state
+   * @returns {{ label: string, value: string }[]}
+   */
   _statsOf(state) {
     return [
       { label: 'Cash', value: `$${Math.floor(state.cash)}` },
@@ -49,7 +65,7 @@ export class GameHud {
    * for the HUD before laying out everything below it.
    * @param {CanvasRenderingContext2D} ctx
    * @param {number} width
-   * @param {object} state
+   * @param {HudState} state
    * @returns {{barHeight: number, fitsOneRow: boolean, statWidths: number[], totalStatsWidth: number, buttonsWidth: number}}
    */
   measureLayout(ctx, width, state) {
@@ -68,7 +84,7 @@ export class GameHud {
   /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {number} width
-   * @param {object} state
+   * @param {HudState} state
    * @returns {number}
    */
   measureBarHeight(ctx, width, state) {
@@ -118,6 +134,12 @@ export class GameHud {
     ctx.restore();
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {number} x
+   * @param {number} y  the baseline between the label and its value
+   * @param {{ label: string, value: string }} stat
+   */
   _drawStat(ctx, x, y, stat) {
     ctx.font = '400 11px "Roboto", system-ui, sans-serif';
     ctx.fillStyle = PALETTE.textMuted;
@@ -127,6 +149,11 @@ export class GameHud {
     ctx.fillText(stat.value, x, y + 7);
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {HudState} state
+   */
   _drawButtons(ctx, rect, state) {
     const [skipRect, pauseRect] = row(rect, [BUTTON_WIDTH, BUTTON_WIDTH], PADDING);
     this._skipDisabled = state.phase !== 'intermission';
@@ -156,12 +183,19 @@ export class GameHud {
     return null;
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
   setHover(x, y) {
     this._skipButton.hovered = this._skipButton.contains(x, y);
     this._pauseButton.hovered = this._pauseButton.contains(x, y);
   }
 
-  /** @returns {{key: string, label: string, disabled: boolean, action: object}[]} */
+  /**
+   * @param {boolean} paused
+   * @returns {{key: string, label: string, disabled: boolean, action: object}[]}
+   */
   accessibilityControls(paused) {
     return [
       { key: 'hud-skip', label: 'Skip intermission', disabled: this._skipDisabled, action: { kind: 'skipIntermission' } },

@@ -21,6 +21,17 @@ const BUTTON_HEIGHT = 40;
 
 // Exported so a check can assert the exact wording without a canvas. A check that
 // cannot reach the thing it is checking finds a way to pass anyway.
+/**
+ * What each overlay is told about the moment it is describing.
+ * @typedef {{
+ *   waveIndex?: number,
+ *   totalWaves?: number,
+ *   completionBonus?: number,
+ *   leaked?: number,
+ * }} OverlayPayload
+ */
+
+/** @type {Record<string, { headline: (p: OverlayPayload) => string, body: (p: OverlayPayload) => string, actionLabel: string }>} */
 export const COPY = {
   waveStart: {
     headline: (p) => `Wave ${p.waveIndex} of ${p.totalWaves || p.waveIndex}`,
@@ -147,6 +158,10 @@ export class OverlayHud {
     return null;
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
   setHover(x, y) {
     this._button.hovered = this._button.contains(x, y);
   }
@@ -163,6 +178,13 @@ export class OverlayHud {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string} text
+ * @param {number} cx  the centre the lines are centred on
+ * @param {number} y
+ * @param {number} maxWidth
+ */
 function wrapCentered(ctx, text, cx, y, maxWidth) {
   const words = String(text).split(/\s+/).filter(Boolean);
   const lines = [];

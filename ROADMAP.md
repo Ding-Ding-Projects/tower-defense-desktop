@@ -101,7 +101,14 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] Social embed graphic with server-rendered metadata
 - [x] Offline in-app documentation browser with a completeness check
 - [x] Real captures of the real built program in the readme
-- [ ] Screen recording of the real built program
+- [ ] Screen recording of the real built program. Blocked on two specific things rather
+      than on effort, so they are written down: the sanctioned capture route records a
+      MONITOR, and the program is driven on an off-screen desktop, which is not a
+      monitor and cannot be recorded that way without putting the window on the visible
+      desktop. Assembling a frame sequence from the per-window captures that DO work
+      would produce a genuine recording, and there is no encoder installed to turn those
+      frames into a file. Still images of the real program are captured and embedded
+      already; a sequence of them is not a recording and is not going to be called one
 
 ## Known open gaps
 
@@ -115,8 +122,10 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
   It is now a ratchet rather than an open hole. `tsconfig.render.json` carries an
   explicit list of the files that DO pass, runs as part of `npm run typecheck`, and
   `tests/ui/typecheck-ratchet.test.js` refuses to let a file be quietly dropped from
-  that list to make a red check green. Seventeen of the forty-three are in. The rest go
-  in one at a time; `renderer.js` alone is 388 of the remainder.
+  that list to make a red check green. Twenty of the forty-three are in, including the
+  whole of the interface's own widget, overlay, top-bar and accessibility-mirror code.
+  The rest go in one at a time; `renderer.js` alone is 388 of the remainder, and the
+  shop and tower panel pull in the art modules behind them.
 
   Bringing them in keeps paying for itself, and none of what it found was an
   annotation problem:
