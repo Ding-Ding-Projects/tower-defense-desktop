@@ -122,61 +122,20 @@ jobs:
         id: notes
         shell: pwsh
         run: |
-          $completed = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
-          $started = '${{ steps.started.outputs.started_at }}'
-          if ($started -ne 'unavailable') {
-            $span = ([datetime]$completed) - ([datetime]$started)
-            $duration = '{0:hh\:mm\:ss}' -f $span
-          } else {
-            $duration = 'unavailable'
-          }
-
-          $lineCount = Get-Content "$env:RUNNER_TEMP\line-count.md" -Raw
-
-          $notes = @"
-## Tower Defence Desktop ${{ steps.version.outputs.version }}
-
-A deterministic tower defense game for Windows, with mechanical and statistical
-parity to Tower Defense Simulator.
-
-> [!WARNING]
-> **This installer is unsigned and always will be.** Windows will show an
-> unknown-publisher warning when you run it. That is expected. It is not a claim that
-> the file is safe, and it is not a defect being worked around.
-
-### Installer
-
-| | |
-| --- | --- |
-| File | ``$([System.IO.Path]::GetFileName('${{ steps.artifacts.outputs.setup }}'))`` |
-| Size | ${{ steps.artifacts.outputs.size_mb }} MB |
-| SHA-256 | ``${{ steps.artifacts.outputs.sha256 }}`` |
-| Signature | NotSigned, verified during the build |
-| Commit | ``$env:GITHUB_SHA`` |
-
-### Build timing
-
-| | |
-| --- | --- |
-| Started | $started |
-| Completed | $completed |
-| Duration | $duration |
-
-### What is in this build
-
-$lineCount
-
-### Verification
-
-> [!NOTE]
-> Continuous integration for this project runs **no tests and no lint** by standing
-> decision. It builds, packages, publishes and attaches evidence. Checking happens
-> locally before a push, with ``npm run check``. This release makes no claim that any
-> check passed.
-"@
-          $path = "$env:RUNNER_TEMP\release-notes.md"
-          $notes | Out-File -FilePath $path -Encoding utf8
-          "path=$path" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          # Composed by a committed script, not inline. The first attempt embedded a
+          # PowerShell here-string whose content must start at column zero, which
+          # terminated the surrounding YAML block and failed the whole workflow to
+          # parse in zero seconds, before any step ran.
+          node tools/release-notes.mjs `
+            --version ${{ steps.version.outputs.version }} `
+            --setup '${{ steps.artifacts.outputs.setup }}' `
+            --sha256 ${{ steps.artifacts.outputs.sha256 }} `
+            --size-mb ${{ steps.artifacts.outputs.size_mb }} `
+            --commit $env:GITHUB_SHA `
+            --started '${{ steps.started.outputs.started_at }}' `
+            --line-count (Join-Path $env:RUNNER_TEMP 'line-count.md') `
+            --out (Join-Path $env:RUNNER_TEMP 'release-notes.md')
+          "path=$(Join-Path $env:RUNNER_TEMP 'release-notes.md')" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Publish the release
         shell: pwsh
