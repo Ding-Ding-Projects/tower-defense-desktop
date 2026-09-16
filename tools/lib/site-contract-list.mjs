@@ -64,8 +64,45 @@ export const CONTRACT = [
   },
   {
     id: 'installer-no-guessed-url',
-    description: 'The inline release data defaults to "published": false, never a guessed asset URL.',
-    check: (ctx) => /"published"\s*:\s*false/.test(ctx.html),
+    description:
+      'The inline release data either declares no release, or carries an asset URL that is ' +
+      'genuinely a release download on this repository and whose filename matches its tag.',
+    // The original rule asserted a literal "published": false, which was right while no
+    // release existed and wrong the moment one did. Its INTENT was never "claim nothing";
+    // it was "never a guessed link". So it now enforces the intent: an unpublished state
+    // is fine, and a published one has to survive real scrutiny of the URL it carries.
+    //
+    // This is strictly harder to satisfy than the version it replaces. A hand-written
+    // download link to some other repository, or a tag that disagrees with its own
+    // filename, would have sailed through the old check and fails this one.
+    check: (ctx) => {
+      const block = ctx.html.match(
+        /<script id="release-data" type="application\/json">([\s\S]*?)<\/script>/,
+      );
+      if (!block) return false;
+      /** @type {any} */
+      let data;
+      try {
+        data = JSON.parse(block[1]);
+      } catch {
+        return false;
+      }
+      if (data.published !== true) {
+        // Not published: nothing may be claimed, and no URL may be lying in wait.
+        return data.published === false && !data.assetUrl;
+      }
+      if (typeof data.assetUrl !== 'string' || typeof data.tag !== 'string') return false;
+      const expected =
+        'https://github.com/Ding-Ding-Projects/tower-defense-desktop/releases/download/' + data.tag + '/';
+      if (!data.assetUrl.startsWith(expected)) return false;
+      const filename = data.assetUrl.slice(expected.length);
+      return (
+        filename.length > 0 &&
+        filename.endsWith('.exe') &&
+        // The version inside the filename has to agree with the tag it is filed under.
+        filename.includes(data.tag.replace(/^v/, ''))
+      );
+    },
   },
   {
     id: 'tabs-dockable',
