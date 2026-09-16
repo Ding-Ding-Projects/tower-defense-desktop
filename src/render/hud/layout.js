@@ -68,6 +68,16 @@ export function stack(rect, sizes, gap = 0) {
   return layoutAxis(rect, sizes, gap, 'y', 'height');
 }
 
+/**
+ * Split a rectangle along one axis. A null size means "take what is left", shared
+ * equally between every null.
+ * @param {Rect} rect
+ * @param {(number|null|undefined)[]} sizes
+ * @param {number} gap
+ * @param {'x'|'y'} axisKey
+ * @param {'width'|'height'} sizeKey
+ * @returns {Rect[]}
+ */
 function layoutAxis(rect, sizes, gap, axisKey, sizeKey) {
   const count = sizes.length;
   if (count === 0) return [];

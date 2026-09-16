@@ -52,6 +52,12 @@ export class ShopPanel {
     }
   }
 
+  /**
+   * Returns the wrapper along with the two elements the caller updates as cash
+   * changes, rather than making it re-query them out of the wrapper each time.
+   * @param {import('../data/schema/types.js').TowerDef} def
+   * @returns {{ root: HTMLElement, button: HTMLElement, reason: HTMLElement }}
+   */
   _createEntry(def) {
     const root = this.doc.createElement('div');
     root.className = 'shop-entry';

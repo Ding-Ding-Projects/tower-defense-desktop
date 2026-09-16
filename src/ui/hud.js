@@ -27,6 +27,13 @@ export class Hud {
     this.el.append(this.cashEl.root, this.livesEl.root, this.waveEl.root, this.phaseEl.root, this.skipButton);
   }
 
+  /**
+   * Returns the wrapper AND the element the value goes into, because the caller
+   * updates the value every frame and should not have to go looking for it.
+   * @param {string} label
+   * @param {string} className
+   * @returns {{ root: HTMLElement, valueEl: HTMLElement }}
+   */
   _stat(label, className) {
     const root = this.doc.createElement('div');
     root.className = `hud__stat ${className}`;

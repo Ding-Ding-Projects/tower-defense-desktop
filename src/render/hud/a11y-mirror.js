@@ -35,6 +35,9 @@ export class AccessibilityMirror {
     return !!this.doc;
   }
 
+  /**
+   * @param {HTMLElement|null} host
+   */
   mount(host) {
     if (!this.doc || !host) return;
     if (this.container) this.unmount();
@@ -63,26 +66,39 @@ export class AccessibilityMirror {
    * @param {(action: object) => void} dispatch  called with the control's action on activation
    */
   sync(controls, dispatch) {
-    if (!this.container) return;
+    // Both captured as consts up front. A container only ever exists after mount, and
+    // mount only runs with a document, so neither can be null past this line; the
+    // compiler cannot follow that across two methods, and guarding once here is
+    // clearer than guarding at every use inside the loop.
+    const { doc, container } = this;
+    if (!doc || !container) return;
     const seen = new Set();
     for (const control of controls) {
       seen.add(control.key);
       let el = this._elements.get(control.key);
       if (!el) {
-        el = this.doc.createElement('button');
-        el.type = 'button';
-        el.addEventListener('click', () => {
-          if (el.disabled) return;
+        // A const the listener can close over. The behaviour was already correct --
+        // `el` is declared inside the loop body, so each iteration gets its own
+        // binding -- but the compiler cannot narrow a reassigned `let` through a
+        // closure, and a const says plainly which button the listener means.
+        const button = doc.createElement('button');
+        button.type = 'button';
+        button.addEventListener('click', () => {
+          if (button.disabled) return;
           dispatch(control.action);
         });
-        this.container.appendChild(el);
-        this._elements.set(control.key, el);
+        container.appendChild(button);
+        this._elements.set(control.key, button);
+        el = button;
       }
       if (el.textContent !== control.label) el.textContent = control.label;
       el.setAttribute('aria-label', control.label);
       el.disabled = !!control.disabled;
       el.setAttribute('aria-disabled', String(!!control.disabled));
-      el._interfaceAction = control.action;
+      // Parked on the element so a check can read back what a given button would
+      // dispatch without clicking it. Cast because this is our own property on a
+      // standard element rather than part of its interface.
+      /** @type {any} */ (el)._interfaceAction = control.action;
     }
     for (const [key, el] of this._elements) {
       if (!seen.has(key)) {

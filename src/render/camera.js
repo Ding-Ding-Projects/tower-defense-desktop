@@ -54,6 +54,14 @@ export function clampCamera(camera, bounds) {
   };
 }
 
+/**
+ * Keep the view inside the map on one axis, and centre it when the map is smaller
+ * than the view.
+ * @param {number} center
+ * @param {number} halfView
+ * @param {number} mapExtent
+ * @returns {number}
+ */
 function clampAxis(center, halfView, mapExtent) {
   if (halfView * 2 >= mapExtent) {
     return mapExtent / 2;
