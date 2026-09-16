@@ -1,0 +1,154 @@
+/*
+ * Material Design 3 tokens for the Tower Defence Desktop documentation site.
+ *
+ * Colour roles are derived at runtime from a single accent hue/saturation/lightness
+ * triple (set by site/scripts/settings.js on the <html> element) using color-mix(),
+ * rather than being hand-picked per theme. That is what makes the full-spectrum
+ * accent picker in Settings actually repaint every surface instead of only a button.
+ */
+
+:root {
+  /* Accent seed, overridden inline by settings.js. Defaults to a teal in TDS's own
+     palette family so the untouched site still looks intentional. */
+  --accent-h: 168;
+  --accent-s: 62%;
+  --accent-l: 38%;
+
+  --md-seed: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+
+  /* Light scheme surfaces */
+  --md-bg-light: hsl(var(--accent-h) 20% 98%);
+  --md-surface-light: hsl(var(--accent-h) 14% 99%);
+  --md-surface-variant-light: hsl(var(--accent-h) 16% 92%);
+  --md-on-surface-light: hsl(var(--accent-h) 12% 12%);
+  --md-on-surface-variant-light: hsl(var(--accent-h) 8% 30%);
+  --md-outline-light: hsl(var(--accent-h) 8% 48%);
+
+  /* Dark scheme surfaces */
+  --md-bg-dark: hsl(var(--accent-h) 16% 9%);
+  --md-surface-dark: hsl(var(--accent-h) 14% 12%);
+  --md-surface-variant-dark: hsl(var(--accent-h) 12% 22%);
+  --md-on-surface-dark: hsl(var(--accent-h) 20% 94%);
+  --md-on-surface-variant-dark: hsl(var(--accent-h) 10% 78%);
+  --md-outline-dark: hsl(var(--accent-h) 8% 58%);
+
+  --md-error: hsl(6 78% 46%);
+  --md-on-error: hsl(0 0% 100%);
+
+  /* Shape scale */
+  --shape-xs: 4px;
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-xl: 28px;
+  --shape-full: 999px;
+
+  /* Elevation scale, matched to M3's tonal + shadow approach */
+  --elev-0: none;
+  --elev-1: 0 1px 2px hsl(0 0% 0% / 0.30), 0 1px 3px 1px hsl(0 0% 0% / 0.15);
+  --elev-2: 0 1px 2px hsl(0 0% 0% / 0.30), 0 2px 6px 2px hsl(0 0% 0% / 0.15);
+  --elev-3: 0 1px 3px hsl(0 0% 0% / 0.30), 0 4px 8px 3px hsl(0 0% 0% / 0.15);
+
+  /* Motion. Zeroed by the reduced-motion query further down. */
+  --motion-fast: 100ms;
+  --motion-medium: 200ms;
+  --motion-slow: 350ms;
+  --motion-easing: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Typography: a Latin-first stack with an explicit CJK fallback chain so Traditional
+     Chinese (used throughout the bilingual and Cantonese language modes) never falls
+     back to a mismatched system serif. */
+  --font-latin: "Roboto Flex", "Segoe UI", system-ui, sans-serif;
+  --font-cjk: "Noto Sans HK", "Microsoft JhengHei", "PMingLiU", "Segoe UI", sans-serif;
+  --font-mono: "Cascadia Mono", "Consolas", ui-monospace, monospace;
+  --font-body: var(--font-latin), var(--font-cjk);
+
+  --type-display: 700 clamp(1.75rem, 1.3rem + 2vw, 2.75rem) / 1.15 var(--font-body);
+  --type-headline: 600 clamp(1.3rem, 1.1rem + 1vw, 1.75rem) / 1.2 var(--font-body);
+  --type-title: 600 1.1rem/1.3 var(--font-body);
+  --type-body: 400 0.95rem/1.55 var(--font-body);
+  --type-body-small: 400 0.85rem/1.45 var(--font-body);
+  --type-label: 600 0.78rem/1.2 var(--font-body);
+
+  /* Touch targets, per the accessibility contract: nothing interactive under 44px. */
+  --target-min: 44px;
+
+  color-scheme: light;
+  --md-bg: var(--md-bg-light);
+  --md-surface: var(--md-surface-light);
+  --md-surface-variant: var(--md-surface-variant-light);
+  --md-on-surface: var(--md-on-surface-light);
+  --md-on-surface-variant: var(--md-on-surface-variant-light);
+  --md-outline: var(--md-outline-light);
+  --md-primary: hsl(var(--accent-h) var(--accent-s) calc(var(--accent-l) * 0.9));
+  --md-on-primary: hsl(var(--accent-h) 30% 99%);
+  --md-primary-container: hsl(var(--accent-h) 60% 88%);
+  --md-on-primary-container: hsl(var(--accent-h) 55% 16%);
+  --md-secondary-container: hsl(calc(var(--accent-h) + 40) 30% 88%);
+  --md-on-secondary-container: hsl(calc(var(--accent-h) + 40) 30% 18%);
+  --md-tertiary-container: hsl(calc(var(--accent-h) - 40) 40% 88%);
+  --md-on-tertiary-container: hsl(calc(var(--accent-h) - 40) 40% 16%);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --md-bg: var(--md-bg-dark);
+  --md-surface: var(--md-surface-dark);
+  --md-surface-variant: var(--md-surface-variant-dark);
+  --md-on-surface: var(--md-on-surface-dark);
+  --md-on-surface-variant: var(--md-on-surface-variant-dark);
+  --md-outline: var(--md-outline-dark);
+  --md-primary: hsl(var(--accent-h) calc(var(--accent-s) - 10%) 76%);
+  --md-on-primary: hsl(var(--accent-h) 55% 14%);
+  --md-primary-container: hsl(var(--accent-h) 45% 26%);
+  --md-on-primary-container: hsl(var(--accent-h) 60% 90%);
+  --md-secondary-container: hsl(calc(var(--accent-h) + 40) 22% 26%);
+  --md-on-secondary-container: hsl(calc(var(--accent-h) + 40) 30% 90%);
+  --md-tertiary-container: hsl(calc(var(--accent-h) - 40) 30% 26%);
+  --md-on-tertiary-container: hsl(calc(var(--accent-h) - 40) 40% 90%);
+}
+
+/* System theme follows the OS when data-theme="system" (the default). */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    color-scheme: dark;
+    --md-bg: var(--md-bg-dark);
+    --md-surface: var(--md-surface-dark);
+    --md-surface-variant: var(--md-surface-variant-dark);
+    --md-on-surface: var(--md-on-surface-dark);
+    --md-on-surface-variant: var(--md-on-surface-variant-dark);
+    --md-outline: var(--md-outline-dark);
+    --md-primary: hsl(var(--accent-h) calc(var(--accent-s) - 10%) 76%);
+    --md-on-primary: hsl(var(--accent-h) 55% 14%);
+    --md-primary-container: hsl(var(--accent-h) 45% 26%);
+    --md-on-primary-container: hsl(var(--accent-h) 60% 90%);
+    --md-secondary-container: hsl(calc(var(--accent-h) + 40) 22% 26%);
+    --md-on-secondary-container: hsl(calc(var(--accent-h) + 40) 30% 90%);
+    --md-tertiary-container: hsl(calc(var(--accent-h) - 40) 30% 26%);
+    --md-on-tertiary-container: hsl(calc(var(--accent-h) - 40) 40% 90%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-medium: 0ms;
+    --motion-slow: 0ms;
+  }
+}
+
+/* Density scale: comfortable is the default, compact tightens spacing for power
+   users, spacious loosens it for low-vision or touch-first use. */
+:root,
+:root[data-density="comfortable"] {
+  --space-unit: 8px;
+  --row-height: 48px;
+}
+:root[data-density="compact"] {
+  --space-unit: 6px;
+  --row-height: 40px;
+}
+:root[data-density="spacious"] {
+  --space-unit: 10px;
+  --row-height: 56px;
+}

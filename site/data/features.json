@@ -1,0 +1,464 @@
+[
+  {
+    "id": "seeded-rng",
+    "category": "Simulation core",
+    "status": "shipped",
+    "docsArticle": "simulation-and-replay",
+    "title": { "en": "Deterministic seeded random stream", "yue": "有種子嘅確定性隨機數列" },
+    "summary": {
+      "en": "One mulberry32 stream per match; every draw in the simulation pulls from it in a fixed order.",
+      "yue": "每場對戰得一條 mulberry32 隨機數列，全部隨機都跟固定次序由呢度攞。"
+    }
+  },
+  {
+    "id": "fixed-point-math",
+    "category": "Simulation core",
+    "status": "shipped",
+    "docsArticle": "simulation-and-replay",
+    "title": { "en": "Fixed-point positions and distances", "yue": "定點數座標同距離" },
+    "summary": {
+      "en": "Integers in 1/1024 map-unit steps, so a long match cannot drift from float rounding error.",
+      "yue": "座標用 1/1024 單位嘅整數，長時間對戰都唔會因為浮點誤差走樣。"
+    }
+  },
+  {
+    "id": "deterministic-tick",
+    "category": "Simulation core",
+    "status": "planned",
+    "docsArticle": "simulation-and-replay",
+    "title": { "en": "Fixed 30 Hz tick and command queue", "yue": "固定 30 Hz tick 同指令隊列" },
+    "summary": {
+      "en": "Simulation state advances in fixed steps, with player actions applied at tick boundaries.",
+      "yue": "模擬狀態按固定步進，玩家操作喺 tick 交界先套用。"
+    }
+  },
+  {
+    "id": "snapshot-restore",
+    "category": "Simulation core",
+    "status": "planned",
+    "docsArticle": "simulation-and-replay",
+    "title": { "en": "Snapshot, restore and state hashing", "yue": "存檔、還原同狀態雜湊" },
+    "summary": {
+      "en": "A match's whole state serialises to one snapshot and back, with a stable hash to compare two runs.",
+      "yue": "整個對戰狀態可以存做一個 snapshot 再還原，仲有穩定雜湊值比較兩次結果。"
+    }
+  },
+  {
+    "id": "replay",
+    "category": "Simulation core",
+    "status": "planned",
+    "docsArticle": "simulation-and-replay",
+    "title": { "en": "Replay from seed and command log", "yue": "由種子同指令紀錄重播" },
+    "summary": {
+      "en": "A match replays byte-for-byte from its seed and recorded commands, proven by matching hash sequences.",
+      "yue": "一場對戰可以由種子同紀錄低嘅指令一字不漏重播，用雜湊序列做證明。"
+    }
+  },
+  {
+    "id": "data-schema",
+    "category": "Data and roster",
+    "status": "shipped",
+    "docsArticle": "data-model",
+    "title": { "en": "Validated data row shapes with required provenance", "yue": "有驗證嘅資料行形狀，出處一定要寫" },
+    "summary": {
+      "en": "Towers, enemies, maps, waves, difficulties and statuses are typed rows; every top-level row cites its wiki source.",
+      "yue": "塔、怪、地圖、波次、難度同狀態全部係有型嘅資料行，每行都要註明個 wiki 出處。"
+    }
+  },
+  {
+    "id": "data-validator",
+    "category": "Data and roster",
+    "status": "planned",
+    "docsArticle": "data-model",
+    "title": { "en": "Referential integrity and geometry validator", "yue": "參照完整性同幾何驗證器" },
+    "summary": {
+      "en": "Loads every JSON row and rejects a dangling reference or an invalid placement polygon before the game starts.",
+      "yue": "載入所有 JSON 資料，一有斷咗嘅參照或者唔啱嘅擺放形狀就即刻拒收。"
+    }
+  },
+  {
+    "id": "open-statistics",
+    "category": "Data and roster",
+    "status": "in-progress",
+    "docsArticle": "data-model",
+    "title": { "en": "Six open statistical questions, tracked rather than guessed", "yue": "六條未有定論嘅數值，記低嚟唔會靠估" },
+    "summary": {
+      "en": "Targeting modes beyond the five, mitigation, mark-and-consume, area falloff, Hardcore's real effect and sell refund percent.",
+      "yue": "五種以外嘅索敵模式、減免機制、標記同消耗配合、範圍傷害會唔會遞減、Hardcore 實際改啲乜，同賣出退款百分比。"
+    }
+  },
+  {
+    "id": "towers-roster",
+    "category": "Data and roster",
+    "status": "planned",
+    "docsArticle": "towers-and-upgrades",
+    "title": { "en": "First tranche of cited towers", "yue": "第一批有出處嘅塔" },
+    "summary": {
+      "en": "Real towers as JSON rows, each level's cost, damage and range cited to the wiki it was read from.",
+      "yue": "真正嘅塔用 JSON 資料表示，每級嘅價錢、傷害同射程都寫明抄自邊個 wiki。"
+    }
+  },
+  {
+    "id": "enemies-roster",
+    "category": "Data and roster",
+    "status": "planned",
+    "docsArticle": "enemies-and-statuses",
+    "title": { "en": "Cited enemies, including bosses", "yue": "有出處嘅怪物，包括 Boss" },
+    "summary": {
+      "en": "HP, speed, defense, immunities and abilities for the first tranche of enemies and bosses.",
+      "yue": "第一批怪物同 Boss 嘅血量、速度、防禦、免疫同技能。"
+    }
+  },
+  {
+    "id": "maps-roster",
+    "category": "Data and roster",
+    "status": "planned",
+    "docsArticle": "maps-and-placement",
+    "title": { "en": "Two maps with real lanes and placement zones", "yue": "兩個有真正路線同擺放區嘅地圖" },
+    "summary": {
+      "en": "Lane waypoints and placement polygons authored as data, ready for the validator to check.",
+      "yue": "路線航點同擺放多邊形都寫成資料，等驗證器去查。"
+    }
+  },
+  {
+    "id": "difficulties-roster",
+    "category": "Data and roster",
+    "status": "planned",
+    "docsArticle": "waves-and-difficulties",
+    "title": { "en": "Every difficulty as its own row", "yue": "每個難度都係獨立一行資料" },
+    "summary": {
+      "en": "Easy through Hardcore, each with its own cash, HP and speed multipliers and disallowed towers.",
+      "yue": "由 Easy 到 Hardcore，各自有金錢、血量同速度倍率，同埋唔准用嘅塔。"
+    }
+  },
+  {
+    "id": "wave-tables",
+    "category": "Data and roster",
+    "status": "planned",
+    "docsArticle": "waves-and-difficulties",
+    "title": { "en": "Wave tables per map and difficulty", "yue": "每個地圖同難度嘅波次表" },
+    "summary": {
+      "en": "Enemy groups, spawn intervals and completion bonuses, keyed by map and difficulty.",
+      "yue": "怪物分組、出怪間隔同完成獎勵，跟地圖同難度分類。"
+    }
+  },
+  {
+    "id": "targeting-modes",
+    "category": "Towers and combat",
+    "status": "planned",
+    "docsArticle": "towers-and-upgrades",
+    "title": { "en": "Targeting: first, last, closest, strongest, weakest", "yue": "索敵：最先、最後、最近、最強、最弱" },
+    "summary": {
+      "en": "Five targeting modes with deterministic tie-breaking, so two identical matches pick the same target.",
+      "yue": "五種索敵模式，撞形嘅時候都有固定判法，一樣嘅對戰揀返一樣嘅目標。"
+    }
+  },
+  {
+    "id": "tower-abilities-auras",
+    "category": "Towers and combat",
+    "status": "planned",
+    "docsArticle": "towers-and-upgrades",
+    "title": { "en": "Tower abilities and aura recomputation", "yue": "塔嘅技能同光環重新計算" },
+    "summary": {
+      "en": "Cooldown-gated abilities, and auras that recompute nearby towers' effective stats fresh every tick.",
+      "yue": "有冷卻時間嘅技能，光環每個 tick 都重新計返附近塔嘅實際數值。"
+    }
+  },
+  {
+    "id": "firing-model",
+    "category": "Towers and combat",
+    "status": "planned",
+    "docsArticle": "towers-and-upgrades",
+    "title": { "en": "Fire rate, spin-up, burst, reload, hitscan and projectile", "yue": "射速、加速、連發、裝彈、瞬中同拋射體" },
+    "summary": {
+      "en": "Every firing pattern a tower level can declare, from a steady hitscan to a bursting, reloading launcher.",
+      "yue": "塔嘅每種射擊方式，由穩定瞬中到連發完要裝彈嘅發射器都有。"
+    }
+  },
+  {
+    "id": "area-pierce-chain",
+    "category": "Towers and combat",
+    "status": "planned",
+    "docsArticle": "towers-and-upgrades",
+    "title": { "en": "Area damage, pierce and chain", "yue": "範圍傷害、貫穿同連鎖" },
+    "summary": {
+      "en": "A shot can splash an area, pierce through several enemies, or chain to nearby targets.",
+      "yue": "一發可以炸範圍、貫穿幾隻怪，或者連鎖跳去附近目標。"
+    }
+  },
+  {
+    "id": "damage-order",
+    "category": "Towers and combat",
+    "status": "planned",
+    "docsArticle": "enemies-and-statuses",
+    "title": { "en": "Damage order: shield, then flat reduction, then hit points", "yue": "傷害順序：先護盾、再扣減、先至係血量" },
+    "summary": {
+      "en": "A fixed resolution order for every hit, so shielded and armoured enemies behave the same way every time.",
+      "yue": "每次攻擊都跟一個固定順序計算，護盾同裝甲嘅怪物次次表現都一樣。"
+    }
+  },
+  {
+    "id": "tag-synergy",
+    "category": "Towers and combat",
+    "status": "planned",
+    "docsArticle": "towers-and-upgrades",
+    "title": { "en": "Tag-based synergy bonuses", "yue": "以標籤為本嘅配合加成" },
+    "summary": {
+      "en": "A generic tag plus a damage multiplier, so a new combo is a data row, not a hardcoded tower pair.",
+      "yue": "通用標籤加傷害倍率，新配合只需要加一行資料，唔使寫死邊兩隻塔夾。"
+    }
+  },
+  {
+    "id": "status-effects",
+    "category": "Enemies and statuses",
+    "status": "planned",
+    "docsArticle": "enemies-and-statuses",
+    "title": { "en": "Status effects: stacking, immunities and expiry", "yue": "狀態效果：疊加、免疫同過期" },
+    "summary": {
+      "en": "Stun, slow, damage-over-time, debuff and buff, each with its own stacking rule and immunity list.",
+      "yue": "暈眩、減速、持續傷害、減益同增益，各自有自己嘅疊加規則同免疫名單。"
+    }
+  },
+  {
+    "id": "hidden-detection",
+    "category": "Enemies and statuses",
+    "status": "planned",
+    "docsArticle": "enemies-and-statuses",
+    "title": { "en": "Hidden versus detection, flying versus anti-air", "yue": "隱形對偵測、飛行對防空" },
+    "summary": {
+      "en": "A hidden enemy needs a detecting tower; a flying enemy needs a tower that hits air, independently of each other.",
+      "yue": "隱形怪要靠有偵測能力嘅塔先見到，飛行怪就要防空塔先打得中，兩者互不相干。"
+    }
+  },
+  {
+    "id": "enemy-boss-abilities",
+    "category": "Enemies and statuses",
+    "status": "planned",
+    "docsArticle": "enemies-and-statuses",
+    "title": { "en": "Enemy and boss abilities, including health thresholds", "yue": "怪物同 Boss 技能，包括血量門檻觸發" },
+    "summary": {
+      "en": "Summon, stun, shield-phase, heal and speed-phase, some firing once a boss drops below a hit-point fraction.",
+      "yue": "召喚、暈眩、護盾階段、治療同加速階段，有啲要 Boss 血量跌到某個比例先觸發。"
+    }
+  },
+  {
+    "id": "pathing",
+    "category": "Maps and placement",
+    "status": "planned",
+    "docsArticle": "maps-and-placement",
+    "title": { "en": "Lane pathing with deterministic per-enemy offset", "yue": "路線行走，每隻怪都有確定性偏移" },
+    "summary": {
+      "en": "Enemies follow lane waypoints at their own speed, with a small deterministic offset so a group is not a single file.",
+      "yue": "怪物跟住路線航點走，速度各自唔同，仲有細細嘅確定性偏移唔會逐隻排晒直線。"
+    }
+  },
+  {
+    "id": "placement-rules",
+    "category": "Maps and placement",
+    "status": "planned",
+    "docsArticle": "maps-and-placement",
+    "title": { "en": "Terrain, footprint collision and shared caps", "yue": "地形、佔位碰撞同共用上限" },
+    "summary": {
+      "en": "A tower can only stand on its allowed terrain, cannot overlap another footprint, and some towers share a placement cap.",
+      "yue": "塔淨係可以擺喺容許嘅地形，唔可以同其他塔重疊，有啲塔仲要共用擺放上限。"
+    }
+  },
+  {
+    "id": "wave-director",
+    "category": "Waves and economy",
+    "status": "planned",
+    "docsArticle": "waves-and-difficulties",
+    "title": { "en": "Wave director: intermission, groups and boss waves", "yue": "波次導演：中場、分組同 Boss 波" },
+    "summary": {
+      "en": "Each wave is a set of timed enemy groups with an intermission before it and a completion bonus after it.",
+      "yue": "每個波次都係一堆計時嘅怪物分組，波前有中場、波後有完成獎勵。"
+    }
+  },
+  {
+    "id": "economy-model",
+    "category": "Waves and economy",
+    "status": "planned",
+    "docsArticle": "economy",
+    "title": { "en": "Starting cash, kill reward and income towers", "yue": "起始金錢、擊殺獎勵同收入塔" },
+    "summary": {
+      "en": "Cash flows in from a starting amount, per-kill rewards, wave completion bonuses and dedicated income towers.",
+      "yue": "金錢嘅來源有起始金額、逐隻擊殺獎勵、波次完成獎勵，同埋專門負責搵錢嘅塔。"
+    }
+  },
+  {
+    "id": "difficulty-modifiers",
+    "category": "Waves and economy",
+    "status": "planned",
+    "docsArticle": "waves-and-difficulties",
+    "title": { "en": "Per-difficulty multipliers and disallowed towers", "yue": "每個難度嘅倍率同禁用塔" },
+    "summary": {
+      "en": "Cash, enemy HP and enemy speed each scale per difficulty, and some difficulties disallow specific towers.",
+      "yue": "金錢、怪物血量同速度會跟難度縮放，有啲難度仲會禁用指定嘅塔。"
+    }
+  },
+  {
+    "id": "win-loss",
+    "category": "Waves and economy",
+    "status": "planned",
+    "docsArticle": "waves-and-difficulties",
+    "title": { "en": "Win and loss conditions", "yue": "勝利同落敗條件" },
+    "summary": {
+      "en": "Clear every wave to win; run out of lives to lose, with lives sourced from the map or a difficulty override.",
+      "yue": "打完晒啲波次就贏，命數清零就輸，命數嚟自地圖或者難度覆寫。"
+    }
+  },
+  {
+    "id": "canvas-renderer",
+    "category": "Interface",
+    "status": "planned",
+    "docsArticle": null,
+    "title": { "en": "Canvas renderer decoupled from the simulation rate", "yue": "同模擬速率分開嘅 Canvas 渲染器" },
+    "summary": {
+      "en": "Interpolated rendering at display refresh rate, independent of the fixed 30 Hz simulation tick.",
+      "yue": "渲染跟住螢幕更新率內插,同固定 30 Hz 嘅模擬 tick 完全分開。"
+    }
+  },
+  {
+    "id": "material-interface",
+    "category": "Interface",
+    "status": "planned",
+    "docsArticle": null,
+    "title": { "en": "Material Design 3 shop, tower panel and heads-up display", "yue": "Material Design 3 商店、塔面板同 HUD" },
+    "summary": {
+      "en": "Every in-game state real: wave start, clear, victory, defeat, pause and settings, built with genuine M3 components.",
+      "yue": "遊戲入面每個狀態都係真嘅：開波、通關、勝利、落敗、暫停同設定，全部用真正嘅 M3 元件整。"
+    }
+  },
+  {
+    "id": "display-scaling",
+    "category": "Interface",
+    "status": "planned",
+    "docsArticle": "accessibility",
+    "title": { "en": "Verified at 100, 125, 150 and 200 percent display scale", "yue": "喺 100、125、150 同 200% 顯示縮放都驗證過" },
+    "summary": {
+      "en": "The game window is checked at every common Windows display scale with no clipped or overlapping content.",
+      "yue": "遊戲視窗喺 Windows 常見嘅每個顯示縮放度都測試過，冇畫面被切或者重疊。"
+    }
+  },
+  {
+    "id": "squirrel-installer",
+    "category": "Desktop and shipping",
+    "status": "planned",
+    "docsArticle": "build-and-release",
+    "title": { "en": "Unsigned Squirrel.Windows installer", "yue": "未簽署嘅 Squirrel.Windows 安裝檔" },
+    "summary": {
+      "en": "A real Squirrel package: Setup.exe, a RELEASES file and delta packages, disclosed as unsigned.",
+      "yue": "真正嘅 Squirrel 安裝包：Setup.exe、RELEASES 檔同差異更新包，明確講明未經簽署。"
+    }
+  },
+  {
+    "id": "auto-update",
+    "category": "Desktop and shipping",
+    "status": "planned",
+    "docsArticle": "update-mechanism",
+    "title": { "en": "Chrome-style automatic updates", "yue": "Chrome 風格嘅自動更新" },
+    "summary": {
+      "en": "Checks for updates in the background and shows a non-blocking ready-to-restart banner, never a forced restart.",
+      "yue": "喺背景check更新，得咗會出一個唔阻住你嘅「可以重啟」提示，唔會強制幫你重啟。"
+    }
+  },
+  {
+    "id": "release-workflow",
+    "category": "Desktop and shipping",
+    "status": "planned",
+    "docsArticle": "build-and-release",
+    "title": { "en": "Uniquely tagged, non-draft release on every push", "yue": "每次 push 都出一個獨立標籤、非草稿嘅 release" },
+    "summary": {
+      "en": "A workflow that builds, packages and publishes a real installable release with no test or lint gate.",
+      "yue": "工作流程會build、打包同發佈一個真正裝得嘅 release，唔會俾測試或者 lint 卡住。"
+    }
+  },
+  {
+    "id": "landing-site",
+    "category": "Documentation and site",
+    "status": "shipped",
+    "docsArticle": null,
+    "title": { "en": "This Material Design 3 landing and documentation site", "yue": "呢個 Material Design 3 嘅著陸同文件網站" },
+    "summary": {
+      "en": "Every bundled asset is local: no content delivery network, no analytics, no third-party tracking.",
+      "yue": "所有資源都係本機嘅：冇用 CDN、冇分析工具、冇第三方追蹤。"
+    }
+  },
+  {
+    "id": "docs-per-feature",
+    "category": "Documentation and site",
+    "status": "in-progress",
+    "docsArticle": null,
+    "title": { "en": "One documentation article per feature", "yue": "每個功能一篇文件" },
+    "summary": {
+      "en": "Behaviour, configuration, failure modes, security considerations and how to verify it, per feature area.",
+      "yue": "每個功能都有行為、設定、可能出錯情況、安全考慮同驗證方法。"
+    }
+  },
+  {
+    "id": "offline-docs-browser",
+    "category": "Documentation and site",
+    "status": "shipped",
+    "docsArticle": null,
+    "title": { "en": "Offline in-app documentation browser", "yue": "離線嘅內置文件瀏覽器" },
+    "summary": {
+      "en": "Every article loads from a local bundle checked for completeness at build time, with no network request.",
+      "yue": "每篇文件由本機打包載入，build 嗰陣已經check完齊唔齊全，唔使上網。"
+    }
+  },
+  {
+    "id": "social-embed",
+    "category": "Documentation and site",
+    "status": "shipped",
+    "docsArticle": null,
+    "title": { "en": "Server-rendered social embed metadata", "yue": "喺伺服器端渲染嘅社交分享圖" },
+    "summary": {
+      "en": "A real og:image plus dimensions, alt text and a Twitter large-image card baked into the served HTML.",
+      "yue": "真正嘅 og:image 連尺寸、alt 文字同 Twitter 大圖卡都寫死喺伺服嘅 HTML 入面。"
+    }
+  },
+  {
+    "id": "three-language-modes",
+    "category": "Documentation and site",
+    "status": "shipped",
+    "docsArticle": null,
+    "title": { "en": "English, Cantonese and bilingual language modes", "yue": "英文、廣東話同雙語模式" },
+    "summary": {
+      "en": "A language switcher that covers the whole site's chrome, feature summaries and settings, not just a banner.",
+      "yue": "語言切換掣覆蓋成個網站嘅介面、功能簡介同設定，唔止得個標語轉。"
+    }
+  },
+  {
+    "id": "accessible-search",
+    "category": "Documentation and site",
+    "status": "shipped",
+    "docsArticle": null,
+    "title": { "en": "Search with a regular-expression builder on every panel", "yue": "每個面板都有帶正則表達式建構器嘅搜尋" },
+    "summary": {
+      "en": "A plain-text filter by default, with a regex mode and a live tester popover anchored beside the field.",
+      "yue": "預設係純文字篩選，仲有正則模式同一個貼住輸入框嘅即時測試彈窗。"
+    }
+  },
+  {
+    "id": "dockable-tabs",
+    "category": "Documentation and site",
+    "status": "shipped",
+    "docsArticle": null,
+    "title": { "en": "Dockable tabs with overflow, reorder, pin and groups", "yue": "可停泊嘅分頁，有溢出選單、排序、釘住同分組" },
+    "summary": {
+      "en": "Every tab stays reachable through an always-available menu, and layout choices persist across reloads.",
+      "yue": "所有分頁都可以透過一個常駐選單搵返，版面設定重新整理都會記得。"
+    }
+  },
+  {
+    "id": "full-spectrum-appearance",
+    "category": "Documentation and site",
+    "status": "shipped",
+    "docsArticle": null,
+    "title": { "en": "Theme, density, full-spectrum accent and CJK-safe font", "yue": "主題、疏密、全光譜主色同 CJK 安全字體" },
+    "summary": {
+      "en": "Light, dark or system theme, three density levels, an HSL accent picker and a font choice with a CJK fallback.",
+      "yue": "淺色、深色或跟系統、三種疏密、HSL 主色選擇器，仲有帶 CJK 後備嘅字體選項。"
+    }
+  }
+]

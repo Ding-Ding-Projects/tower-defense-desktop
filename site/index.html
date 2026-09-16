@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system" data-density="comfortable" data-language="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tower Defence Desktop — a deterministic Windows tower defense game</title>
+<meta
+  name="description"
+  content="A deterministic tower defense game for Windows aiming at mechanical and statistical parity with Roblox Tower Defense Simulator. Landing page, full feature list and offline documentation."
+/>
+<meta name="theme-color" content="#1f6b5c" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f6b5c'/%3E%3Cpath d='M16 6l8 5v9l-8 6-8-6v-9z' fill='%23eaf7f2'/%3E%3C/svg%3E" />
+
+<!-- Social embed metadata. A crawler runs no scripts, so these values are hard-coded
+     here rather than generated at request time; site/scripts/metadata.js only
+     self-checks them against the same rules tests/site/metadata-emitter.test.mjs
+     verifies, it never writes them. -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Tower Defence Desktop" />
+<meta
+  property="og:description"
+  content="A deterministic tower defense game for Windows, built for mechanical and statistical parity with Roblox Tower Defense Simulator."
+/>
+<meta property="og:image" content="https://ding-ding-projects.github.io/tower-defense-desktop/social-preview.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Tower Defence Desktop wordmark over a stylised isometric tower-defense lane" />
+<meta property="og:url" content="https://ding-ding-projects.github.io/tower-defense-desktop/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tower Defence Desktop" />
+<meta
+  name="twitter:description"
+  content="A deterministic tower defense game for Windows, built for mechanical and statistical parity with Roblox Tower Defense Simulator."
+/>
+<meta name="twitter:image" content="https://ding-ding-projects.github.io/tower-defense-desktop/social-preview.png" />
+
+<link rel="stylesheet" href="./styles/tokens.css" />
+<link rel="stylesheet" href="./styles/layout.css" />
+<link rel="stylesheet" href="./styles/components.css" />
+</head>
+<body>
+<div class="app-shell" data-tab-dock="top">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="app-header">
+    <div class="app-header__brand">
+      <img
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f6b5c'/%3E%3Cpath d='M16 6l8 5v9l-8 6-8-6v-9z' fill='%23eaf7f2'/%3E%3C/svg%3E"
+        alt=""
+        aria-hidden="true"
+      />
+      <span class="app-header__brand-text">Tower Defence Desktop</span>
+    </div>
+    <div class="app-header__controls">
+      <label class="visually-hidden" for="language-select">Language / 語言</label>
+      <select id="language-select" class="md-field" aria-label="Language">
+        <option value="en">English</option>
+        <option value="yue">廣東話</option>
+        <option value="bilingual">EN + 廣東話</option>
+      </select>
+      <button id="theme-toggle" type="button" class="md-switch" role="switch" aria-checked="false" aria-label="Dark theme">
+        <span class="md-switch__thumb" aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="tab-region" aria-label="Site sections">
+    <div class="tab-strip" id="tab-strip" role="tablist" aria-label="Site sections"></div>
+  </nav>
+  <div style="position: relative">
+    <button
+      id="tab-overflow-trigger"
+      type="button"
+      class="md-btn"
+      data-variant="outlined"
+      aria-haspopup="true"
+      aria-expanded="false"
+      style="position: absolute; right: 12px; top: -44px"
+    >
+      More tabs
+    </button>
+    <div id="tab-overflow-menu" class="tab-overflow-menu" role="menu" data-open="false"></div>
+  </div>
+
+  <main id="main-content" class="app-main" tabindex="-1">
+    <section id="panel-overview" class="tab-panel" role="tabpanel" aria-labelledby="tab-overview" data-active="true"></section>
+    <section id="panel-features" class="tab-panel" role="tabpanel" aria-labelledby="tab-features" data-active="false"></section>
+    <section id="panel-download" class="tab-panel" role="tabpanel" aria-labelledby="tab-download" data-active="false"></section>
+    <section id="panel-docs" class="tab-panel" role="tabpanel" aria-labelledby="tab-docs" data-active="false"></section>
+    <section id="panel-settings" class="tab-panel" role="tabpanel" aria-labelledby="tab-settings" data-active="false"></section>
+    <section id="panel-about" class="tab-panel" role="tabpanel" aria-labelledby="tab-about" data-active="false"></section>
+  </main>
+
+  <footer class="app-footer">Tower Defence Desktop — an independent, in-development project.</footer>
+</div>
+
+<div id="notification-region" class="notification-region" aria-live="polite" role="status"></div>
+
+<!-- Honest release state: no release has been published yet, so this deliberately
+     carries no asset URL. site/scripts/panels.js keeps the download button hidden
+     until "published" is true, and never guesses a link. -->
+<script id="release-data" type="application/json">
+{
+  "published": false
+}
+</script>
+
+<script type="module" src="./scripts/app.js"></script>
+</body>
+</html>
