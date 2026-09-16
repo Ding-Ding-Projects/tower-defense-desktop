@@ -159,6 +159,7 @@ export const STATUS_TINT = Object.freeze({
  */
 export function shade(hex, amount) {
   const { r, g, b } = hexToRgb(hex);
+  /** @param {number} channel */
   const adjust = (channel) => clampByte(channel + (amount > 0 ? (255 - channel) * amount : channel * amount));
   return `rgb(${adjust(r)}, ${adjust(g)}, ${adjust(b)})`;
 }
@@ -174,10 +175,17 @@ export function withAlpha(hex, alpha) {
 }
 
 /**
+ * How far apart two colours are, as plain Euclidean distance in RGB.
+ *
+ * This block used to be mixColors' documentation: colorDistance was inserted directly
+ * beneath it and silently adopted it, so the compiler was told this takes a `t` it does
+ * not have and returns a string when it returns a number. A doc comment attaches to
+ * whatever follows it, which makes inserting a function above an existing one a
+ * reliable way to give it somebody else's signature.
+ *
  * @param {string} hexA
  * @param {string} hexB
- * @param {number} t  0..1, 0 is hexA
- * @returns {string} 'rgb(r, g, b)'
+ * @returns {number}
  */
 export function colorDistance(hexA, hexB) {
   // Plain Euclidean distance in RGB. Not a perceptual metric, and it does not need to
@@ -191,6 +199,12 @@ export function colorDistance(hexA, hexB) {
   return Math.sqrt(dr * dr + dg * dg + db * db);
 }
 
+/**
+ * @param {string} hexA
+ * @param {string} hexB
+ * @param {number} t  0..1, 0 is hexA
+ * @returns {string} a hex colour, '#rrggbb'
+ */
 export function mixHex(hexA, hexB, t) {
   // The hex-returning sibling of mixColors, and it exists for a specific reason:
   // withAlpha and shade parse hex and nothing else, so a colour that has been through
@@ -199,6 +213,11 @@ export function mixHex(hexA, hexB, t) {
   const a = hexToRgb(hexA);
   const b = hexToRgb(hexB);
   const c = clamp01(t);
+  /**
+   * @param {number} from
+   * @param {number} to
+   * @returns {string}
+   */
   const channel = (from, to) => {
     const value = Math.round(from + (to - from) * c);
     return Math.max(0, Math.min(255, value)).toString(16).padStart(2, '0');
@@ -206,6 +225,12 @@ export function mixHex(hexA, hexB, t) {
   return '#' + channel(a.r, b.r) + channel(a.g, b.g) + channel(a.b, b.b);
 }
 
+/**
+ * @param {string} hexA
+ * @param {string} hexB
+ * @param {number} t  0..1, 0 is hexA
+ * @returns {string} 'rgb(r, g, b)'
+ */
 export function mixColors(hexA, hexB, t) {
   const a = hexToRgb(hexA);
   const b = hexToRgb(hexB);
@@ -216,6 +241,10 @@ export function mixColors(hexA, hexB, t) {
   return `rgb(${r}, ${g}, ${bl})`;
 }
 
+/**
+ * @param {string} hex  '#rgb', '#rrggbb', or the same without the hash
+ * @returns {{ r: number, g: number, b: number }}
+ */
 function hexToRgb(hex) {
   const clean = hex.startsWith('#') ? hex.slice(1) : hex;
   const num = parseInt(clean.length === 3
@@ -224,10 +253,18 @@ function hexToRgb(hex) {
   return { r: (num >> 16) & 0xff, g: (num >> 8) & 0xff, b: num & 0xff };
 }
 
+/**
+ * @param {number} value
+ * @returns {number}
+ */
 function clampByte(value) {
   return Math.max(0, Math.min(255, Math.round(value)));
 }
 
+/**
+ * @param {number} value
+ * @returns {number}
+ */
 function clamp01(value) {
   return Math.max(0, Math.min(1, value));
 }

@@ -115,8 +115,8 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
   It is now a ratchet rather than an open hole. `tsconfig.render.json` carries an
   explicit list of the files that DO pass, runs as part of `npm run typecheck`, and
   `tests/ui/typecheck-ratchet.test.js` refuses to let a file be quietly dropped from
-  that list to make a red check green. Fifteen of the forty-three are in. The rest go
-  in one at a time.
+  that list to make a red check green. Seventeen of the forty-three are in. The rest go
+  in one at a time; `renderer.js` alone is 388 of the remainder.
 
   Bringing them in keeps paying for itself, and none of what it found was an
   annotation problem:
@@ -136,6 +136,10 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
     string to get two independent streams out of one seed.
   - Fixed-point coordinates were declared as plain numbers with the truth in a comment
     beside them.
+  - `colorDistance` had adopted `mixColors`' documentation, because it was inserted
+    directly beneath that block and a doc comment attaches to whatever follows it. It
+    was documented as taking a `t` it does not have and returning a string when it
+    returns a number.
 
 ## Deliberately not doing
 

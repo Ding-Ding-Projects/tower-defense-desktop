@@ -14,10 +14,17 @@ export const DAMAGE_NUMBER_BUDGET = 120;
 const PARTICLE_LIFETIME_SECONDS = 0.5;
 const DAMAGE_NUMBER_LIFETIME_SECONDS = 0.9;
 
+/**
+ * @typedef {{ x: number, y: number, vx: number, vy: number, age: number, life: number, color: string }} Particle
+ * @typedef {{ x: number, y: number, amount: number, age: number, life: number, kind: string }} DamageNumber
+ */
+
+/** @returns {Particle} */
 function blankParticle() {
   return { x: 0, y: 0, vx: 0, vy: 0, age: 0, life: PARTICLE_LIFETIME_SECONDS, color: '#ffffff' };
 }
 
+/** @param {Particle} p */
 function resetParticle(p) {
   p.x = 0;
   p.y = 0;
@@ -26,10 +33,12 @@ function resetParticle(p) {
   p.age = 0;
 }
 
+/** @returns {DamageNumber} */
 function blankDamageNumber() {
   return { x: 0, y: 0, amount: 0, age: 0, life: DAMAGE_NUMBER_LIFETIME_SECONDS, kind: 'damage' };
 }
 
+/** @param {DamageNumber} d */
 function resetDamageNumber(d) {
   d.x = 0;
   d.y = 0;
@@ -38,6 +47,10 @@ function resetDamageNumber(d) {
 }
 
 export class ParticleSystem {
+  /**
+   * @param {number} [particleBudget]
+   * @param {number} [damageNumberBudget]
+   */
   constructor(particleBudget = PARTICLE_BUDGET, damageNumberBudget = DAMAGE_NUMBER_BUDGET) {
     this.particles = new ObjectPool(particleBudget, blankParticle, resetParticle);
     this.damageNumbers = new ObjectPool(damageNumberBudget, blankDamageNumber, resetDamageNumber);
@@ -47,6 +60,12 @@ export class ParticleSystem {
 
   /** Spawns a small burst of hit particles at a world position. Silently drops
    * particles once the budget is spent. */
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {string} color
+   * @param {number} [count]
+   */
   emitBurst(x, y, color, count = 6) {
     for (let i = 0; i < count; i += 1) {
       const slot = this.particles.acquire();
@@ -64,6 +83,12 @@ export class ParticleSystem {
     }
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} amount
+   * @param {string} [kind]
+   */
   emitDamageNumber(x, y, amount, kind = 'damage') {
     const slot = this.damageNumbers.acquire();
     if (!slot) return;
@@ -99,10 +124,12 @@ export class ParticleSystem {
     }
   }
 
+  /** @param {(p: Particle) => void} fn */
   forEachParticle(fn) {
     this.particles.forEachActive(fn);
   }
 
+  /** @param {(d: DamageNumber) => void} fn */
   forEachDamageNumber(fn) {
     this.damageNumbers.forEachActive(fn);
   }
