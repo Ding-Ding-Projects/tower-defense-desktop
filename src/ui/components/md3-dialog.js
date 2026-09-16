@@ -37,9 +37,16 @@ TEMPLATE.innerHTML = `
 export class Md3Dialog extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(TEMPLATE.content.cloneNode(true));
-    this._dialog = this.shadowRoot.querySelector('dialog');
+    // attachShadow RETURNS the root it just created; reading this.shadowRoot
+    // afterwards gets the same object typed as possibly null, which it cannot be on
+    // the line below the call that made it. The query results are asserted because
+    // the template is a constant in this file: a missing element means the template
+    // was edited and this component quietly stopped working.
+    const root = this.attachShadow({ mode: 'open' });
+    root.appendChild(TEMPLATE.content.cloneNode(true));
+    const dialog = root.querySelector('dialog');
+    if (!dialog) throw new Error('md3-dialog: the shadow template has no dialog');
+    this._dialog = dialog;
     this._dialog.addEventListener('close', () => this.dispatchEvent(new Event('close', { bubbles: true })));
     this._dialog.addEventListener('cancel', (e) => {
       if (this.hasAttribute('no-escape-close')) e.preventDefault();
@@ -50,6 +57,7 @@ export class Md3Dialog extends HTMLElement {
     if (!this._dialog.open) this._dialog.showModal();
   }
 
+  /** @param {string} [returnValue] */
   close(returnValue) {
     if (this._dialog.open) this._dialog.close(returnValue);
   }

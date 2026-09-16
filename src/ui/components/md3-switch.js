@@ -79,9 +79,16 @@ export class Md3Switch extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(TEMPLATE.content.cloneNode(true));
-    this._input = this.shadowRoot.querySelector('input');
+    // attachShadow RETURNS the root it just created; reading this.shadowRoot
+    // afterwards gets the same object typed as possibly null, which it cannot be on
+    // the line below the call that made it. The query results are asserted because
+    // the template is a constant in this file: a missing element means the template
+    // was edited and this component quietly stopped working.
+    const root = this.attachShadow({ mode: 'open' });
+    root.appendChild(TEMPLATE.content.cloneNode(true));
+    const input = root.querySelector('input');
+    if (!input) throw new Error('md3-switch: the shadow template has no input');
+    this._input = input;
     this._input.addEventListener('change', () => {
       this.toggleAttribute('checked', this._input.checked);
       this.dispatchEvent(new Event('change', { bubbles: true }));

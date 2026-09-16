@@ -63,10 +63,18 @@ export class Md3IconButton extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(TEMPLATE.content.cloneNode(true));
-    this._button = this.shadowRoot.querySelector('button');
-    this._path = this.shadowRoot.querySelector('path');
+    // attachShadow RETURNS the root it just created; reading this.shadowRoot
+    // afterwards gets the same object typed as possibly null, which it cannot be on
+    // the line below the call that made it. The query results are asserted because
+    // the template is a constant in this file: a missing element means the template
+    // was edited and this component quietly stopped working.
+    const root = this.attachShadow({ mode: 'open' });
+    root.appendChild(TEMPLATE.content.cloneNode(true));
+    const button = root.querySelector('button');
+    const path = root.querySelector('path');
+    if (!button || !path) throw new Error('md3-icon-button: the shadow template is incomplete');
+    this._button = button;
+    this._path = path;
   }
 
   connectedCallback() {
@@ -86,14 +94,21 @@ export class Md3IconButton extends HTMLElement {
     const label = this.getAttribute('aria-label') ?? '';
     this._button.setAttribute('aria-label', label);
     if (this.hasAttribute('disabled') && this.hasAttribute('title-when-disabled')) {
-      this._button.title = this.getAttribute('title-when-disabled');
+      this._button.title = this.getAttribute('title-when-disabled') ?? '';
     } else {
       this._button.removeAttribute('title');
     }
-    const icon = this.getAttribute('icon');
-    this._path.setAttribute('d', ICONS[icon] ?? '');
+    // An absent icon attribute is a legitimate state, and indexing a lookup with null
+    // is not: it reaches for a key that cannot exist rather than falling through to the
+    // empty path this line already intends.
+    const icon = this.getAttribute('icon') ?? '';
+    this._path.setAttribute('d', /** @type {Record<string, string|undefined>} */ (ICONS)[icon] ?? '');
   }
 
+  /**
+   * @override
+   * @param {FocusOptions} [options]
+   */
   focus(options) {
     this._button.focus(options);
   }

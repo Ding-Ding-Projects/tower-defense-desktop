@@ -75,9 +75,17 @@ export class Md3Button extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(TEMPLATE.content.cloneNode(true));
-    this._button = this.shadowRoot.querySelector('button');
+    // attachShadow RETURNS the root it just created; reading this.shadowRoot afterwards
+    // gets the same object typed as possibly null, which it cannot be on the line
+    // immediately below the call that made it.
+    const root = this.attachShadow({ mode: 'open' });
+    root.appendChild(TEMPLATE.content.cloneNode(true));
+    const button = root.querySelector('button');
+    // The template is a constant in this file, so a missing button means the template
+    // was edited and this component quietly stopped working. Saying so beats every
+    // later use guarding against a case that should be impossible.
+    if (!button) throw new Error('md3-button: the shadow template has no button');
+    this._button = button;
   }
 
   connectedCallback() {
@@ -92,17 +100,17 @@ export class Md3Button extends HTMLElement {
   _sync() {
     this._button.disabled = this.hasAttribute('disabled');
     if (this.hasAttribute('aria-pressed')) {
-      this._button.setAttribute('aria-pressed', this.getAttribute('aria-pressed'));
+      this._button.setAttribute('aria-pressed', this.getAttribute('aria-pressed') ?? '');
     } else {
       this._button.removeAttribute('aria-pressed');
     }
     if (this.hasAttribute('aria-label')) {
-      this._button.setAttribute('aria-label', this.getAttribute('aria-label'));
+      this._button.setAttribute('aria-label', this.getAttribute('aria-label') ?? '');
     } else {
       this._button.removeAttribute('aria-label');
     }
     if (this.hasAttribute('disabled') && this.hasAttribute('title-when-disabled')) {
-      this._button.title = this.getAttribute('title-when-disabled');
+      this._button.title = this.getAttribute('title-when-disabled') ?? '';
     }
   }
 
@@ -110,10 +118,15 @@ export class Md3Button extends HTMLElement {
     return this.hasAttribute('disabled');
   }
 
+  /** @param {boolean} value */
   set disabled(value) {
     this.toggleAttribute('disabled', !!value);
   }
 
+  /**
+   * @override
+   * @param {FocusOptions} [options]
+   */
   focus(options) {
     this._button.focus(options);
   }
