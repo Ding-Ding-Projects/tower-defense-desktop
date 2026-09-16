@@ -16,7 +16,7 @@
  * want the generator state, and the hash absolutely does.
  */
 
-import { fromFixed } from '../core/fixed.js';
+// fromFixed is deliberately NOT used here: the interface converts coordinates itself.
 import { TICK_RATE } from '../core/constants.js';
 
 /** Internal phase names to the ones the interface layer uses. */
@@ -46,31 +46,40 @@ export function snapshot(state) {
       state.phase === 'intermission' ? state.phaseTicks / TICK_RATE : 0,
     killCount: state.killCount,
     leakCount: state.leakCount,
+    // Positions stay FIXED-POINT here, deliberately.
+    //
+    // The interface layer converts them itself, in one place, as part of
+    // interpolating between two snapshots. Converting here as well divided every
+    // coordinate by 1024 a second time and piled the entire battlefield into the
+    // top-left corner of the map, where it rendered as a single smudge that looked
+    // like a stray decoration. Nothing threw, no check failed, and the lane simply
+    // appeared empty. Field names below match what the interface reads for the same
+    // reason: a mismatch there is silent too.
     towers: state.towers.map((t) => ({
       id: t.seq,
       defId: t.defId,
       level: t.level,
-      x: fromFixed(t.xFixed),
-      y: fromFixed(t.yFixed),
-      targeting: t.targeting,
-      abilityCooldownSeconds: t.abilityCooldownTicks / TICK_RATE,
+      x: t.xFixed,
+      y: t.yFixed,
+      targetingMode: t.targeting,
+      abilityCooldownRemainingSeconds: t.abilityCooldownTicks / TICK_RATE,
       totalSpent: t.totalSpent,
     })),
     enemies: state.enemies.map((e) => ({
       id: e.seq,
       defId: e.defId,
-      x: fromFixed(e.xFixed),
-      y: fromFixed(e.yFixed),
-      hp: e.hp,
-      maxHp: e.maxHp,
-      shield: e.shield,
+      x: e.xFixed,
+      y: e.yFixed,
+      hpCurrent: e.hp,
+      hpMax: e.maxHp,
+      shieldCurrent: e.shield,
       statuses: e.statuses.map((s) => ({ id: s.id, stacks: s.stacks })),
     })),
     projectiles: state.projectiles.map((p) => ({
       id: p.seq,
-      x: fromFixed(p.xFixed),
-      y: fromFixed(p.yFixed),
-      targetId: p.targetSeq,
+      x: p.xFixed,
+      y: p.yFixed,
+      targetEnemyId: p.targetSeq,
     })),
   };
 }
