@@ -11,7 +11,7 @@ const TOWER = {
   allowedTerrain: ['ground'],
   placementPool: 'default',
   maxCount: 2,
-  sellRefundPercent: 70,
+  sellRefundFraction: 70,
   footprintRadius: 1,
   targetingModes: ['first', 'last', 'closest', 'strongest', 'weakest'],
   levels: [
@@ -92,8 +92,8 @@ test('deriveSellValue sums spent cost through the current level and applies the 
 });
 
 test('deriveSellValue floors a fractional refund rather than rounding', () => {
-  const oddRefund = { ...TOWER, sellRefundPercent: 33, levels: [{ level: 0, cost: 100 }] };
+  const oddRefund = { ...TOWER, sellRefundFraction: 33, levels: [{ level: 0, cost: 100 }] };
   assert.equal(deriveSellValue(oddRefund, 0), 33); // 100 * 0.33 = 33 exactly, sanity check
-  const oddRefund2 = { ...TOWER, sellRefundPercent: 33, levels: [{ level: 0, cost: 101 }] };
+  const oddRefund2 = { ...TOWER, sellRefundFraction: 33, levels: [{ level: 0, cost: 101 }] };
   assert.equal(deriveSellValue(oddRefund2, 0), 33); // 101 * 0.33 = 33.33 -> floors to 33
 });

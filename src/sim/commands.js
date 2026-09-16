@@ -143,7 +143,7 @@ function sellTower(state, gameData, payload) {
   if (!tower) return { accepted: false, reason: 'no such tower' };
   const def = gameData.towers.get(tower.defId);
   if (!def) return { accepted: false, reason: 'unknown tower' };
-  state.cash += Math.trunc(tower.totalSpent * def.sellRefundPercent);
+  state.cash += Math.trunc(tower.totalSpent * def.sellRefundFraction);
   state.towers = state.towers.filter((t) => t.seq !== tower.seq);
   // Anything this tower had in flight is orphaned rather than left pointing at a
   // tower that no longer exists.

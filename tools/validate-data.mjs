@@ -89,8 +89,12 @@ for (const raw of RAW.towers) {
     must(['ground', 'water', 'cliff'].includes(terrain), where + ': unknown terrain ' + terrain);
   }
   must(tower.targetingModes.length > 0, where + ': has no targeting modes');
-  must(tower.sellRefundPercent >= 0 && tower.sellRefundPercent <= 1,
-    where + ': a refund outside 0..1 either pays nothing or prints money');
+  // A FRACTION between 0 and 1, never a number out of a hundred. The field used to
+  // be called sellRefundPercent while holding 0.7, so the simulation read it as a
+  // fraction and the interface read it as a percentage. Both were reasonable given
+  // the name, and the visible result was a tower offering to sell for nothing.
+  must(typeof tower.sellRefundFraction === 'number' && tower.sellRefundFraction >= 0 && tower.sellRefundFraction <= 1,
+    where + ': sellRefundFraction is ' + tower.sellRefundFraction + '; it must be a fraction between 0 and 1, not a percentage');
   must(tower.levels.length > 0, where + ': has no levels');
 
   tower.levels.forEach((level, i) => {

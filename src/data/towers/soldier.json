@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundPercent": 0.7,
+  "sellRefundFraction": 0.7,
   "footprintRadius": 1.5,
   "targetingModes": [
     "first",

@@ -126,13 +126,30 @@ export function deriveUpgradeState(towerDef, currentLevel, cash) {
  * @returns {number}
  */
 export function deriveSellValue(towerDef, currentLevel) {
-  const spent = towerDef.levels
-    .filter((l) => l.level <= currentLevel)
+  // Two things here were wrong at once and produced the same visible answer: a
+  // freshly placed tower offering to sell for nothing.
+  //
+  // First, what was spent. Level 0 is the placed tower and its `cost` is zero,
+  // because the price of putting it down lives in `baseCost`. Summing level costs
+  // alone therefore came to zero for a tower nobody had upgraded yet.
+  //
+  // Second, the refund. `sellRefundFraction` is a FRACTION between 0 and 1, not a
+  // number out of a hundred, so dividing by 100 again scaled the refund down by a
+  // further hundredfold. Either mistake alone rounds a small refund to zero; together
+  // they guaranteed it.
+  const spentOnUpgrades = towerDef.levels
+    .filter((l) => l.level > 0 && l.level <= currentLevel)
     .reduce((sum, l) => sum + l.cost, 0);
-  // spent and sellRefundPercent are both integers, so multiply before dividing:
-  // Math.floor(spent * (percent / 100)) looks equivalent but is not, because of
-  // binary floating point representation error. Multiplying first sidesteps it.
-  return Math.floor((spent * towerDef.sellRefundPercent) / 100);
+  const spent = towerDef.baseCost + spentOnUpgrades;
+
+  // Math.trunc, and the same multiplication, as the simulation's own sell handler.
+  //
+  // This number is a PROMISE on a button. Whatever arithmetic it uses, the simulation
+  // will use its own when the button is pressed, and a panel that computes a more
+  // defensible answer than the simulation pays is simply a panel that lies. Note that
+  // 180 times 0.7 floors to 125 rather than 126, because 0.7 has no exact binary
+  // representation; being consistent with the payer matters more than being nicer.
+  return Math.trunc(spent * towerDef.sellRefundFraction);
 }
 
 /**

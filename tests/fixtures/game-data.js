@@ -46,7 +46,7 @@ export function makeGameData() {
   const towers = new Map([
     ['gunner', {
       id: 'gunner', displayName: 'Gunner', baseCost: 100, allowedTerrain: ['ground'],
-      placementPool: 'default', maxCount: null, sellRefundPercent: 0.7, footprintRadius: 1,
+      placementPool: 'default', maxCount: null, sellRefundFraction: 0.7, footprintRadius: 1,
       targetingModes: ['first', 'last', 'closest', 'strongest', 'weakest'],
       levels: [
         { level: 0, cost: 0, damage: 10, fireRate: 1, range: 20, detectsHidden: false, hitsAir: false, source: fixtureSource() },
@@ -56,7 +56,7 @@ export function makeGameData() {
     }],
     ['spotter', {
       id: 'spotter', displayName: 'Spotter', baseCost: 200, allowedTerrain: ['ground', 'cliff'],
-      placementPool: 'default', maxCount: null, sellRefundPercent: 0.5, footprintRadius: 1,
+      placementPool: 'default', maxCount: null, sellRefundFraction: 0.5, footprintRadius: 1,
       targetingModes: ['first', 'closest'],
       levels: [
         {
@@ -69,7 +69,7 @@ export function makeGameData() {
     }],
     ['bank', {
       id: 'bank', displayName: 'Bank', baseCost: 250, allowedTerrain: ['ground'],
-      placementPool: 'economy', maxCount: 2, sellRefundPercent: 0.6, footprintRadius: 2,
+      placementPool: 'economy', maxCount: 2, sellRefundFraction: 0.6, footprintRadius: 2,
       targetingModes: ['first'],
       levels: [
         { level: 0, cost: 0, damage: 0, fireRate: 0.1, range: 0, detectsHidden: false, hitsAir: false, incomePerWave: 50, source: fixtureSource() },
@@ -78,7 +78,7 @@ export function makeGameData() {
     }],
     ['captain', {
       id: 'captain', displayName: 'Captain', baseCost: 300, allowedTerrain: ['ground'],
-      placementPool: 'default', maxCount: null, sellRefundPercent: 0.7, footprintRadius: 1,
+      placementPool: 'default', maxCount: null, sellRefundFraction: 0.7, footprintRadius: 1,
       targetingModes: ['first'],
       levels: [
         {

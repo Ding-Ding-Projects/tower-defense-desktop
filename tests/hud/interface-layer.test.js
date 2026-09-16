@@ -12,7 +12,7 @@ function gameData() {
     towers: new Map([
       ['gunner', {
         id: 'gunner', displayName: 'Gunner', baseCost: 100, allowedTerrain: ['ground'],
-        placementPool: 'default', maxCount: null, sellRefundPercent: 70, footprintRadius: 1,
+        placementPool: 'default', maxCount: null, sellRefundFraction: 0.7, footprintRadius: 1,
         targetingModes: ['first', 'closest'],
         levels: [
           { level: 0, cost: 0, damage: 10, fireRate: 1, range: 20, detectsHidden: false, hitsAir: false, source: SOURCE },

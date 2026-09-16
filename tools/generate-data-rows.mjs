@@ -100,7 +100,7 @@ for (const scraped of cache.results) {
     allowedTerrain: overlay.terrain,
     placementPool: overlay.pool,
     maxCount: overlay.max,
-    sellRefundPercent: overlay.refund,
+    sellRefundFraction: overlay.refund,
     footprintRadius: overlay.footprint,
     targetingModes: ALL_MODES,
     // Level 0 is the placed tower, so its cost is the placement cost and the level

@@ -75,10 +75,10 @@ export function deriveSellValue(towerDef, currentLevel) {
   const spent = towerDef.levels
     .filter((l) => l.level <= currentLevel)
     .reduce((sum, l) => sum + l.cost, 0);
-  // spent and sellRefundPercent are both integers, so multiply before dividing:
+  // spent and sellRefundFraction are both integers, so multiply before dividing:
   // Math.floor(spent * (percent / 100)) looks equivalent but is not — 70 / 100 is
   // 0.6999999999999999556 in a double, and 180 * that floors to 125 instead of
   // the true 126. Keeping the multiplication in integers first sidesteps the
   // representation error entirely rather than trying to round it away after.
-  return Math.floor((spent * towerDef.sellRefundPercent) / 100);
+  return Math.floor((spent * towerDef.sellRefundFraction) / 100);
 }

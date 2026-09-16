@@ -13,7 +13,7 @@ function towerDef(overrides = {}) {
     allowedTerrain: ['ground'],
     placementPool: 'default',
     maxCount: null,
-    sellRefundPercent: 70,
+    sellRefundFraction: 70,
     footprintRadius: 1,
     targetingModes: ['first'],
     levels: [{ level: 0, cost: 0, damage: 10, fireRate: 1, range: 20, detectsHidden: false, hitsAir: false, source: SOURCE }],

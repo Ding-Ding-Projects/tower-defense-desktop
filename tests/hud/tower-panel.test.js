@@ -12,7 +12,7 @@ const TOWER_DEF = {
   allowedTerrain: ['ground'],
   placementPool: 'default',
   maxCount: null,
-  sellRefundPercent: 70,
+  sellRefundFraction: 0.7,
   footprintRadius: 1,
   targetingModes: ['first', 'closest'],
   levels: [

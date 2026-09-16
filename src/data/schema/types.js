@@ -105,7 +105,7 @@
  * @property {Terrain[]} allowedTerrain
  * @property {string} placementPool   towers sharing a pool share its cap
  * @property {number|null} maxCount
- * @property {number} sellRefundPercent
+ * @property {number} sellRefundFraction
  * @property {number} footprintRadius
  * @property {TargetingMode[]} targetingModes
  * @property {TowerLevel[]} levels

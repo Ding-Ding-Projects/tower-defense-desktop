@@ -55,7 +55,7 @@ export const STUB_TOWER = {
   allowedTerrain: ['ground'],
   placementPool: 'default',
   maxCount: 6,
-  sellRefundPercent: 70,
+  sellRefundFraction: 0.7,
   footprintRadius: 1,
   targetingModes: ['first', 'last', 'closest', 'strongest', 'weakest'],
   levels: [
@@ -206,7 +206,7 @@ function applyCommand(state, command) {
       if (idx === -1) return;
       const tower = state.towers[idx];
       const spent = STUB_TOWER.levels.slice(0, tower.level + 1).reduce((sum, l) => sum + l.cost, 0);
-      state.cash += Math.floor(spent * (STUB_TOWER.sellRefundPercent / 100));
+      state.cash += Math.floor(spent * (STUB_TOWER.sellRefundFraction / 100));
       state.events.push({ type: 'towerSold', x: tower.x, y: tower.y, towerDefId: tower.defId });
       state.towers.splice(idx, 1);
       break;
