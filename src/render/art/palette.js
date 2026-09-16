@@ -70,15 +70,24 @@ export const TOWER = Object.freeze({
 });
 
 export const ENEMY = Object.freeze({
-  normal: '#8a6a52',
+  // Moved off the path's own brown. At #8a6a52 against an earth base of #7a6142 a
+  // walker was within about 21 of the road it was walking on, which reads as a smudge
+  // moving over dirt rather than as a figure. Cooler and darker separates it from the
+  // path without turning it into a colour nothing in this world would wear.
+  normal: '#4e4a44',
   quick: '#4f6f8a',
-  fast: '#7a5a48',
+  // The worst offender of the lot: at #7a5a48 a runner was a distance of 9 from the
+  // path base, which is to say invisible on the road it spends its whole life on.
+  fast: '#a8603f',
   boss: '#8c1d1d',
   bossDark: '#5c1010',
   bossPlate: '#3a1414',
   flying: '#c9a76b',
   hidden: '#bcd6e6',
-  outline: 'rgba(20, 14, 10, 0.55)',
+  // Darker and more opaque than it was. An outline is what separates a figure from
+  // whatever it happens to be standing on, and at 0.55 it was doing that job only
+  // against the lightest patches of grass.
+  outline: 'rgba(14, 10, 7, 0.85)',
   shield: '#8ecbe8',
   shieldDark: '#4c8fb0',
   defensePlate: '#8a8a86',
@@ -170,6 +179,18 @@ export function withAlpha(hex, alpha) {
  * @param {number} t  0..1, 0 is hexA
  * @returns {string} 'rgb(r, g, b)'
  */
+export function colorDistance(hexA, hexB) {
+  // Plain Euclidean distance in RGB. Not a perceptual metric, and it does not need to
+  // be: it exists to catch a figure painted almost exactly the colour of the ground it
+  // walks on, which is a gap of single digits, not a subtle one.
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  const dr = a.r - b.r;
+  const dg = a.g - b.g;
+  const db = a.b - b.b;
+  return Math.sqrt(dr * dr + dg * dg + db * db);
+}
+
 export function mixHex(hexA, hexB, t) {
   // The hex-returning sibling of mixColors, and it exists for a specific reason:
   // withAlpha and shade parse hex and nothing else, so a colour that has been through

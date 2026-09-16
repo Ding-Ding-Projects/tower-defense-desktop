@@ -81,7 +81,11 @@ function hpScale(maxHp) {
 export function enemyBodyRadius(size, def) {
   const archetype = enemyArchetype(def);
   const scale = hpScale(def.maxHp) * (def.boss ? 1.7 : 1) * (archetype === 'fast' ? 0.92 : 1);
-  return size * 0.27 * scale;
+  // 0.27 left the creature occupying roughly half its own sprite box, which at
+  // gameplay zoom is a twenty pixel smudge with a health bar wider than it sitting on
+  // top. The box still needs headroom for a boss's bulk, a flier's lift and a wraith's
+  // drift, so this is not the whole box either.
+  return size * 0.34 * scale;
 }
 
 function baseColor(archetype) {

@@ -42,14 +42,16 @@ import {
  * The art module publishes its own world sizes; these scale them for this map's
  * proportions, where two hundred units span a couple of thousand pixels.
  */
-const WORLD = Object.freeze({
+export const WORLD = Object.freeze({
   tower: TOWER_WORLD_SIZE * 1.6,
   enemy: ENEMY_WORLD_SIZE * 2.1,
   projectile: PROJECTILE_WORLD_SIZE,
   particle: 0.35,
   laneWidth: 4.5,
-  healthBarWidth: 2.6,
-  healthBarHeight: 0.45,
+  // Narrower than the creature it belongs to, not wider. At 2.6 the bar was broader
+  // than the enemy's own body and became the thing the eye landed on.
+  healthBarWidth: 1.9,
+  healthBarHeight: 0.32,
   healthBarGap: 0.5,
 });
 
@@ -243,13 +245,20 @@ export class CanvasRenderer {
     const sprite = getEnemySprite(def, SPRITE_PX, gait.phase, gait.facing, hpRatio);
     this.ctx.drawImage(sprite, p.x - size / 2, p.y - size / 2, size, size);
 
-    this._drawHealthBar(
-      p.x,
-      p.y - size / 2 - WORLD.healthBarGap * camera.zoom,
-      WORLD.healthBarWidth * camera.zoom,
-      hpRatio,
-      camera.zoom,
-    );
+    // Only once something has actually been hurt. A full bar carries no information
+    // and there is one per enemy, so a wave in good health rendered as a wall of green
+    // rectangles sitting above creatures narrower than the bars themselves. What a
+    // player needs to see at a glance is which enemies are hurt, and that reads far
+    // better when the undamaged ones are not shouting.
+    if (hpRatio < 1) {
+      this._drawHealthBar(
+        p.x,
+        p.y - size / 2 - WORLD.healthBarGap * camera.zoom,
+        WORLD.healthBarWidth * camera.zoom,
+        hpRatio,
+        camera.zoom,
+      );
+    }
 
     let iconX = p.x - size / 2;
     for (const status of enemy.statuses) {
