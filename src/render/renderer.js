@@ -29,12 +29,12 @@ const SPRITE_PX = 96;
  * and the tower it belongs to can agree.
  */
 const WORLD = Object.freeze({
-  tower: 3.2,
-  enemy: 2.0,
+  tower: 4.6,
+  enemy: 3.4,
   projectile: 0.45,
   particle: 0.35,
-  laneWidth: 8,
-  healthBarWidth: 2.4,
+  laneWidth: 9,
+  healthBarWidth: 3.2,
   healthBarHeight: 0.45,
   healthBarGap: 0.6,
 });
