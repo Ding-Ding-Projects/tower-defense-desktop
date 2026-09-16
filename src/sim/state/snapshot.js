@@ -150,6 +150,10 @@ export function serializeState(state) {
       t.reloadTicks,
       t.abilityCooldownTicks,
       t.totalSpent,
+      // Drives which swings crit, so two replays that disagree about it deal different
+      // damage. Left out of the hash it would diverge in complete silence, and the
+      // determinism proof would report the two runs identical while they were not.
+      t.hitsLanded ?? 0,
     );
   }
 
