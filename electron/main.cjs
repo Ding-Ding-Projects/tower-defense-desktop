@@ -59,16 +59,54 @@ function handleSquirrelEvent() {
   }
 }
 
+/**
+ * A window size asked for on the command line, as `--window-size=960x600`.
+ *
+ * This exists so the layout can be captured at an exact, repeatable size. Resizing a
+ * window on an off-screen desktop is not something the capture tooling can do from
+ * outside, so without a way to ask for a size at launch the only viewport anyone ever
+ * looks at is whatever the desktop happened to be, and clipping at the minimum
+ * supported size goes unnoticed because nobody has ever seen it.
+ *
+ * Refuses anything below the app's own minimum rather than quietly accepting it: a
+ * capture at a size the product does not support proves nothing about the product.
+ *
+ * @param {string[]} argv
+ * @returns {{ width: number, height: number } | null}
+ */
+function requestedWindowSize(argv) {
+  const arg = argv.find((a) => a.startsWith('--window-size='));
+  if (!arg) return null;
+  const match = /^--window-size=(\d+)x(\d+)$/.exec(arg);
+  if (!match) {
+    console.error('--window-size expects WIDTHxHEIGHT, for example --window-size=960x600');
+    return null;
+  }
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  if (width < MIN_WINDOW_WIDTH || height < MIN_WINDOW_HEIGHT) {
+    console.error(
+      '--window-size below the supported minimum of ' + MIN_WINDOW_WIDTH + 'x' + MIN_WINDOW_HEIGHT + '; ignoring',
+    );
+    return null;
+  }
+  return { width, height };
+}
+
+const MIN_WINDOW_WIDTH = 960;
+const MIN_WINDOW_HEIGHT = 600;
+
 function startApplication() {
   /** @type {import('electron').BrowserWindow | null} */
   let window = null;
 
   const createWindow = () => {
+    const size = requestedWindowSize(process.argv) ?? { width: 1280, height: 800 };
     window = new BrowserWindow({
-      width: 1280,
-      height: 800,
-      minWidth: 960,
-      minHeight: 600,
+      width: size.width,
+      height: size.height,
+      minWidth: MIN_WINDOW_WIDTH,
+      minHeight: MIN_WINDOW_HEIGHT,
       // Frameless with a custom title bar drawn by the interface, per the product
       // rules. The controls below are the only way it can drive the real window.
       frame: false,

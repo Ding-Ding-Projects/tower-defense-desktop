@@ -131,7 +131,18 @@ export class InterfaceLayer {
     let shopRect = sidebarRect;
     let towerPanelRect = null;
     if (showTowerPanel) {
-      [shopRect, towerPanelRect] = stack(sidebarRect, [null, null], SIDEBAR_GAP);
+      // The panel gets the height it measures; the shop takes whatever is left, because
+      // the shop is the one that scrolls. An even split gave the shop more than it
+      // needed and the panel less, and the panel is the half that cannot cope with
+      // less: at 125 percent interface scale in the smallest supported window its
+      // buttons ran off the bottom of the screen entirely.
+      const needed = this._towerPanel.measureHeight(ctx, sidebarRect.width, {
+        towerDef, tower: towerInstance, cash: snapshot.cash ?? 0,
+      });
+      // Never more than two thirds of the sidebar. A tower with a long upgrade
+      // description must not squeeze the shop out of existence.
+      const panelHeight = Math.min(needed, Math.max(0, sidebarRect.height * 0.66));
+      [shopRect, towerPanelRect] = stack(sidebarRect, [null, panelHeight], SIDEBAR_GAP);
     }
 
     const placementPoolCounts = new Map();

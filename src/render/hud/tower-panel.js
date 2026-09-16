@@ -52,6 +52,56 @@ export class TowerPanelHud {
    *   cash: number,
    * }} state
    */
+  /**
+   * The height this panel's content actually needs.
+   *
+   * The sidebar used to split evenly between the shop and this panel, which is fine at
+   * a comfortable window and wrong everywhere else: the shop scrolls and this does not,
+   * so half the sidebar is more room than the shop needs and less than this needs. At
+   * 125 percent interface scale in the smallest supported window the panel's buttons
+   * ran past the bottom of the screen, and at 200 percent a good deal more than that.
+   *
+   * Measured the same way the shop measures its cards and the top bar measures itself,
+   * so the one panel that cannot scroll is the one that gets told its real size.
+   *
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {number} width
+   * @param {{towerDef: any, tower: any, cash: number}} state
+   * @returns {number}
+   */
+  measureHeight(ctx, width, state) {
+    const { towerDef, tower, cash } = state;
+    if (!towerDef || !tower) return 0;
+
+    const innerWidth = Math.max(0, width - PADDING * 2);
+    const levelDef = towerDef.levels[tower.level];
+    if (!levelDef) return 0;
+
+    let height = PADDING;
+    height += PORTRAIT_SIZE + PADDING;
+    for (const field of STAT_FIELDS) {
+      if (levelDef[field] != null) height += ROW_HEIGHT;
+    }
+    height += PADDING / 2;
+    height += BUTTON_HEIGHT + PADDING / 2;
+    if (levelDef.ability) height += BUTTON_HEIGHT + PADDING / 2;
+
+    const upgrade = deriveUpgradeState(towerDef, tower.level, cash);
+    const detailText = upgrade.changes
+      .map((c) => `${FIELD_LABELS[c.field] ?? c.field}: ${c.before} -> ${c.after}`)
+      .join(', ');
+    height += BUTTON_HEIGHT + 4;
+    if (detailText) {
+      ctx.save();
+      ctx.font = '400 11px "Roboto", system-ui, sans-serif';
+      const lines = wrapText(ctx, detailText, innerWidth);
+      ctx.restore();
+      height += wrappedTextHeight(lines.length, DETAIL_LINE_HEIGHT) + 4;
+    }
+    height += BUTTON_HEIGHT + PADDING;
+    return height;
+  }
+
   draw(ctx, rect, state) {
     const { towerDef, tower, cash } = state;
     this.visible = !!(towerDef && tower);

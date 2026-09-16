@@ -55,8 +55,21 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] Shop cards and the upgrade panel draw the real tower sprite, not a lettered box
 - [x] Every tower visually distinct, including towers sharing all mechanical stats
 - [x] Every state real: wave start, clear, victory, defeat, pause, settings
-- [ ] Frameless window with a custom title bar
-- [ ] Verified at 100, 125, 150 and 200 percent display scale with no clipping
+- [x] Frameless window with a custom title bar, verified in the running program
+- [ ] The window can be resized to an exact size for capture via `--window-size=WxH`,
+      but the capture matrix itself is still taken by hand rather than by a script
+- [x] Verified at 100, 125, 150 and 200 percent interface scale with no clipping, by
+      `tests/hud/viewport-fit.test.js`, which draws the real interface layer with a
+      tower selected (the tightest the layout gets) and bounds every drawing
+      coordinate. The contract it enforces is about logical area: the interface needs
+      960 by 600 to lay out in, so 200 percent scale needs a 1920 by 1200 window.
+      `uiScale` is currently pinned to 1 in app.js, so the larger steps guard a
+      preference that is not exposed yet. Finding this needed two corrections to the
+      check itself: the first version read `fillRect` and found six rectangles in the
+      whole interface, because almost all of it is drawn as paths; the second compared
+      pre-scale coordinates against the full window, so every scale above 1 passed
+      trivially. Once it was measuring the right thing it found real clipping, and the
+      sidebar now gives the upgrade panel the height it measures instead of half
 - [ ] Keyboard reachable end to end with visible focus and correct roles
 
 ## Phase 5: shipping
