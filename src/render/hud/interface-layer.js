@@ -47,6 +47,26 @@ const SIDEBAR_GAP = 10;
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 360;
 
+/**
+ * Everything one frame of the interface needs to know.
+ *
+ * Spelled out rather than left as `object`, which is what it was: `object` accepts any
+ * shape at all and then refuses every property read off it, so the declaration was
+ * simultaneously too loose to catch a caller passing the wrong thing and too tight to
+ * let this file read its own argument.
+ *
+ * @typedef {{
+ *   snapshot?: any,
+ *   gameData?: { towers?: Map<string, any> },
+ *   totalWaves?: number,
+ *   selectedTowerId?: string|number|null,
+ *   placingTowerDefId?: string|null,
+ *   disallowedTowerIds?: string[],
+ *   paused?: boolean,
+ *   uiScale?: number,
+ * }} InterfaceState
+ */
+
 export class InterfaceLayer {
   /**
    * @param {{doc?: Document|null}} [options]
@@ -60,13 +80,18 @@ export class InterfaceLayer {
     this._mirror = new AccessibilityMirror(this._doc);
     this._mountHost = null;
 
+    /** @type {{ kind: import('./overlays.js').OverlayKind, payload: any }|null} */
     this._overlay = null;
+    /** @type {string|null} */
     this._lastPhase = null;
     this._uiScale = 1;
     this._viewportRect = { x: 0, y: 0, width: 0, height: 0 };
   }
 
-  /** Attaches the hidden, real-control accessibility mirror under `host`. */
+  /**
+   * Attaches the hidden, real-control accessibility mirror under `host`.
+   * @param {HTMLElement|null} host
+   */
   mountAccessibilityMirror(host) {
     this._mountHost = host;
     this._mirror.mount(host);
@@ -85,7 +110,7 @@ export class InterfaceLayer {
   /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {import('./layout.js').Rect} viewportRect
-   * @param {object} state
+   * @param {InterfaceState} state
    */
   draw(ctx, viewportRect, state) {
     const uiScale = state.uiScale && state.uiScale > 0 ? state.uiScale : 1;
@@ -119,7 +144,7 @@ export class InterfaceLayer {
     const towers = gameData.towers ?? new Map();
 
     const towerInstance = state.selectedTowerId
-      ? (snapshot.towers ?? []).find((t) => t.id === state.selectedTowerId) ?? null
+      ? (snapshot.towers ?? []).find((/** @type {any} */ t) => t.id === state.selectedTowerId) ?? null
       : null;
     const towerDef = towerInstance ? towers.get(towerInstance.defId) ?? null : null;
     const showTowerPanel = !!(towerDef && towerInstance);
@@ -196,6 +221,10 @@ export class InterfaceLayer {
    * @param {number} x
    * @param {number} y
    */
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
   setHover(x, y) {
     const { lx, ly } = this._toLocal(x, y);
     if (this._overlay) {
@@ -208,10 +237,16 @@ export class InterfaceLayer {
   }
 
   /** Scrolls the shop's tower list by `deltaY` pixels (e.g. from a wheel event). */
+  /** @param {number} deltaY */
   scrollShop(deltaY) {
     this._shop.scroll(deltaY);
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {{lx: number, ly: number}}
+   */
   _toLocal(x, y) {
     const scale = this._uiScale || 1;
     return {
@@ -220,6 +255,10 @@ export class InterfaceLayer {
     };
   }
 
+  /**
+   * @param {any} snapshot
+   * @param {number} totalWaves
+   */
   _updateOverlayState(snapshot, totalWaves) {
     const phase = snapshot.phase ?? 'intermission';
     if (this._lastPhase == null) {
@@ -250,6 +289,7 @@ export class InterfaceLayer {
     this._lastPhase = phase;
   }
 
+  /** @param {InterfaceState} state */
   _syncAccessibilityMirror(state) {
     if (!this._mirror.isAvailable) return;
     const controls = [];
@@ -263,6 +303,7 @@ export class InterfaceLayer {
     this._mirror.sync(controls, (action) => this._dispatchMirrorAction(action));
   }
 
+  /** @param {any} action */
   _dispatchMirrorAction(action) {
     if (!action) return;
     if (action.kind === 'dismissOverlay') this._overlay = null;

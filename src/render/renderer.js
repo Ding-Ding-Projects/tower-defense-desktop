@@ -66,13 +66,29 @@ export class CanvasRenderer {
    */
   constructor(canvas, gameData, mapDef) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
+    // Refused here rather than discovered later. Without a 2D context this class cannot
+    // do anything at all, and letting it be built anyway means the failure surfaces as
+    // a TypeError somewhere deep in a draw call, several frames and one stack trace
+    // away from the thing that actually went wrong.
+    if (!ctx) throw new Error('CanvasRenderer: the canvas has no 2D context');
+    this.ctx = ctx;
     this.gameData = gameData;
     this.mapDef = mapDef;
+    /** @type {string|number|null} */
     this.selectedTowerId = null;
+    /** @type {string|null} */
     this.placingTowerDefId = null;
     this.reducedMotion = false;
     this._leakFlashUntil = 0;
+
+    // Set here as well as in resize(), which is where they were only ever set before.
+    // Drawing before the first resize would otherwise work with undefined dimensions,
+    // and undefined arithmetic produces NaN coordinates rather than an error, so the
+    // frame comes out blank with nothing to say about it.
+    this.dpr = 1;
+    this.cssWidth = 0;
+    this.cssHeight = 0;
 
     /**
      * Per-enemy walk phase, last position and facing.
@@ -85,14 +101,31 @@ export class CanvasRenderer {
      */
     this._gait = new Map();
 
-    /** Transient effects: a position, a kind and a start time. */
+    /**
+     * Transient effects: a position, a kind and a start time, plus whatever that kind
+     * needs. A muzzle flash needs the angle it points; an explosion needs its radius;
+     * both need how long they last.
+     * @type {{
+     *   x: number, y: number, kind: string, start: number,
+     *   life?: number, radius?: number, angle?: number,
+     * }[]}
+     */
     this._effects = [];
 
-    /** The in-canvas interface, drawn last so it sits above the battlefield. */
+    /**
+     * The in-canvas interface, drawn last so it sits above the battlefield.
+     * @type {import('./hud/interface-layer.js').InterfaceLayer|null}
+     */
     this.interfaceLayer = null;
+    /** @type {import('./hud/interface-layer.js').InterfaceState|null} */
     this.interfaceState = null;
   }
 
+  /**
+   * @param {number} cssWidth
+   * @param {number} cssHeight
+   * @param {number} [devicePixelRatio]
+   */
   resize(cssWidth, cssHeight, devicePixelRatio = window.devicePixelRatio || 1) {
     this.canvas.width = Math.round(cssWidth * devicePixelRatio);
     this.canvas.height = Math.round(cssHeight * devicePixelRatio);
@@ -107,6 +140,11 @@ export class CanvasRenderer {
    * @param {import('./view-model.js').ViewModel} viewModel
    * @param {{ x: number, y: number, zoom: number }} camera
    * @param {import('./particles.js').ParticleSystem} particles
+   */
+  /**
+   * @param {any} viewModel
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {any} [particles]
    */
   draw(viewModel, camera, particles) {
     const ctx = this.ctx;
@@ -128,8 +166,8 @@ export class CanvasRenderer {
     for (const proj of viewModel.projectiles) this._drawProjectile(proj, camera, w, h);
 
     this._drawEffects(camera, w, h, now);
-    particles.forEachParticle((p) => this._drawParticle(p, camera, w, h));
-    particles.forEachDamageNumber((d) => this._drawDamageNumber(d, camera, w, h));
+    particles.forEachParticle((/** @type {any} */ p) => this._drawParticle(p, camera, w, h));
+    particles.forEachDamageNumber((/** @type {any} */ d) => this._drawDamageNumber(d, camera, w, h));
 
     this._forgetDepartedEnemies(viewModel);
 
@@ -145,6 +183,11 @@ export class CanvasRenderer {
   }
 
   /** The ground, generated once per map and then blitted. */
+  /**
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   */
   _drawGround(camera, w, h) {
     const ctx = this.ctx;
     ctx.fillStyle = '#0b0d10';
@@ -161,6 +204,11 @@ export class CanvasRenderer {
     );
   }
 
+  /**
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   */
   _drawTrack(camera, w, h) {
     for (const lane of this.mapDef.lanes) {
       const points = lane.waypoints.map((wp) => worldToScreen(camera, w, h, wp.x, wp.y));
@@ -168,6 +216,11 @@ export class CanvasRenderer {
     }
   }
 
+  /**
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   */
   _drawZones(camera, w, h) {
     if (!this.placingTowerDefId) return;
     const ctx = this.ctx;
@@ -194,6 +247,13 @@ export class CanvasRenderer {
    * A tower points at whatever it would actually be shooting: the nearest enemy inside
    * its range. Without this every turret faces the same way and the battlefield reads
    * as a diagram of towers rather than a fight.
+   */
+  /**
+   * @param {any} tower
+   * @param {any} viewModel
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
    */
   _drawTower(tower, viewModel, camera, w, h) {
     const def = this.gameData.towers.get(tower.defId);
@@ -233,6 +293,12 @@ export class CanvasRenderer {
     this.ctx.drawImage(sprite, p.x - size / 2, p.y - size / 2, size, size);
   }
 
+  /**
+   * @param {any} enemy
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   */
   _drawEnemy(enemy, camera, w, h) {
     const def = this.gameData.enemies.get(enemy.defId);
     if (!def) return;
@@ -273,6 +339,10 @@ export class CanvasRenderer {
    * a sprinting runner step at exactly the same rate, which reads as a sliding sprite
    * rather than a walking thing.
    */
+  /**
+   * @param {any} enemy
+   * @returns {{phase: number, facing: number}}
+   */
   _advanceGait(enemy) {
     const previous = this._gait.get(enemy.id);
     if (!previous) {
@@ -295,14 +365,22 @@ export class CanvasRenderer {
   }
 
   /** Forget gait state for anything dead or leaked, so the map cannot grow forever. */
+  /**
+   * @param {any} viewModel
+   */
   _forgetDepartedEnemies(viewModel) {
     if (this._gait.size <= viewModel.enemies.length) return;
-    const alive = new Set(viewModel.enemies.map((e) => e.id));
+    const alive = new Set(viewModel.enemies.map((/** @type {any} */ e) => e.id));
     for (const id of this._gait.keys()) {
       if (!alive.has(id)) this._gait.delete(id);
     }
   }
 
+  /**
+   * @param {any} event
+   * @param {any} particles
+   * @param {number} now  milliseconds
+   */
   _handleEvent(event, particles, now) {
     const x = fromFixed(event.x);
     const y = fromFixed(event.y);
@@ -321,23 +399,39 @@ export class CanvasRenderer {
     }
   }
 
+  /**
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   * @param {number} now  milliseconds
+   */
   _drawEffects(camera, w, h, now) {
     const ctx = this.ctx;
     const surviving = [];
     for (const effect of this._effects) {
-      const t = (now - effect.start) / effect.life;
+      // Every effect is pushed with a life, but the shape allows it to be absent and
+      // dividing by undefined gives NaN, which compares false against every threshold:
+      // the effect would never expire and would be redrawn forever.
+      const t = (now - effect.start) / (effect.life ?? 1);
       if (t >= 1) continue;
       const p = worldToScreen(camera, w, h, effect.x, effect.y);
       const size = camera.zoom;
       if (effect.kind === 'spark') drawImpactSpark(ctx, p.x, p.y, t, size);
       else if (effect.kind === 'explosion') {
         drawExplosion(ctx, p.x, p.y, (effect.radius ?? 1.5) * camera.zoom, t, size);
-      } else if (effect.kind === 'muzzle') drawMuzzleFlash(ctx, p.x, p.y, effect.angle, t, size);
+      } else if (effect.kind === 'muzzle') drawMuzzleFlash(ctx, p.x, p.y, effect.angle ?? 0, t, size);
       surviving.push(effect);
     }
     this._effects = surviving;
   }
 
+  /**
+   * @param {number} cx
+   * @param {number} y
+   * @param {number} width
+   * @param {number} ratio  0..1
+   * @param {number} zoom
+   */
   _drawHealthBar(cx, y, width, ratio, zoom) {
     const ctx = this.ctx;
     // Sized in map units like everything else. A pixel floor here quietly undoes the
@@ -356,6 +450,12 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {{id: string, stacks?: number}} status
+   * @param {number} zoom
+   */
   _drawStatusIcon(x, y, status, zoom) {
     const ctx = this.ctx;
     const colours = {
@@ -370,11 +470,17 @@ export class CanvasRenderer {
     ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, Math.max(2, 0.3 * zoom), 0, Math.PI * 2);
-    ctx.fillStyle = colours[status.id] ?? '#9aa0a6';
+    ctx.fillStyle = /** @type {Record<string, string|undefined>} */ (colours)[status.id] ?? '#9aa0a6';
     ctx.fill();
     ctx.restore();
   }
 
+  /**
+   * @param {any} proj
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   */
   _drawProjectile(proj, camera, w, h) {
     const p = worldToScreen(camera, w, h, proj.x, proj.y);
     const ctx = this.ctx;
@@ -391,6 +497,12 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
+  /**
+   * @param {any} p
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   */
   _drawParticle(p, camera, w, h) {
     const screen = worldToScreen(camera, w, h, p.x, p.y);
     const alpha = Math.max(0, 1 - p.age / p.life);
@@ -404,6 +516,12 @@ export class CanvasRenderer {
     ctx.restore();
   }
 
+  /**
+   * @param {any} d
+   * @param {{x: number, y: number, zoom: number}} camera
+   * @param {number} w  viewport width in CSS pixels
+   * @param {number} h
+   */
   _drawDamageNumber(d, camera, w, h) {
     const screen = worldToScreen(camera, w, h, d.x, d.y);
     const alpha = Math.max(0, 1 - d.age / d.life);
