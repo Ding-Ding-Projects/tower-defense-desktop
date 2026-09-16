@@ -48,7 +48,15 @@ export function targetingModeLabel(mode) {
   return TARGETING_LABELS[mode] ?? mode;
 }
 
-/** Display labels for every stat field a level diff or stat readout can name. */
+/**
+ * Display labels for every stat field a level diff or stat readout can name.
+ *
+ * Typed as a partial lookup so the `?? field` fallback every caller writes is
+ * meaningful rather than dead: a field with no friendly label falls back to its own
+ * name, which is ugly and readable, instead of printing "undefined" at a player.
+ *
+ * @type {Partial<Record<string, string>>}
+ */
 export const FIELD_LABELS = {
   damage: 'Damage',
   fireRate: 'Fire rate',

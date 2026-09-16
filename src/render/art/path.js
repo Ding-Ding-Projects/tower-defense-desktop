@@ -15,9 +15,11 @@
 import { PATH, mixColors } from './palette.js';
 import { hash2 } from './noise.js';
 
+/** @typedef {{ x: number, y: number }} Point */
+
 /**
  * @param {CanvasRenderingContext2D} ctx
- * @param {Array<{x: number, y: number}>} points  screen-space polyline, at least 2 points
+ * @param {Point[]} points  screen-space polyline, at least 2 points
  * @param {number} widthPx
  * @param {string|number} seed
  * @param {{ chevronSpacingPx?: number }} [options]
@@ -38,6 +40,12 @@ export function drawPath(ctx, points, widthPx, seed, options = {}) {
   drawDirectionChevrons(ctx, points, chevronSpacing, widthPx);
 }
 
+/**
+ * A unit normal per point, taken from the direction its neighbours imply, so the two
+ * edges of the lane stay parallel through a corner.
+ * @param {Point[]} points
+ * @returns {Point[]}
+ */
 function computeNormals(points) {
   const normals = [];
   for (let i = 0; i < points.length; i += 1) {
@@ -51,6 +59,15 @@ function computeNormals(points) {
   return normals;
 }
 
+/**
+ * @param {Point[]} points
+ * @param {Point[]} normals
+ * @param {number} offset  how far along the normal, signed
+ * @param {string|number} seed
+ * @param {string} side  composed into the seed so the two edges wobble independently
+ * @param {number} jitterScale
+ * @returns {Point[]}
+ */
 function offsetPolyline(points, normals, offset, seed, side, jitterScale) {
   return points.map((p, i) => {
     const n = normals[i];
@@ -60,6 +77,11 @@ function offsetPolyline(points, normals, offset, seed, side, jitterScale) {
   });
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Point[]} leftEdge
+ * @param {Point[]} rightEdge
+ */
 function tracePolygon(ctx, leftEdge, rightEdge) {
   ctx.beginPath();
   leftEdge.forEach((p, i) => {
@@ -72,6 +94,11 @@ function tracePolygon(ctx, leftEdge, rightEdge) {
   ctx.closePath();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Point[]} leftEdge
+ * @param {Point[]} rightEdge
+ */
 function drawShadow(ctx, leftEdge, rightEdge) {
   ctx.save();
   ctx.translate(0, 2.5);
@@ -81,6 +108,11 @@ function drawShadow(ctx, leftEdge, rightEdge) {
   ctx.restore();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Point[]} leftEdge
+ * @param {Point[]} rightEdge
+ */
 function drawEarthFill(ctx, leftEdge, rightEdge) {
   tracePolygon(ctx, leftEdge, rightEdge);
   ctx.fillStyle = mixColors(PATH.earthDark, PATH.earthBase, 0.7);
@@ -90,6 +122,12 @@ function drawEarthFill(ctx, leftEdge, rightEdge) {
   ctx.stroke();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Point[]} points
+ * @param {Point[]} normals
+ * @param {number} widthPx
+ */
 function drawRuts(ctx, points, normals, widthPx) {
   const rutOffset = widthPx * 0.22;
   ctx.strokeStyle = PATH.rut;
@@ -108,6 +146,12 @@ function drawRuts(ctx, points, normals, widthPx) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Point[]} points
+ * @param {number} spacingPx
+ * @param {number} widthPx
+ */
 function drawDirectionChevrons(ctx, points, spacingPx, widthPx) {
   const chevronSize = Math.max(3, Math.min(9, widthPx * 0.22));
   ctx.fillStyle = PATH.direction;
@@ -137,6 +181,16 @@ function drawDirectionChevrons(ctx, points, spacingPx, widthPx) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} dirX  unit direction of travel
+ * @param {number} dirY
+ * @param {number} normX  unit normal, for the arrow's width
+ * @param {number} normY
+ * @param {number} size
+ */
 function drawChevron(ctx, cx, cy, dirX, dirY, normX, normY, size) {
   const tipX = cx + dirX * size;
   const tipY = cy + dirY * size;

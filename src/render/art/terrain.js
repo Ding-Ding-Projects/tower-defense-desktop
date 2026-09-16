@@ -63,6 +63,12 @@ export function renderTerrainTexture(ctx, pixelWidth, pixelHeight, seed) {
   drawVignette(ctx, pixelWidth, pixelHeight);
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} w
+ * @param {number} h
+ * @param {string|number} seed
+ */
 function drawClumps(ctx, w, h, seed) {
   const area = w * h;
   const count = Math.max(4, Math.round(area / 2200));
@@ -86,6 +92,12 @@ function drawClumps(ctx, w, h, seed) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} w
+ * @param {number} h
+ * @param {string|number} seed
+ */
 function drawTufts(ctx, w, h, seed) {
   const area = w * h;
   const count = Math.max(6, Math.round(area / 900));
@@ -108,6 +120,12 @@ function drawTufts(ctx, w, h, seed) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} w
+ * @param {number} h
+ * @param {string|number} seed
+ */
 function drawRocks(ctx, w, h, seed) {
   const area = w * h;
   const count = Math.max(2, Math.round(area / 6000));
@@ -139,6 +157,11 @@ function drawRocks(ctx, w, h, seed) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} w
+ * @param {number} h
+ */
 function drawVignette(ctx, w, h) {
   const cx = w / 2;
   const cy = h / 2;
@@ -185,6 +208,12 @@ export function getTerrainSprite(seed, mapWidthUnits, mapHeightUnits) {
 }
 
 /** Exposed for callers (and tests) that want the noise sample used at a point, e.g. to keep decorative placement consistent with the drawn ground. */
+/**
+ * @param {number} mapX
+ * @param {number} mapY
+ * @param {string|number} seed
+ * @returns {number} in [0, 1)
+ */
 export function terrainNoiseAt(mapX, mapY, seed) {
   return hash2(Math.round(mapX * 10), Math.round(mapY * 10), seed);
 }

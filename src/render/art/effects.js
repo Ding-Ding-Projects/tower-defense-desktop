@@ -20,10 +20,18 @@ import { hash2 } from './noise.js';
 /** Base world size of a projectile, in map units. */
 export const PROJECTILE_WORLD_SIZE = 0.5;
 
+/**
+ * @param {number} t  progress, 0 at the start of the effect and 1 at its end
+ * @returns {number}
+ */
 function fadeOut(t) {
   return Math.max(0, 1 - t);
 }
 
+/**
+ * @param {number} t  progress, 0..1
+ * @returns {number}
+ */
 function easeOutQuad(t) {
   return 1 - (1 - t) * (1 - t);
 }
@@ -59,6 +67,14 @@ export function drawMuzzleFlash(ctx, x, y, angleRadians, t, size) {
   ctx.restore();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} outerR
+ * @param {number} innerR
+ * @param {number} points  how many spikes
+ */
 function drawStar(ctx, cx, cy, outerR, innerR, points) {
   ctx.beginPath();
   for (let i = 0; i < points * 2; i += 1) {

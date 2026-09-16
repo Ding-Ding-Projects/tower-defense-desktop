@@ -80,7 +80,8 @@ function smoothstep(t) {
  * lattice. Continuous, deterministic, and cheap.
  * @param {number} x
  * @param {number} y
- * @param {number} seed
+ * @param {string|number} seed  either, because normalizeSeed accepts either and callers
+ *   compose strings to get independent streams from one seed
  * @returns {number} in [0, 1)
  */
 export function valueNoise2D(x, y, seed) {
@@ -107,19 +108,24 @@ export function valueNoise2D(x, y, seed) {
  * looks like organic terrain variation instead of one blurry blob.
  * @param {number} x
  * @param {number} y
- * @param {number} seed
+ * @param {string|number} seed
  * @param {number} [octaves]
  * @param {number} [lacunarity]  frequency multiplier per octave
  * @param {number} [gain]        amplitude multiplier per octave
  * @returns {number} in [0, 1)
  */
 export function fbm2D(x, y, seed, octaves = 4, lacunarity = 2, gain = 0.5) {
+  // Normalised once, so each octave's seed is derived the same way whether the caller
+  // passed a number or a string. Left as-is, `seed + o * 101` is addition for one and
+  // concatenation for the other: both deterministic, but two different derivations
+  // hiding behind one expression, and only one of them is what the line reads as.
+  const baseSeed = normalizeSeed(seed);
   let amplitude = 1;
   let frequency = 1;
   let sum = 0;
   let max = 0;
   for (let o = 0; o < octaves; o += 1) {
-    sum += valueNoise2D(x * frequency, y * frequency, seed + o * 101) * amplitude;
+    sum += valueNoise2D(x * frequency, y * frequency, baseSeed + o * 101) * amplitude;
     max += amplitude;
     amplitude *= gain;
     frequency *= lacunarity;

@@ -25,6 +25,12 @@ const PORTRAIT_SIZE = 40;
 // is the same picture they picked out of the shop a minute earlier.
 const PORTRAIT_ANGLE = -Math.PI / 2;
 
+/**
+ * The stats the panel lists, typed against the schema's own field names so one renamed
+ * there turns this red rather than quietly printing nothing.
+ * @type {Array<Extract<keyof import('../../data/schema/types.js').TowerLevel,
+ *   'damage'|'fireRate'|'range'|'aoeRadius'|'pierceCount'|'chainCount'>>}
+ */
 const STAT_FIELDS = ['damage', 'fireRate', 'range', 'aoeRadius', 'pierceCount', 'chainCount'];
 
 export class TowerPanelHud {
@@ -102,6 +108,11 @@ export class TowerPanelHud {
     return height;
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {{towerDef: any, tower: any, cash: number}} state
+   */
   draw(ctx, rect, state) {
     const { towerDef, tower, cash } = state;
     this.visible = !!(towerDef && tower);
@@ -264,6 +275,10 @@ export class TowerPanelHud {
     return null;
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
   setHover(x, y) {
     this._targetingButton.hovered = this._targetingButton.contains(x, y);
     this._abilityButton.hovered = this._hasAbility && this._abilityButton.contains(x, y);
@@ -274,10 +289,19 @@ export class TowerPanelHud {
   /** @returns {{key: string, label: string, disabled: boolean, action: object}[]} */
   accessibilityControls() {
     if (!this.visible) return [];
+    /** @type {{key: string, label: string, disabled: boolean, action: object}[]} */
     const controls = [
-      { key: 'tower-panel-targeting', label: this._targetingButton.rect ? undefined : undefined, disabled: false, action: { kind: 'cycleTargeting' } },
+      // The label used to be a ternary whose two branches were both `undefined`,
+      // overwritten on the very next line. It read as though the button's presence
+      // mattered and it did not, and it left the label's type as undefined, which is
+      // why every entry added after it was a type error.
+      {
+        key: 'tower-panel-targeting',
+        label: 'Cycle targeting mode',
+        disabled: false,
+        action: { kind: 'cycleTargeting' },
+      },
     ];
-    controls[0].label = `Cycle targeting mode`;
     if (this._hasAbility) {
       controls.push({
         key: 'tower-panel-ability',

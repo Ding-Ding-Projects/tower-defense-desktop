@@ -75,8 +75,12 @@ export const TOWER_WORLD_SIZE = 3;
 const ROTATION_CACHE_BUCKETS = 24;
 
 /**
+ * @typedef {'support'|'aoe'|'chain'|'pierce'|'economy'|'single'} TowerRole
+ */
+
+/**
  * @param {import('../../data/schema/types.js').TowerLevel} levelDef
- * @returns {'support'|'aoe'|'chain'|'pierce'|'economy'|'single'}
+ * @returns {TowerRole}
  */
 export function towerRole(levelDef) {
   if (levelDef.aura) return 'support';
@@ -87,8 +91,19 @@ export function towerRole(levelDef) {
   return 'single';
 }
 
+/**
+ * The accent for a role.
+ *
+ * `economy` deliberately has no colour of its own and falls back to the single-target
+ * one: an income tower's silhouette already sets it apart, and giving it a sixth accent
+ * would spend a colour on the one archetype that never shoots at anything.
+ *
+ * @param {TowerRole} role
+ * @returns {string} a hex colour
+ */
 function roleColor(role) {
-  return TOWER_ROLE[role] ?? TOWER_ROLE.single;
+  const byRole = /** @type {Record<string, string>} */ (TOWER_ROLE);
+  return byRole[role] ?? TOWER_ROLE.single;
 }
 
 /**
@@ -145,6 +160,12 @@ export function drawTower(ctx, size, def, levelDef, rotationRadians) {
   drawLevelPips(ctx, cx, cy, r, level);
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ */
 function drawShadow(ctx, cx, cy, r) {
   ctx.fillStyle = TOWER.shadow;
   ctx.beginPath();
@@ -153,6 +174,14 @@ function drawShadow(ctx, cx, cy, r) {
 }
 
 /** An octagonal plinth, two-tone so it reads as a solid slab rather than a flat disc. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @param {number} level
+ * @param {{ hull: string, plinthSides: number, panels: number }|null} livery
+ */
 function drawPlinth(ctx, cx, cy, r, level, livery) {
   const sides = livery?.plinthSides ?? 8;
   const turn = Math.PI / sides;
@@ -194,6 +223,14 @@ function drawPlinth(ctx, cx, cy, r, level, livery) {
 }
 
 /** Armor rivets around the plinth rim: more of them at higher level, so an upgraded tower reads as more heavily plated without a second art pass. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @param {number} level
+ * @param {string} accent
+ */
 function drawArmorRing(ctx, cx, cy, r, level, accent) {
   if (level <= 0) return;
   const rivetCount = 6 + level * 2;
@@ -217,6 +254,14 @@ function drawArmorRing(ctx, cx, cy, r, level, accent) {
 }
 
 /** Drawn already rotated (caller has translated to the tower centre and rotated by rotationRadians): everything here points along local +x. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {TowerRole} role
+ * @param {number} r
+ * @param {number} size
+ * @param {any} levelDef
+ * @param {string} accent
+ */
 function drawSilhouette(ctx, role, r, size, levelDef, accent) {
   const barrels = Math.max(1, levelDef.burstCount ?? 1);
   switch (role) {
@@ -241,6 +286,12 @@ function drawSilhouette(ctx, role, r, size, levelDef, accent) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {number} count
+ * @param {string} accent
+ */
 function drawBarrels(ctx, r, count, accent) {
   const barrelLen = r * 1.1;
   const barrelW = Math.max(1.2, r * 0.16);
@@ -255,6 +306,11 @@ function drawBarrels(ctx, r, count, accent) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} accent
+ */
 function drawRifle(ctx, r, accent) {
   const len = r * 1.6;
   const w = Math.max(1, r * 0.1);
@@ -266,6 +322,11 @@ function drawRifle(ctx, r, accent) {
   ctx.fillRect(len * 0.55, -w * 0.9, w * 0.5, w * 1.8);
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} accent
+ */
 function drawMortar(ctx, r, accent) {
   const len = r * 0.75;
   const w = Math.max(2, r * 0.42);
@@ -283,6 +344,12 @@ function drawMortar(ctx, r, accent) {
   ctx.fill();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {number} chainCount
+ * @param {string} accent
+ */
 function drawChainArray(ctx, r, chainCount, accent) {
   const rods = Math.max(2, Math.min(5, chainCount));
   const spread = Math.PI / 3;
@@ -304,6 +371,11 @@ function drawChainArray(ctx, r, chainCount, accent) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} accent
+ */
 function drawBeacon(ctx, r, accent) {
   ctx.strokeStyle = withAlpha(accent, 0.7);
   ctx.setLineDash([r * 0.15, r * 0.12]);
@@ -318,6 +390,11 @@ function drawBeacon(ctx, r, accent) {
   ctx.fill();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} accent
+ */
 function drawCoinSlot(ctx, r, accent) {
   ctx.fillStyle = TOWER.turretMetal;
   ctx.beginPath();
@@ -336,6 +413,13 @@ function drawCoinSlot(ctx, r, accent) {
 }
 
 /** The turret head: a metal hub with a rim-light arc facing the palette's light direction. Drawn unrotated, on top of the (rotated) barrel, so the hub itself never spins even though its payload does. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @param {string} accent
+ */
 function drawTurretHub(ctx, cx, cy, r, accent) {
   const hubR = r * 0.52;
   ctx.fillStyle = TOWER.turretMetal;
@@ -355,6 +439,12 @@ function drawTurretHub(ctx, cx, cy, r, accent) {
   ctx.stroke();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ */
 function drawAntiAirSpike(ctx, cx, cy, r) {
   ctx.fillStyle = TOWER.antiAirSpike;
   ctx.beginPath();
@@ -365,6 +455,12 @@ function drawAntiAirSpike(ctx, cx, cy, r) {
   ctx.fill();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ */
 function drawSensorLens(ctx, cx, cy, r) {
   const x = cx + r * 0.6;
   const y = cy - r * 0.6;
@@ -378,6 +474,13 @@ function drawSensorLens(ctx, cx, cy, r) {
   ctx.fill();
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @param {number} level
+ */
 function drawLevelPips(ctx, cx, cy, r, level) {
   if (level <= 0) return;
   const y = cy + r * 1.3;
@@ -391,6 +494,14 @@ function drawLevelPips(ctx, cx, cy, r, level) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radius
+ * @param {number} sides
+ * @param {number} rotation  radians
+ */
 function drawRegularPolygon(ctx, cx, cy, radius, sides, rotation) {
   ctx.beginPath();
   for (let i = 0; i < sides; i += 1) {
@@ -403,6 +514,12 @@ function drawRegularPolygon(ctx, cx, cy, radius, sides, rotation) {
   ctx.closePath();
 }
 
+/**
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }

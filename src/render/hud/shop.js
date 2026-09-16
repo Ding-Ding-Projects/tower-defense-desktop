@@ -33,15 +33,45 @@ const NAME_LINE_HEIGHT = 18;
 const REASON_LINE_HEIGHT = 14;
 const HEADING_HEIGHT = 26;
 
+/**
+ * One card's bookkeeping.
+ *
+ * The declared shape used to list five of the seven fields the code actually stores:
+ * `selected` and `affordable` were assigned every frame and typed nowhere, so nothing
+ * would have objected to a reader asking for a field that had quietly been renamed.
+ *
+ * @typedef {{
+ *   rect: import('./layout.js').Rect|null,
+ *   button: Button,
+ *   def: import('../../data/schema/types.js').TowerDef,
+ *   disabled: boolean,
+ *   disabledReason: string|null,
+ *   selected: boolean,
+ *   affordable: boolean,
+ *   iconSlot?: IconSlot,
+ * }} ShopEntry
+ */
+
 export class ShopHud {
   constructor() {
-    /** @type {Map<string, {rect: import('./layout.js').Rect, button: Button, def: object, disabled: boolean, disabledReason: string|null}>} */
+    /** @type {Map<string, ShopEntry>} */
     this._entries = new Map();
     this.rect = null;
     this._contentHeight = 0;
     this._scrollOffset = 0;
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} rect
+   * @param {{
+   *   towers: Map<string, import('../../data/schema/types.js').TowerDef>,
+   *   cash: number,
+   *   placementPoolCounts: Map<string, number>,
+   *   disallowedTowerIds?: string[],
+   *   selectedDefId?: string|null,
+   * }} state
+   */
   /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {import('./layout.js').Rect} rect
@@ -113,6 +143,15 @@ export class ShopHud {
     }
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('../../data/schema/types.js').TowerDef} def
+   * @param {number} cash
+   * @param {Map<string, number>} placementPoolCounts
+   * @param {string[]} disallowedTowerIds
+   * @param {number} width
+   * @returns {number}
+   */
   _measureCardHeight(ctx, def, cash, placementPoolCounts, disallowedTowerIds, width) {
     const { disabledReason } = deriveShopEntryState(def, cash, placementPoolCounts, disallowedTowerIds);
     const textWidth = width - PADDING * 2 - ICON_SIZE - PADDING;
@@ -122,11 +161,29 @@ export class ShopHud {
     return Math.max(ICON_SIZE + PADDING, NAME_LINE_HEIGHT + reasonHeight) + PADDING * 2;
   }
 
+  /**
+   * @param {import('../../data/schema/types.js').TowerDef} def
+   * @param {import('./layout.js').Rect} cardRect
+   * @param {number} cash
+   * @param {Map<string, number>} placementPoolCounts
+   * @param {string[]} disallowedTowerIds
+   * @param {string|null|undefined} selectedDefId
+   */
   _updateEntry(def, cardRect, cash, placementPoolCounts, disallowedTowerIds, selectedDefId) {
     const { affordable, disabledReason } = deriveShopEntryState(def, cash, placementPoolCounts, disallowedTowerIds);
     let entry = this._entries.get(def.id);
     if (!entry) {
-      entry = { button: new Button({ id: def.id, action: { kind: 'buyTower', towerId: def.id } }), def };
+      // Built complete rather than half-filled and patched below, so the declared shape
+      // and the object actually created cannot drift apart.
+      entry = {
+        rect: null,
+        button: new Button({ id: def.id, action: { kind: 'buyTower', towerId: def.id } }),
+        def,
+        disabled: false,
+        disabledReason: null,
+        selected: false,
+        affordable: true,
+      };
       this._entries.set(def.id, entry);
     }
     entry.rect = cardRect;
@@ -138,6 +195,15 @@ export class ShopHud {
     return entry;
   }
 
+  /**
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {import('./layout.js').Rect} cardRect
+   * @param {import('../../data/schema/types.js').TowerDef} def
+   * @param {number} cash
+   * @param {Map<string, number>} placementPoolCounts
+   * @param {string[]} disallowedTowerIds
+   * @param {string|null|undefined} selectedDefId
+   */
   _drawCard(ctx, cardRect, def, cash, placementPoolCounts, disallowedTowerIds, selectedDefId) {
     const entry = this._updateEntry(def, cardRect, cash, placementPoolCounts, disallowedTowerIds, selectedDefId);
     const inner = inset(cardRect, PADDING);
@@ -199,6 +265,11 @@ export class ShopHud {
    * @param {number} y
    * @returns {{kind: 'buyTower', towerId: string}|null}
    */
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {object|null}
+   */
   hitTest(x, y) {
     if (!this.rect || !containsPoint(this.rect, x, y)) return null;
     for (const entry of this._entries.values()) {
@@ -210,6 +281,10 @@ export class ShopHud {
     return null;
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
   setHover(x, y) {
     for (const entry of this._entries.values()) {
       entry.button.hovered = !!entry.rect && containsPoint(entry.rect, x, y) && !entry.disabled;
@@ -217,6 +292,7 @@ export class ShopHud {
   }
 
   /** Scrolls the card list by `deltaY` pixels, clamped to content bounds. */
+  /** @param {number} deltaY */
   scroll(deltaY) {
     this._scrollOffset += deltaY;
   }

@@ -49,6 +49,8 @@ export function enemySpriteSignature(def, size) {
   return `enemy:${def.id}:${size}`;
 }
 
+/** @typedef {'boss'|'flier'|'wraith'|'machine'|'armored'|'fast'|'walker'} EnemyArchetype */
+
 /**
  * @param {import('../../data/schema/types.js').EnemyDef} def
  * @returns {'boss'|'flier'|'wraith'|'machine'|'armored'|'fast'|'walker'}
@@ -64,6 +66,10 @@ export function enemyArchetype(def) {
   return 'walker';
 }
 
+/**
+ * @param {number} maxHp
+ * @returns {number}
+ */
 function hpScale(maxHp) {
   return clamp(0.72 + Math.log10(Math.max(10, maxHp)) * 0.16, 0.72, 1.55);
 }
@@ -88,6 +94,10 @@ export function enemyBodyRadius(size, def) {
   return size * 0.34 * scale;
 }
 
+/**
+ * @param {EnemyArchetype} archetype
+ * @returns {string}
+ */
 function baseColor(archetype) {
   switch (archetype) {
     case 'boss': return ENEMY.boss;
@@ -155,6 +165,13 @@ export function drawEnemy(ctx, size, def, phase, facingRadians = 0, hpRatio = 1)
 /* ---------------------------------------------------------------- shadow */
 
 /** Tight and dark directly under the body, softening outward: a radial gradient squashed into an ellipse, never a flat translucent disc. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} groundY
+ * @param {number} r
+ * @param {EnemyArchetype} archetype
+ */
 function drawContactShadow(ctx, cx, groundY, r, archetype) {
   const squash = 0.36;
   const faint = archetype === 'wraith';
@@ -181,6 +198,15 @@ function drawContactShadow(ctx, cx, groundY, r, archetype) {
  * direction (lit side), fading through the base colour to a shaded rim on
  * the far side, plus a soft warm bounce-light smudge on the underside where
  * light reflects up off the ground. Never a single flat fillStyle.
+ */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} rx
+ * @param {number} ry
+ * @param {string} color
+ * @param {{ metal?: boolean }} [options]
  */
 function fillWithVolume(ctx, cx, cy, rx, ry, color, options = {}) {
   const hot = { x: cx + LIGHT_DIRECTION.x * rx * 0.55, y: cy + LIGHT_DIRECTION.y * ry * 0.55 };
@@ -212,6 +238,14 @@ function fillWithVolume(ctx, cx, cy, rx, ry, color, options = {}) {
 
 /* ------------------------------------------------------------- wear/gait */
 
+/**
+ * @param {number} phase  walk phase, advanced by distance travelled
+ * @param {number} speedFactor
+ * @param {number} amplitude
+ * @param {number} phaseOffset
+ * @param {boolean} limp
+ * @returns {number}
+ */
 function limbSwing(phase, speedFactor, amplitude, phaseOffset, limp) {
   const p = phase * speedFactor + phaseOffset;
   const factor = limp ? 0.6 : 1;
@@ -219,6 +253,11 @@ function limbSwing(phase, speedFactor, amplitude, phaseOffset, limp) {
 }
 
 /** Scorching, cracks: extra draw calls only, never fewer, so a damaged enemy always draws at least as much as an undamaged one. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {number} hp  0..1
+ */
 function drawWear(ctx, r, hp) {
   if (hp >= 0.66) return;
   ctx.fillStyle = ENEMY.scorch;
@@ -243,6 +282,14 @@ function drawWear(ctx, r, hp) {
 
 /* ---------------------------------------------------------- eyes / face */
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x
+ * @param {number} y
+ * @param {number} r
+ * @param {string} eyeColor
+ * @param {boolean} dim
+ */
 function drawEyes(ctx, x, y, r, eyeColor, dim) {
   ctx.fillStyle = dim ? withAlpha(eyeColor, 0.6) : eyeColor;
   ctx.beginPath();
@@ -261,6 +308,15 @@ function drawEyes(ctx, x, y, r, eyeColor, dim) {
  * gait: front leg forward while the back leg drives, arms swinging opposite
  * their nearest leg, a slight double-frequency bob and counter-rotation of
  * the torso on every step.
+ */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} color
+ * @param {number} phase
+ * @param {number} speedFactor
+ * @param {number} hp  0..1
+ * @param {{ armored: boolean, boss: boolean, lean: number }} opts
  */
 function drawHumanoidBody(ctx, r, color, phase, speedFactor, hp, opts) {
   const limp = hp < 0.5 && !opts.boss;
@@ -335,6 +391,15 @@ function drawHumanoidBody(ctx, r, color, phase, speedFactor, hp, opts) {
   drawEyes(ctx, headX, headY, headR, ENEMY.eye, false);
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} x1
+ * @param {number} y1
+ * @param {string} color
+ * @param {number} width
+ */
 function drawLimb(ctx, x0, y0, x1, y1, color, width) {
   ctx.strokeStyle = color;
   ctx.lineWidth = Math.max(1, width);
@@ -346,6 +411,13 @@ function drawLimb(ctx, x0, y0, x1, y1, color, width) {
 }
 
 /** Visible plate edges with a darker gap between them; missing plates as health drops. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} rx
+ * @param {number} ry
+ * @param {number} hp  0..1
+ * @param {boolean} boss
+ */
 function drawPlateSegments(ctx, rx, ry, hp, boss) {
   const totalPlates = boss ? 5 : 3;
   const visiblePlates = Math.max(1, Math.round(totalPlates * (0.4 + hp * 0.6)));
@@ -363,6 +435,12 @@ function drawPlateSegments(ctx, rx, ry, hp, boss) {
   }
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} headR
+ */
 function drawCrown(ctx, cx, cy, headR) {
   const spikes = 5;
   ctx.fillStyle = ENEMY.bossPlate;
@@ -382,6 +460,14 @@ function drawCrown(ctx, cx, cy, headR) {
 /* ------------------------------------------------------------- machine */
 
 /** Hull, tracks, panel lines. No head, no limbs: a vehicle, not a creature wearing armour. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} color
+ * @param {number} phase
+ * @param {number} speedFactor
+ * @param {number} hp  0..1
+ */
 function drawMachineBody(ctx, r, color, phase, speedFactor, hp) {
   const hullW = r * 1.7;
   const hullH = r * 1.1;
@@ -422,6 +508,14 @@ function drawMachineBody(ctx, r, color, phase, speedFactor, hp) {
   drawWear(ctx, r, hp);
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} offsetY
+ * @param {number} length
+ * @param {number} thickness
+ * @param {number} phase
+ * @param {number} speedFactor
+ */
 function drawTrack(ctx, offsetY, length, thickness, phase, speedFactor) {
   ctx.fillStyle = ENEMY.track;
   ctx.beginPath();
@@ -445,6 +539,14 @@ function drawTrack(ctx, offsetY, length, thickness, phase, speedFactor) {
 /* --------------------------------------------------------------- flier */
 
 /** Lifted off the ground (see the caller's `lift`), wings that actually flap. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} color
+ * @param {number} phase
+ * @param {number} speedFactor
+ * @param {number} hp  0..1
+ */
 function drawFlierBody(ctx, r, color, phase, speedFactor, hp) {
   const flap = Math.sin(phase * speedFactor * 1.6);
 
@@ -476,6 +578,14 @@ function drawFlierBody(ctx, r, color, phase, speedFactor, hp) {
   drawWear(ctx, r, hp);
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x
+ * @param {number} y
+ * @param {number} r
+ * @param {number} flap
+ * @param {number} side  1 or -1
+ */
 function drawWing(ctx, x, y, r, flap, side) {
   ctx.save();
   ctx.translate(x, y);
@@ -496,10 +606,23 @@ function drawWing(ctx, x, y, r, flap, side) {
 /* -------------------------------------------------------------- wraith */
 
 /** A translucent refractive shimmer: a faint edge and two ghost-hued echo outlines standing in for chromatic refraction, not a lower alpha on the solid body. */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} r
+ * @param {string} color
+ * @param {number} phase
+ * @param {number} speedFactor
+ * @param {number} hp  0..1
+ */
 function drawWraithBody(ctx, r, color, phase, speedFactor, hp) {
   const drift = Math.sin(phase * speedFactor * 0.7) * r * 0.05;
 
-  for (const [dx, tint] of [[-drift, ENEMY.wraithEchoA], [drift, ENEMY.wraithEchoB]]) {
+  // Annotated as pairs rather than left to inference. A literal array of mixed types
+  // infers as (number|string)[], so both halves of the destructuring come out as either,
+  // and the offset and the colour become interchangeable to the compiler.
+  /** @type {Array<[number, string]>} */
+  const echoes = [[-drift, ENEMY.wraithEchoA], [drift, ENEMY.wraithEchoB]];
+  for (const [dx, tint] of echoes) {
     ctx.fillStyle = tint;
     ctx.beginPath();
     ctx.ellipse(dx, r * 0.05, r * 0.4, r * 0.62, 0, 0, Math.PI * 2);
@@ -537,6 +660,13 @@ function drawWraithBody(ctx, r, color, phase, speedFactor, hp) {
 
 /* --------------------------------------------------------------- shield */
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @param {number} phase
+ */
 function drawShieldOverlay(ctx, cx, cy, r, phase) {
   const shimmer = 0.55 + Math.sin(phase * 0.5) * 0.1;
   ctx.strokeStyle = withAlpha(ENEMY.shield, shimmer);
@@ -553,6 +683,12 @@ function drawShieldOverlay(ctx, cx, cy, r, phase) {
 
 /* ----------------------------------------------------------------- misc */
 
+/**
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
