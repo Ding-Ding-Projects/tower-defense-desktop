@@ -1,0 +1,343 @@
+{
+  "retrievedAt": "2026-09-16",
+  "results": [
+    {
+      "id": "scout",
+      "displayName": "Scout",
+      "url": "https://tds.fandom.com/wiki/Scout",
+      "hidden": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 125,
+      "baseSell": 41,
+      "refundRatio": 0.328,
+      "immunities": "None"
+    },
+    {
+      "id": "sniper",
+      "displayName": "Sniper",
+      "url": "https://tds.fandom.com/wiki/Sniper",
+      "hidden": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "flying": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "lead": {
+        "fromLevel": 3,
+        "never": false,
+        "raw": "Level 3+"
+      },
+      "footprint": 1.25,
+      "footprintRaw": "Below Average (1.25)",
+      "baseCost": 450,
+      "baseSell": 150,
+      "refundRatio": 0.3333,
+      "immunities": "Stun"
+    },
+    {
+      "id": "soldier",
+      "displayName": "Soldier",
+      "url": "https://tds.fandom.com/wiki/Soldier",
+      "hidden": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "flying": {
+        "fromLevel": 4,
+        "never": false,
+        "raw": "Level 4"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 400,
+      "baseSell": 133,
+      "refundRatio": 0.3325,
+      "immunities": "None"
+    },
+    {
+      "id": "freezer",
+      "displayName": "Freezer",
+      "url": "https://tds.fandom.com/wiki/Freezer",
+      "hidden": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 450,
+      "baseSell": 150,
+      "refundRatio": 0.3333,
+      "immunities": "None"
+    },
+    {
+      "id": "militant",
+      "displayName": "Militant",
+      "url": "https://tds.fandom.com/wiki/Militant",
+      "hidden": {
+        "fromLevel": 1,
+        "never": false,
+        "raw": "Level 1+"
+      },
+      "flying": {
+        "fromLevel": 1,
+        "never": false,
+        "raw": "Level 1+"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 600,
+      "baseSell": 200,
+      "refundRatio": 0.3333,
+      "immunities": "None"
+    },
+    {
+      "id": "shotgunner",
+      "displayName": "Shotgunner",
+      "url": "https://tds.fandom.com/wiki/Shotgunner",
+      "hidden": {
+        "fromLevel": 1,
+        "never": false,
+        "raw": "Level 1+"
+      },
+      "flying": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1,
+      "footprintRaw": "Small (1)",
+      "baseCost": 1500,
+      "baseSell": 500,
+      "refundRatio": 0.3333,
+      "immunities": "None"
+    },
+    {
+      "id": "hunter",
+      "displayName": "Hunter",
+      "url": "https://tds.fandom.com/wiki/Hunter",
+      "hidden": {
+        "fromLevel": 3,
+        "never": false,
+        "raw": "Level 3+"
+      },
+      "flying": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 1625,
+      "baseSell": 541,
+      "refundRatio": 0.3329,
+      "immunities": "None"
+    },
+    {
+      "id": "minigunner",
+      "displayName": "Minigunner",
+      "url": "https://tds.fandom.com/wiki/Minigunner",
+      "hidden": {
+        "fromLevel": 1,
+        "never": false,
+        "raw": "Level 1+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 1850,
+      "baseSell": 616,
+      "refundRatio": 0.333,
+      "immunities": "None"
+    },
+    {
+      "id": "ranger",
+      "displayName": "Ranger",
+      "url": "https://tds.fandom.com/wiki/Ranger",
+      "hidden": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "flying": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "lead": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 4500,
+      "baseSell": 1500,
+      "refundRatio": 0.3333,
+      "immunities": "Stun"
+    },
+    {
+      "id": "electroshocker",
+      "displayName": "Electroshocker",
+      "url": "https://tds.fandom.com/wiki/Electroshocker",
+      "hidden": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 650,
+      "baseSell": 216,
+      "refundRatio": 0.3323,
+      "immunities": "None"
+    },
+    {
+      "id": "cowboy",
+      "displayName": "Cowboy",
+      "url": "https://tds.fandom.com/wiki/Cowboy",
+      "hidden": {
+        "fromLevel": 3,
+        "never": false,
+        "raw": "Level 3+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 1.25,
+      "footprintRaw": "Below Average (1.25)",
+      "baseCost": 550,
+      "baseSell": 183,
+      "refundRatio": 0.3327,
+      "immunities": "Partial Debuff"
+    },
+    {
+      "id": "turret",
+      "displayName": "Turret",
+      "url": "https://tds.fandom.com/wiki/Turret",
+      "hidden": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": 1,
+        "never": false,
+        "raw": "Level 1+"
+      },
+      "footprint": 2,
+      "footprintRaw": "Large (2)",
+      "baseCost": 7750,
+      "baseSell": 2583,
+      "refundRatio": 0.3333,
+      "immunities": "Partial Debuff"
+    },
+    {
+      "id": "gatling-gun",
+      "displayName": "Gatling Gun",
+      "url": "https://tds.fandom.com/wiki/Gatling_Gun",
+      "hidden": {
+        "fromLevel": 3,
+        "never": false,
+        "raw": "Level 3+"
+      },
+      "flying": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "lead": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "footprint": 2,
+      "footprintRaw": "Large (2)",
+      "baseCost": 5250,
+      "baseSell": 1750,
+      "refundRatio": 0.3333,
+      "immunities": "Stun"
+    }
+  ]
+}

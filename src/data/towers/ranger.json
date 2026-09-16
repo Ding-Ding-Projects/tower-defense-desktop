@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 1.5,
   "targetingModes": [
     "first",
@@ -23,7 +23,7 @@
       "damage": 100,
       "fireRate": 0.1667,
       "range": 70,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
@@ -37,7 +37,7 @@
       "damage": 100,
       "fireRate": 0.2105,
       "range": 70,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
@@ -51,7 +51,7 @@
       "damage": 185,
       "fireRate": 0.2105,
       "range": 70,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
@@ -65,7 +65,7 @@
       "damage": 430,
       "fireRate": 0.2222,
       "range": 70,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
@@ -79,7 +79,7 @@
       "damage": 875,
       "fireRate": 0.125,
       "range": 70,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
@@ -90,6 +90,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

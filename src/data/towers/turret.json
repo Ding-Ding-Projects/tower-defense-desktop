@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 2,
   "targetingModes": [
     "first",
@@ -24,7 +24,7 @@
       "fireRate": 2.5,
       "range": 19,
       "detectsHidden": true,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Turret",
         "retrievedAt": "2026-09-16",
@@ -38,7 +38,7 @@
       "fireRate": 2.5,
       "range": 19,
       "detectsHidden": true,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Turret",
         "retrievedAt": "2026-09-16",
@@ -52,7 +52,7 @@
       "fireRate": 3.8462,
       "range": 22,
       "detectsHidden": true,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Turret",
         "retrievedAt": "2026-09-16",
@@ -66,7 +66,7 @@
       "fireRate": 6.25,
       "range": 22,
       "detectsHidden": true,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Turret",
         "retrievedAt": "2026-09-16",
@@ -80,7 +80,7 @@
       "fireRate": 6.25,
       "range": 24,
       "detectsHidden": true,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Turret",
         "retrievedAt": "2026-09-16",
@@ -94,7 +94,7 @@
       "fireRate": 8.3333,
       "range": 27,
       "detectsHidden": true,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Turret",
         "retrievedAt": "2026-09-16",
@@ -104,6 +104,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Turret",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

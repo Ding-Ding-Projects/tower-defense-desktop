@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 1.5,
   "targetingModes": [
     "first",
@@ -37,8 +37,8 @@
       "damage": 1,
       "fireRate": 5.7143,
       "range": 17,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Militant",
         "retrievedAt": "2026-09-16",
@@ -51,8 +51,8 @@
       "damage": 2,
       "fireRate": 5.7143,
       "range": 17,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Militant",
         "retrievedAt": "2026-09-16",
@@ -65,8 +65,8 @@
       "damage": 5,
       "fireRate": 5.7143,
       "range": 17,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Militant",
         "retrievedAt": "2026-09-16",
@@ -79,8 +79,8 @@
       "damage": 12,
       "fireRate": 5.7143,
       "range": 20,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Militant",
         "retrievedAt": "2026-09-16",
@@ -90,6 +90,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Militant",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 1.5,
   "targetingModes": [
     "first",
@@ -51,7 +51,7 @@
       "damage": 3,
       "fireRate": 1.3333,
       "range": 14,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Scout",
@@ -65,7 +65,7 @@
       "damage": 8,
       "fireRate": 1.5385,
       "range": 16,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Scout",
@@ -79,7 +79,7 @@
       "damage": 8,
       "fireRate": 3.0769,
       "range": 16,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Scout",
@@ -90,6 +90,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Scout",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 1.5,
   "targetingModes": [
     "first",
@@ -23,7 +23,7 @@
       "damage": 45,
       "fireRate": 0.2899,
       "range": 22,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Hunter",
@@ -37,7 +37,7 @@
       "damage": 45,
       "fireRate": 0.4082,
       "range": 22,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Hunter",
@@ -51,7 +51,7 @@
       "damage": 96,
       "fireRate": 0.4082,
       "range": 24,
-      "detectsHidden": true,
+      "detectsHidden": false,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Hunter",
@@ -90,6 +90,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Hunter",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

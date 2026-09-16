@@ -2,11 +2,20 @@
 /**
  * Turn the scraped statistics cache into validated data rows.
  *
- * The upgrade table gives numbers and nothing else. Everything the table does not
- * carry (which terrain a tower may stand on, whether it sees hidden enemies, what it
- * refunds when sold) lives in the overlay below, written by hand, one entry per
- * tower, so that a value nobody sourced is visibly a value nobody sourced rather than
- * a plausible default hiding in generated output.
+ * Two caches feed this. `towers.json` holds the upgrade table: cost, damage, rate,
+ * range, per level. `attributes.json` holds the page infobox: hidden and flying
+ * detection, placement footprint, base cost and base selling cost. Between them they
+ * carry almost everything a tower row needs, and what is left is genuinely not on the
+ * page at all — which terrain a tower may stand on, which shared cap it counts
+ * against, which status it applies — and that is what the overlay below is for.
+ *
+ * The overlay used to carry detection, footprint and the refund as well, hand-written
+ * from recollection, and it was wrong about most of them. Ranger was marked as seeing
+ * hidden enemies and does not. Turret was marked as hitting flying ones and does not.
+ * Every tower refunded 70 percent, and the real figure is a third. None of that was
+ * visible, because a plausible number in a generated file looks exactly like a sourced
+ * one. So the rule now is narrower and easier to hold: if the page says it, the page
+ * is what is read, and the overlay only holds what the page does not say.
  *
  * Anything still unresolved is listed in docs/data-sources.md as unresolved. That is
  * the whole point: the roster is allowed to arrive in tranches, and it is not allowed
@@ -20,37 +29,65 @@ import { fileURLToPath } from 'node:url';
 const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
 
 /**
- * Hand-written, per tower, for the fields the statistics table does not carry.
+ * Hand-written, per tower, for the fields neither the table nor the infobox carries.
  *
- * `detectsHidden` and `hitsAir` are marked null where the page was not checked for
- * them, and a null reaches the validator as an unresolved field rather than becoming
- * a quiet false. A quiet false would make a detector look blind and nobody would
- * notice until a hidden wave walked straight through.
+ * Deliberately small. Everything that was moved out of here was moved because the
+ * page had the real answer all along and nobody had gone to look.
  */
 const OVERLAY = {
-  scout: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false },
-  sniper: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: true, hitsAir: false },
-  soldier: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false },
-  freezer: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false, applies: ['slow'], statusSeconds: 1.5 },
-  militant: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false },
-  shotgunner: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false },
-  hunter: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: true, hitsAir: true },
-  minigunner: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false },
-  ranger: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: true, hitsAir: true },
-  electroshocker: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false, chain: 3, chainRadius: 8 },
-  cowboy: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false },
-  turret: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 2, detectsHidden: true, hitsAir: true },
-  'gatling-gun': { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 2, detectsHidden: false, hitsAir: false },
+  scout: { terrain: ['ground'], pool: 'default', max: null },
+  sniper: { terrain: ['ground'], pool: 'default', max: null },
+  soldier: { terrain: ['ground'], pool: 'default', max: null },
+  freezer: { terrain: ['ground'], pool: 'default', max: null, applies: ['slow'], statusSeconds: 1.5 },
+  militant: { terrain: ['ground'], pool: 'default', max: null },
+  shotgunner: { terrain: ['ground'], pool: 'default', max: null },
+  hunter: { terrain: ['ground'], pool: 'default', max: null },
+  minigunner: { terrain: ['ground'], pool: 'default', max: null },
+  ranger: { terrain: ['ground'], pool: 'default', max: null },
+  electroshocker: { terrain: ['ground'], pool: 'default', max: null, chain: 3, chainRadius: 8 },
+  cowboy: { terrain: ['ground'], pool: 'default', max: null },
+  turret: { terrain: ['ground'], pool: 'default', max: null },
+  'gatling-gun': { terrain: ['ground'], pool: 'default', max: null },
 };
 
 const ALL_MODES = ['first', 'last', 'closest', 'strongest', 'weakest'];
 
 /**
- * @param {{ level: number, cost: number, damage: number, shotIntervalSeconds: number, range: number, burstCount?: number, reloadSeconds?: number }} row
+ * The refund, as a fraction of everything spent on the tower.
+ *
+ * Read off the infobox rather than assumed: every tower in the cache lists a base
+ * selling cost exactly equal to its base cost divided by three and truncated, with no
+ * exceptions and no rounding slack. `1/3` is written rather than a tidied decimal
+ * because the simulation multiplies by it, and 0.3333 multiplied by a cost divisible
+ * by three truncates a dollar short — six of the thirteen towers land on exactly that
+ * case.
+ */
+const REFUND_FRACTION = 1 / 3;
+
+/**
+ * Whether a detection applies at a given level.
+ *
+ * Detection is per level, which the old single boolean per tower could not say at all.
+ * Demoman reads "Level 2+": blind at 0 and 1, seeing from 2 upward. Marking the whole
+ * tower as a detector made it see two levels too early, and marking it as blind made
+ * it never see at all; both were wrong for most of its levels.
+ *
+ * @param {{ fromLevel: number|null, never: boolean }} detection
+ * @param {number} level
+ * @returns {boolean}
+ */
+function detectionAtLevel(detection, level) {
+  if (detection.never || detection.fromLevel == null) return false;
+  return level >= detection.fromLevel;
+}
+
+/**
+ * @param {any} row
  * @param {any} overlay
+ * @param {any} attributes
  * @param {{ wikiUrl: string, retrievedAt: string }} source
  */
-function toLevel(row, overlay, source) {
+function toLevel(row, overlay, attributes, source) {
   /** @type {any} */
   const level = {
     level: row.level,
@@ -60,10 +97,11 @@ function toLevel(row, overlay, source) {
     // second. One division, in exactly one place, so it cannot be applied twice.
     fireRate: row.shotIntervalSeconds > 0 ? Number((1 / row.shotIntervalSeconds).toFixed(4)) : 0,
     range: row.range,
-    detectsHidden: overlay.detectsHidden === true,
-    hitsAir: overlay.hitsAir === true,
+    detectsHidden: detectionAtLevel(attributes.hidden, row.level),
+    hitsAir: detectionAtLevel(attributes.flying, row.level),
     source: { ...source, notes: 'upgrade table; firerate column read as a cooldown in seconds' },
   };
+  if (row.aoeRadius) level.aoeRadius = row.aoeRadius;
   if (row.burstCount && row.burstCount > 1) {
     level.burstCount = row.burstCount;
     if (row.reloadSeconds !== undefined) {
@@ -107,6 +145,11 @@ function toLevel(row, overlay, source) {
 
 const cachePath = join(ROOT, 'tools', 'wiki-cache', 'towers.json');
 const cache = JSON.parse(readFileSync(cachePath, 'utf8'));
+const attributesPath = join(ROOT, 'tools', 'wiki-cache', 'attributes.json');
+const attributeCache = JSON.parse(readFileSync(attributesPath, 'utf8'));
+/** @type {Map<string, any>} */
+const attributesById = new Map(attributeCache.results.map((r) => [r.id, r]));
+
 const outDir = join(ROOT, 'src', 'data', 'towers');
 mkdirSync(outDir, { recursive: true });
 
@@ -116,22 +159,44 @@ const skipped = [];
 for (const scraped of cache.results) {
   const overlay = OVERLAY[scraped.id];
   if (!overlay) {
-    skipped.push(scraped.id + ' (no hand-written overlay, so its terrain and detection are unknown)');
+    skipped.push(scraped.id + ' (no hand-written overlay, so its terrain and pool are unknown)');
     continue;
   }
-  // The comment on OVERLAY promises that a null detection field is recorded as
-  // unresolved rather than becoming a quiet false. It was only a promise: `=== true`
-  // in toLevel turned null into false, so a tower nobody had checked would have
-  // shipped as blind to hidden enemies and nothing would have said so until a hidden
-  // wave walked past it. Now the row is refused outright, which is the behaviour the
-  // comment described all along.
-  const unchecked = ['detectsHidden', 'hitsAir'].filter((field) => overlay[field] == null);
-  if (unchecked.length > 0) {
-    skipped.push(
-      scraped.id + ' (' + unchecked.join(' and ') + ' not yet read off the page; a guess here is invisible)',
-    );
+
+  const attributes = attributesById.get(scraped.id);
+  if (!attributes) {
+    skipped.push(scraped.id + ' (no infobox record; run tools/fetch-wiki-attributes.mjs for it first)');
     continue;
   }
+
+  // Refusing rather than defaulting. A detection field that was never read would
+  // otherwise become a quiet false, which makes a detector look blind and gives no
+  // sign of it until a hidden wave walks straight past a tower that should have seen
+  // it. The same reasoning covers the footprint: a guessed size silently changes what
+  // can be placed where.
+  const unread = [];
+  if (attributes.hidden.raw == null) unread.push('hidden detection');
+  if (attributes.flying.raw == null) unread.push('flying detection');
+  if (attributes.footprint == null) unread.push('placement footprint');
+  if (unread.length > 0) {
+    skipped.push(scraped.id + ' (' + unread.join(', ') + ' not on the fetched page; a guess here is invisible)');
+    continue;
+  }
+
+  // The refund is claimed as one rule for the whole roster, so the claim is checked
+  // against every tower rather than spot-checked once. A tower that refunds on some
+  // other basis has to be noticed here, not discovered by a player selling one.
+  if (attributes.baseCost != null && attributes.baseSell != null) {
+    const expected = Math.trunc(attributes.baseCost * REFUND_FRACTION);
+    if (expected !== attributes.baseSell) {
+      skipped.push(
+        scraped.id + ' (its listed selling cost is $' + attributes.baseSell + ', but a third of $' +
+          attributes.baseCost + ' truncates to $' + expected + ', so the refund is not the usual rule)',
+      );
+      continue;
+    }
+  }
+
   const source = { wikiUrl: scraped.url, retrievedAt: scraped.retrievedAt ?? cache.retrievedAt };
   const row = {
     id: scraped.id,
@@ -140,15 +205,21 @@ for (const scraped of cache.results) {
     allowedTerrain: overlay.terrain,
     placementPool: overlay.pool,
     maxCount: overlay.max,
-    sellRefundFraction: overlay.refund,
-    footprintRadius: overlay.footprint,
+    sellRefundFraction: REFUND_FRACTION,
+    footprintRadius: attributes.footprint,
     targetingModes: ALL_MODES,
     // Level 0 is the placed tower, so its cost is the placement cost and the level
     // entry itself charges nothing further.
     levels: scraped.levels.map((l, i) =>
-      toLevel(i === 0 ? { ...l, cost: 0 } : l, overlay, source),
+      toLevel(i === 0 ? { ...l, cost: 0 } : l, overlay, attributes, source),
     ),
-    source,
+    source: {
+      ...source,
+      notes:
+        'upgrade table for the per-level statistics; the page infobox, retrieved ' +
+        attributeCache.retrievedAt + ', for detection, footprint and the selling cost the ' +
+        'refund fraction is derived from',
+    },
   };
   writeFileSync(join(outDir, scraped.id + '.json'), JSON.stringify(row, null, 2) + '\n');
   written.push(scraped.id);

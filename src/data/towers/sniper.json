@@ -7,8 +7,8 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
-  "footprintRadius": 1.5,
+  "sellRefundFraction": 0.3333333333333333,
+  "footprintRadius": 1.25,
   "targetingModes": [
     "first",
     "last",
@@ -23,8 +23,8 @@
       "damage": 10,
       "fireRate": 0.2,
       "range": 28,
-      "detectsHidden": true,
-      "hitsAir": false,
+      "detectsHidden": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
         "retrievedAt": "2026-09-16",
@@ -37,8 +37,8 @@
       "damage": 12,
       "fireRate": 0.25,
       "range": 28,
-      "detectsHidden": true,
-      "hitsAir": false,
+      "detectsHidden": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
         "retrievedAt": "2026-09-16",
@@ -52,7 +52,7 @@
       "fireRate": 0.25,
       "range": 30,
       "detectsHidden": true,
-      "hitsAir": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
         "retrievedAt": "2026-09-16",
@@ -66,7 +66,7 @@
       "fireRate": 0.25,
       "range": 35,
       "detectsHidden": true,
-      "hitsAir": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
         "retrievedAt": "2026-09-16",
@@ -80,7 +80,7 @@
       "fireRate": 0.3125,
       "range": 45,
       "detectsHidden": true,
-      "hitsAir": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
         "retrievedAt": "2026-09-16",
@@ -90,6 +90,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

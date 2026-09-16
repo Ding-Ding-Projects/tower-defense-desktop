@@ -57,13 +57,17 @@ here. They are not reproductions of any map from the source game.
 **Difficulty multipliers.** The difficulty *names* follow the source game. The health
 and speed multipliers, starting cash and life counts are this project's own.
 
-**Terrain, detection and concealment flags.** Which ground a tower may stand on,
-whether it sees hidden enemies, and whether it can hit fliers are hand-set per tower
-in `tools/generate-data-rows.mjs`. The enemy infobox marks concealment with an icon
-rather than the word "yes", so the scraper read every enemy as visible and grounded.
-That would have been a plausible-looking lie: a hidden wave would have walked into a
-tower that should not be able to see it and nothing would have failed. They are
-hand-set in `tools/generate-enemy-rows.mjs` instead.
+**Terrain.** Which ground a tower may stand on is still hand-set per tower in
+`tools/generate-data-rows.mjs`, because the page does not say.
+
+**Enemy concealment.** The enemy infobox marks concealment with an icon rather than
+the word "yes", so the scraper read every enemy as visible and grounded. That would
+have been a plausible-looking lie: a hidden wave would have walked into a tower that
+should not be able to see it and nothing would have failed. Those flags are hand-set
+in `tools/generate-enemy-rows.mjs` instead.
+
+**Tower detection and footprint are no longer hand-set.** They used to be, and they
+were wrong, which is recorded below under the refund because it is the same story.
 
 **Leak damage, boss abilities and enemy immunities.** Engine values.
 
@@ -76,7 +80,31 @@ hand-set in `tools/generate-enemy-rows.mjs` instead.
 | Which towers mark and which consume, and at what multiplier? | **Unresolved.** Modelled as a generic tag plus a bonus multiplier, so any pairing is two data rows. No pairing ships. |
 | Does area damage fall off with distance? | **Unresolved.** Modelled as flat inside the radius, with falloff optional in the schema. |
 | What does Hardcore change? | **Unresolved.** The shipped `hardcore` difficulty is an engine guess: more health, faster enemies, twenty lives, one tower banned. It is not a claim about the source game. |
-| What is the sell refund percentage? | **Unresolved.** Every tower ships at 70 percent, an engine default. |
+| What is the sell refund percentage? | **Resolved: a third, truncated.** Every tower's infobox lists a base selling cost exactly equal to its base cost divided by three and truncated, across all thirteen towers with no exceptions and no rounding slack. Scout costs $125 and sells for $41; Turret costs $7,750 and sells for $2,583. It shipped at 70 percent as an engine default until the infobox was actually read. |
+
+## What reading the infobox corrected
+
+The upgrade table was being scraped from the start. The infobox beside it was not, and
+everything it holds was being hand-written from recollection into an overlay. Most of
+it was wrong, and none of it looked wrong, because a plausible number in a generated
+file is indistinguishable from a sourced one.
+
+| Field | Was | Is | Why it mattered |
+| --- | --- | --- | --- |
+| Sell refund | 0.7 on every tower | A third, truncated | Every refund was more than double what it should have been |
+| Ranger hidden detection | Yes | Never, at any level | A detector that cannot detect |
+| Turret anti-air | Yes | Never, at any level | Fliers walked past a tower listed as covering them |
+| Sniper anti-air | No | From level 0 | The reverse: a real answer to fliers, switched off |
+| Hidden and flying detection generally | One boolean per tower | Per level, as the page states it | Scout reads "Level 2+", so a single boolean is the wrong shape whichever way it is set |
+| Footprint | 1.5 on almost everything | 1, 1.25, 1.5 or 2 as listed | Footprint decides what fits beside what |
+
+The generator now refuses to emit a row whose detection or footprint was not read off
+the page, rather than defaulting it to a quiet false, and
+`tests/data/sourced-attributes.test.js` ties every shipped row back to the scrape
+cache so none of this can drift back unnoticed. Both were watched failing before being
+trusted.
+
+Reading the infobox is `tools/fetch-wiki-attributes.mjs`.
 
 ## The rest of the roster, and why each one is still absent
 

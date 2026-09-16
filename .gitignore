@@ -5,3 +5,7 @@ release/
 *.log
 .DS_Store
 Thumbs.db
+
+# Raw fetched pages, kept only so a re-read does not hammer the source.
+# The distilled results in tools/wiki-cache/*.json are what gets committed.
+tools/wiki-cache/pages/

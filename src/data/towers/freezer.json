@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 1.5,
   "targetingModes": [
     "first",
@@ -59,7 +59,7 @@
       "damage": 3,
       "fireRate": 2.8571,
       "range": 14,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
@@ -77,7 +77,7 @@
       "damage": 4,
       "fireRate": 6.6667,
       "range": 14,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
@@ -97,7 +97,7 @@
       "damage": 9,
       "fireRate": 6.6667,
       "range": 16,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
@@ -114,6 +114,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

@@ -7,8 +7,8 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
-  "footprintRadius": 1.5,
+  "sellRefundFraction": 0.3333333333333333,
+  "footprintRadius": 1.25,
   "targetingModes": [
     "first",
     "last",
@@ -65,7 +65,7 @@
       "damage": 10,
       "fireRate": 1.6667,
       "range": 17.5,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
@@ -79,7 +79,7 @@
       "damage": 10,
       "fireRate": 2.8571,
       "range": 20,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
@@ -93,7 +93,7 @@
       "damage": 24,
       "fireRate": 2.8571,
       "range": 20,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
@@ -104,6 +104,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

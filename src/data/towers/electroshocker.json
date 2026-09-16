@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 1.5,
   "targetingModes": [
     "first",
@@ -55,7 +55,7 @@
       "damage": 8,
       "fireRate": 0.8696,
       "range": 13,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Electroshocker",
@@ -71,7 +71,7 @@
       "damage": 20,
       "fireRate": 0.8696,
       "range": 13,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Electroshocker",
@@ -87,7 +87,7 @@
       "damage": 60,
       "fireRate": 0.4,
       "range": 13,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Electroshocker",
@@ -103,7 +103,7 @@
       "damage": 90,
       "fireRate": 0.4,
       "range": 15,
-      "detectsHidden": false,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Electroshocker",
@@ -116,6 +116,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Electroshocker",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

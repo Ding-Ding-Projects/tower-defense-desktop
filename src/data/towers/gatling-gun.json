@@ -7,7 +7,7 @@
   ],
   "placementPool": "default",
   "maxCount": null,
-  "sellRefundFraction": 0.7,
+  "sellRefundFraction": 0.3333333333333333,
   "footprintRadius": 2,
   "targetingModes": [
     "first",
@@ -24,7 +24,7 @@
       "fireRate": 5.8824,
       "range": 25,
       "detectsHidden": false,
-      "hitsAir": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
@@ -38,7 +38,7 @@
       "fireRate": 5.8824,
       "range": 30,
       "detectsHidden": false,
-      "hitsAir": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
@@ -52,7 +52,7 @@
       "fireRate": 5.8824,
       "range": 30,
       "detectsHidden": false,
-      "hitsAir": false,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
@@ -65,8 +65,8 @@
       "damage": 13,
       "fireRate": 8.3333,
       "range": 35,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
@@ -79,8 +79,8 @@
       "damage": 20,
       "fireRate": 11.1111,
       "range": 45,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
@@ -93,8 +93,8 @@
       "damage": 36,
       "fireRate": 11.1111,
       "range": 50,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
@@ -107,8 +107,8 @@
       "damage": 67,
       "fireRate": 11.1111,
       "range": 50,
-      "detectsHidden": false,
-      "hitsAir": false,
+      "detectsHidden": true,
+      "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
@@ -118,6 +118,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-    "retrievedAt": "2026-09-16"
+    "retrievedAt": "2026-09-16",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }
