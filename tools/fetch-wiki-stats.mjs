@@ -149,17 +149,43 @@ export function extractLevels(html) {
     if (rows.length < 2) continue;
     const header = rows[0].map(normaliseHeader);
     const col = (name) => header.findIndex((h) => h === name);
+    // Several columns mean one thing under more than one name, and the difference is
+    // purely editorial: a splash tower's damage column is headed "Splash Damage", a
+    // melee tower's rate column is headed "Swingrate". Matching only the most common
+    // spelling reported "this page has no statistics table" about eleven pages that
+    // plainly have one, which reads like a missing source rather than a missing alias.
+    //
+    // The aliases are ordered, and the order is the priority: Pyromancer carries both
+    // "Normal Damage" and "Burn Damage", and the direct-hit figure is the one that
+    // belongs in `damage`, with the burn modelled as a status.
+    const firstCol = (...names) => {
+      for (const name of names) {
+        const index = col(name);
+        if (index >= 0) return index;
+      }
+      return -1;
+    };
     const iLevel = col('level');
     const iCost = col('cost');
-    const iDamage = col('damage');
-    const iFire = col('firerate');
+    const iDamage = firstCol('damage', 'splash damage', 'normal damage');
+    const iFire = firstCol('firerate', 'swingrate');
     const iRange = col('range');
     if (iLevel < 0 || iCost < 0 || iDamage < 0 || iFire < 0 || iRange < 0) continue;
+
+    // Splash towers carry their blast size in their own column. It is read here rather
+    // than hand-written in the overlay because it is a real sourced number sitting
+    // right beside the damage it applies to, and a hand-written blast radius is exactly
+    // the kind of plausible invention the overlay exists to keep visible.
+    const iAoe = firstCol('explosion range', 'explosion radius');
 
     // A burst tower carries both columns: "firerate" is the gap between shots inside
     // a burst, and "cooldown" is the reload between bursts. A single-shot tower has
     // only the first, and for it that column IS the whole cycle.
-    const iBurst = col('burst count');
+    // A salvo tower names the same idea "Missile Count": how many projectiles leave
+    // the tower per cycle. Reading it matters for more than flavour, because the
+    // page's own DPS column folds it in — Rocketeer's top level lists 84.44, and
+    // 95 damage over a 4.5 second cycle is 21.11 unless the four missiles are counted.
+    const iBurst = firstCol('burst count', 'missile count');
     const iCooldown = col('cooldown');
 
     const levels = [];
@@ -174,6 +200,10 @@ export function extractLevels(html) {
       }
       /** @type {Record<string, number>} */
       const entry = { level, cost, damage, shotIntervalSeconds: firerate, range };
+      if (iAoe >= 0) {
+        const aoe = money(row[iAoe]);
+        if (aoe !== null && aoe > 0) entry.aoeRadius = aoe;
+      }
       if (iBurst >= 0) {
         const burst = money(row[iBurst]);
         if (burst !== null && burst > 1) entry.burstCount = burst;

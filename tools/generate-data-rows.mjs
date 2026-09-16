@@ -66,7 +66,33 @@ function toLevel(row, overlay, source) {
   };
   if (row.burstCount && row.burstCount > 1) {
     level.burstCount = row.burstCount;
-    if (row.reloadSeconds !== undefined) level.reloadSeconds = row.reloadSeconds;
+    if (row.reloadSeconds !== undefined) {
+      // A burst tower gives both columns: the gap inside the burst and the reload
+      // after it. Nothing to work out.
+      level.reloadSeconds = row.reloadSeconds;
+    } else {
+      // A salvo tower gives only one number, and it is the WHOLE cycle: Rocketeer
+      // fires four missiles and then waits 4.5 seconds, it does not wait 4.5 seconds
+      // between each missile. Taking the column at face value here would quarter the
+      // tower's damage and still look entirely reasonable in the data file.
+      //
+      // The missiles leave together, and the page does not say how far apart. One
+      // simulation tick is the closest the engine can express "together", so that is
+      // what is used, and the reload takes the rest of the cycle. The only number
+      // here that is not off the page is that one-tick spacing, and it is named as a
+      // modelling choice rather than dressed up as a statistic.
+      const salvoGapSeconds = 1 / 30;
+      level.fireRate = 30;
+      level.reloadSeconds = Number(
+        Math.max(salvoGapSeconds, row.shotIntervalSeconds - (row.burstCount - 1) * salvoGapSeconds).toFixed(4),
+      );
+      level.source = {
+        ...level.source,
+        notes:
+          'upgrade table; the firerate column is the whole salvo cycle, so the projectile count is ' +
+          'modelled as a burst fired one tick apart with the remainder of the cycle as the reload',
+      };
+    }
   }
   if (overlay.applies) {
     level.appliesStatuses = overlay.applies;
@@ -91,6 +117,19 @@ for (const scraped of cache.results) {
   const overlay = OVERLAY[scraped.id];
   if (!overlay) {
     skipped.push(scraped.id + ' (no hand-written overlay, so its terrain and detection are unknown)');
+    continue;
+  }
+  // The comment on OVERLAY promises that a null detection field is recorded as
+  // unresolved rather than becoming a quiet false. It was only a promise: `=== true`
+  // in toLevel turned null into false, so a tower nobody had checked would have
+  // shipped as blind to hidden enemies and nothing would have said so until a hidden
+  // wave walked past it. Now the row is refused outright, which is the behaviour the
+  // comment described all along.
+  const unchecked = ['detectsHidden', 'hitsAir'].filter((field) => overlay[field] == null);
+  if (unchecked.length > 0) {
+    skipped.push(
+      scraped.id + ' (' + unchecked.join(' and ') + ' not yet read off the page; a guess here is invisible)',
+    );
     continue;
   }
   const source = { wikiUrl: scraped.url, retrievedAt: scraped.retrievedAt ?? cache.retrievedAt };

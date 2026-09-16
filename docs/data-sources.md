@@ -78,9 +78,52 @@ hand-set in `tools/generate-enemy-rows.mjs` instead.
 | What does Hardcore change? | **Unresolved.** The shipped `hardcore` difficulty is an engine guess: more health, faster enemies, twenty lives, one tower banned. It is not a claim about the source game. |
 | What is the sell refund percentage? | **Unresolved.** Every tower ships at 70 percent, an engine default. |
 
-## What has not been fetched at all
+## The rest of the roster, and why each one is still absent
 
-Roughly thirty further towers exist in the source game, along with a great many more
-enemies and every map. They are absent rather than approximated. Adding one is a data
-row plus a line in the hand-written manifest in `src/data/loader.js`, which fails
-loudly if a file is added and the manifest is not.
+Every remaining tower was fetched and its page read. They are not all the same kind of
+missing, and lumping them together as "not done yet" would hide the fact that some are
+a line of data and others need the engine to grow a feature it does not have.
+
+### Ready to add: their tables are readable and their arithmetic checks out
+
+The scraper now reads the alternate column names these pages use (`Splash Damage`,
+`Swingrate`, `Missile Count`, `Explosion Range`). Each was verified by reproducing the
+page's own DPS column from the damage and rate columns, which is the only independent
+arithmetic the source offers.
+
+| Tower | Cross-check against the page's DPS column |
+| --- | --- |
+| Paintballer | Exact at all 6 levels |
+| Demoman | Exact at all 5 levels |
+| Mortar | Exact at all 6 levels |
+| Rocketeer | Exact at all 5 levels, once the missile count is folded in |
+
+What still blocks them is not the numbers: it is whether each one sees hidden enemies
+and whether it can shoot flying ones. Those live in the page's infobox rather than the
+table, and the site began refusing requests before they could be read. The generator
+now refuses to emit a row whose detection fields are unread, so these cannot ship as a
+quiet "no" in the meantime.
+
+### Blocked on an engine feature, not on data
+
+| Tower | What it needs |
+| --- | --- |
+| Warden | A critical-hit model. Its listed DPS is 1.1667x what damage and swing rate alone produce, because the page averages in a crit multiplier. Shipping the damage column alone would silently understate it by a sixth. |
+| Accelerator | A charge-up beam. Its table has no rate column at all, only charge-up, tick and overcharge. |
+| Pyromancer | Burn damage, burn time, tick rate and defence melt as one coherent status. The status registry can carry a burn, but not the defence melt. |
+| Military Base | Friendly units. It spawns them; nothing in the simulation fights on the player's side. |
+| Medic | Healing and shield recharge for other towers. Auras can buff a stat; nothing repairs. |
+| Farm | No damage at all, only income. The schema has `incomePerWave`, so this is the closest of the group, but the scraper is shaped around a damage table and would need its own reader. |
+
+### Page layout not yet understood
+
+Commander and Pursuit have no table carrying a level column in the shape the others
+use. Ace Pilot could not be fetched at all. All three need a second look rather than a
+guess.
+
+### The rule that governs all of it
+
+Adding a tower is a data row plus a line in the hand-written manifest in
+`src/data/loader.js`. Both halves are now checked: `tests/data/manifest-complete.test.js`
+compares the files on disk against the manifest in both directions, so a generated row
+that never reaches the game turns it red rather than shipping a shop one tower short.
