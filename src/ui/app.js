@@ -24,13 +24,26 @@ import { GameStateOverlays } from './game-states.js';
 import { PauseAndSettings } from './pause-settings.js';
 import { ALL_TARGETING_MODES, cycleTargetingMode } from './targeting.js';
 
-const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 3;
+// Zoom is pixels per map unit. A map is a couple of hundred units across and a
+// canvas is a couple of thousand pixels, so the useful range sits well above one.
+// The original ceiling of 3 clamped the fit to a quarter of the available screen.
+const MIN_ZOOM = 2;
+const MAX_ZOOM = 24;
 
 export function bootstrap(doc = document) {
   const root = doc.getElementById('app-root');
   const gameData = sim.getGameData();
   const mapDef = [...gameData.maps.values()][0];
+  // Chosen from the data rather than named in code. The first version of this line
+  // hardcoded the development stub identifiers, so once the real roster landed the
+  // match could not be created at all: the window opened, the chrome rendered, and
+  // the battlefield and the shop were simply empty with nothing reported anywhere.
+  const difficultyDef =
+    [...gameData.difficulties.values()].find((d) => d.selectable) ??
+    [...gameData.difficulties.values()][0];
+  if (!mapDef || !difficultyDef) {
+    throw new Error('no map or difficulty in the loaded data; there is nothing to play');
+  }
 
   root.appendChild(createTitleBar(doc));
 
@@ -71,17 +84,32 @@ export function bootstrap(doc = document) {
   const loop = new RenderLoop(renderer);
   renderer.reducedMotion = reducedMotionQuery?.matches ?? false;
 
+  let fittedOnce = false;
   let camera = createCamera({ x: mapDef.width / 2, y: mapDef.height / 2, zoom: 1 });
   let paused = false;
   let placingTowerDefId = null;
   let selectedTowerId = null;
-  let matchState = sim.createMatch({ seed: 1, mapId: mapDef.id, difficultyId: 'stub-normal' });
+  let matchState = sim.createMatch({ seed: 1, mapId: mapDef.id, difficultyId: difficultyDef.id });
   let lastPhase = null;
-  const totalWaves = 5;
+  const waveTable = gameData.waveTables.get(mapDef.id + ':' + difficultyDef.id);
+  const totalWaves = waveTable ? waveTable.waves.length : 0;
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
     renderer.resize(rect.width, rect.height, window.devicePixelRatio || 1);
+    // Fit the whole map into the viewport on first paint. Map units are the same
+    // units tower ranges are quoted in, so a 200 unit map at zoom 1 occupied 200
+    // pixels of a 1920 pixel canvas: a correct picture of the battlefield, drawn
+    // the size of a postage stamp in the corner.
+    if (!fittedOnce) {
+      const fit = Math.min(rect.width / mapDef.width, rect.height / mapDef.height) * 0.92;
+      camera = createCamera({
+        x: mapDef.width / 2,
+        y: mapDef.height / 2,
+        zoom: Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, fit)),
+      });
+      fittedOnce = true;
+    }
     camera = clampCamera(camera, {
       viewportWidth: rect.width,
       viewportHeight: rect.height,
@@ -212,7 +240,7 @@ export function bootstrap(doc = document) {
   // --- wave-state overlays ---
   root.addEventListener('game-state-continue', () => {});
   root.addEventListener('game-state-restart', () => {
-    matchState = sim.createMatch({ seed: Date.now() >>> 0, mapId: mapDef.id, difficultyId: 'stub-normal' });
+    matchState = sim.createMatch({ seed: Date.now() >>> 0, mapId: mapDef.id, difficultyId: difficultyDef.id });
     selectedTowerId = null;
     renderer.selectedTowerId = null;
     towerPanel.clear();
