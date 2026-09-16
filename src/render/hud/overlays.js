@@ -19,7 +19,9 @@ const CARD_HEIGHT = 180;
 const PADDING = 20;
 const BUTTON_HEIGHT = 40;
 
-const COPY = {
+// Exported so a check can assert the exact wording without a canvas. A check that
+// cannot reach the thing it is checking finds a way to pass anyway.
+export const COPY = {
   waveStart: {
     headline: (p) => `Wave ${p.waveIndex} of ${p.totalWaves || p.waveIndex}`,
     body: () => 'Enemies are inbound. Check your towers before it starts.',
@@ -27,7 +29,20 @@ const COPY = {
   },
   waveClear: {
     headline: (p) => `Wave ${p.waveIndex} cleared`,
-    body: (p) => (p.completionBonus ? `No leaks got through. Completion bonus: $${p.completionBonus}.` : 'No leaks got through.'),
+    // Reports the real number. This line used to claim no leaks got through no matter
+    // what, and said it cheerfully while the base had just lost twenty lives. An
+    // overlay that states something untrue is worse than one that says nothing,
+    // because a player believes it and stops watching their own life total.
+    body: (p) => {
+      const leaked = p.leaked ?? 0;
+      const how =
+        leaked === 0
+          ? 'No leaks got through.'
+          : leaked === 1
+            ? 'One got through.'
+            : `${leaked} got through.`;
+      return p.completionBonus ? `${how} Completion bonus: $${p.completionBonus}.` : how;
+    },
     actionLabel: 'Next wave',
   },
   victory: {

@@ -217,9 +217,20 @@ export class InterfaceLayer {
     }
     if (phase === this._lastPhase) return;
     if (phase === 'active' && this._lastPhase === 'intermission') {
+      // Remember the running leak total as the wave begins, so the cleared message
+      // can report what this wave cost rather than what the whole match has cost.
+      this._leaksAtWaveStart = snapshot.leakCount ?? 0;
       this._overlay = { kind: 'waveStart', payload: { waveIndex: snapshot.waveIndex ?? 0, totalWaves } };
     } else if (phase === 'intermission' && this._lastPhase === 'active') {
-      this._overlay = { kind: 'waveClear', payload: { waveIndex: snapshot.waveIndex ?? 0, completionBonus: snapshot.waveCompletionBonus ?? 0 } };
+      const leaked = Math.max(0, (snapshot.leakCount ?? 0) - (this._leaksAtWaveStart ?? 0));
+      this._overlay = {
+        kind: 'waveClear',
+        payload: {
+          waveIndex: snapshot.waveIndex ?? 0,
+          completionBonus: snapshot.waveCompletionBonus ?? 0,
+          leaked,
+        },
+      };
     } else if (phase === 'victory') {
       this._overlay = { kind: 'victory', payload: { totalWaves } };
     } else if (phase === 'defeat') {
