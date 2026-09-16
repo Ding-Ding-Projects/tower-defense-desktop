@@ -35,6 +35,11 @@ export const PALETTE = {
   progressFill: '#d0bcff',
   progressFillWarning: '#f2b8b5',
   iconRing: 'rgba(208, 188, 255, 0.5)',
+  // A deliberately lighter plate behind a portrait. The panel fill is nearly black, and
+  // a dark metal tower drawn on it came out as a silhouette of a silhouette: technically
+  // the right sprite, unreadable at 44 pixels. This is the lit alcove the model sits in.
+  iconPlate: '#3c424e',
+  iconPlateEdge: '#2a2f38',
   tooltipFill: '#332d41',
   tooltipBorder: 'rgba(208, 188, 255, 0.5)',
 };
@@ -244,7 +249,19 @@ export class ProgressBar extends Widget {
   }
 }
 
-/** A square icon slot: a bevelled frame around a simple deterministic glyph. */
+/**
+ * A square icon slot holding the thing it names.
+ *
+ * Given a `sprite` it draws that — the same cached canvas the battlefield draws,
+ * so the card in the shop is a picture of the tower that will actually be placed
+ * rather than a letter standing in for one. A shop full of lettered boxes reads as
+ * unfinished no matter how finished everything behind it is, and it makes the
+ * player learn two vocabularies: the shapes on the field, and the initials beside
+ * them.
+ *
+ * The lettered glyph remains as the fallback for a slot with nothing to show yet,
+ * because an empty bevelled box is worse than an initial.
+ */
 export class IconSlot extends Widget {
   _draw(ctx, rect, state) {
     ctx.save();
@@ -254,6 +271,41 @@ export class IconSlot extends Widget {
     ctx.strokeStyle = PALETTE.iconRing;
     ctx.lineWidth = 1.5;
     ctx.stroke();
+
+    if (state.sprite) {
+      // Clipped to the frame so a sprite drawn with a muzzle or a barrel sticking
+      // past its nominal size cannot spill over the card beside it.
+      ctx.save();
+      traceRoundedRect(ctx, rect, 6);
+      ctx.clip();
+
+      // A lighter plate first, with a soft vignette toward the edges, so the tower has
+      // something to be dark against. Without it the portrait is a dark shape on a
+      // darker panel and every tower reads as the same blob.
+      const gradient = ctx.createRadialGradient
+        ? ctx.createRadialGradient(
+            rect.x + rect.width / 2, rect.y + rect.height * 0.42, rect.width * 0.08,
+            rect.x + rect.width / 2, rect.y + rect.height / 2, rect.width * 0.72,
+          )
+        : null;
+      if (gradient) {
+        gradient.addColorStop(0, PALETTE.iconPlate);
+        gradient.addColorStop(1, PALETTE.iconPlateEdge);
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = PALETTE.iconPlate;
+      }
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+      // Dimming an unaffordable card rather than drawing a different picture: the
+      // tower still has to be recognisable as the one it is while it is out of reach.
+      // 0.45 was too deep to read against; this reads as "not yet" rather than "gone".
+      if (state.dimmed) ctx.globalAlpha = 0.7;
+      ctx.drawImage(state.sprite, rect.x, rect.y, rect.width, rect.height);
+      ctx.restore();
+      ctx.restore();
+      return;
+    }
 
     const glyph = (state.glyph ?? '?').slice(0, 1).toUpperCase();
     ctx.font = `700 ${Math.round(rect.height * 0.5)}px "Roboto", system-ui, sans-serif`;

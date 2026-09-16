@@ -4,11 +4,24 @@
  * beacon ring) that points at the target, and visible upgrade differences as
  * level rises.
  *
- * The silhouette is derived entirely from the level's own real data fields —
+ * The SILHOUETTE is derived entirely from the level's own real data fields —
  * aura, aoeRadius, chainCount, pierceCount, incomePerWave, burstCount,
- * hitsAir, detectsHidden — never from the tower's id or displayName. A brand
- * new tower added to src/data/towers tomorrow with, say, an aoeRadius gets
- * the mortar silhouette automatically, with no matching change needed here.
+ * hitsAir, detectsHidden. A brand new tower added to src/data/towers tomorrow
+ * with, say, an aoeRadius gets the mortar silhouette automatically, with no
+ * matching change needed here.
+ *
+ * The LIVERY — hull colour, plinth shape, panel count — is derived from a hash
+ * of the tower's id. That is a refinement of the rule above rather than a break
+ * with it, and it was forced by what the shop actually looked like: shape alone
+ * made Scout, Soldier, Freezer and Militant pixel-identical, because at level 0
+ * they share every mechanical field the silhouette reads. Four towers that draw
+ * as the same dark disc are four towers a player cannot tell apart, in the shop
+ * or on the field.
+ *
+ * The principle being protected is "no hand-written per-tower branch in this
+ * file", not "ignore the id". A hash needs no such branch: the next tower gets
+ * its own colours the moment it has an id, exactly as it gets its silhouette the
+ * moment it has stats. What is still forbidden here is `if (def.id === 'scout')`.
  *
  * `drawTower` is the pure function the renderer calls every frame (rotation
  * changes continuously as a turret tracks its target, so it cannot be baked
@@ -22,8 +35,39 @@
  * directly.
  */
 
-import { TOWER, TOWER_ROLE, LIGHT_ANGLE_RADIANS, shade, withAlpha } from './palette.js';
+import { TOWER, TOWER_ROLE, LIGHT_ANGLE_RADIANS, shade, withAlpha, mixHex } from './palette.js';
 import { getCachedCanvas, quantizeAngle } from './cache.js';
+import { normalizeSeed } from './noise.js';
+
+/**
+ * Hull colours a tower can be painted. Deliberately muted and metallic rather than
+ * saturated: these sit under the role accent, which still has to be the thing that
+ * reads first, because role is what tells a player what the tower DOES.
+ */
+const LIVERY = Object.freeze([
+  '#8a8f98', '#7d6b57', '#55707a', '#6d5b74',
+  '#7a8570', '#8a7060', '#5f6b8a', '#84796a',
+]);
+
+/**
+ * A tower's stable visual identity, hashed from its id.
+ *
+ * Deterministic by construction: the same id always produces the same livery, which is
+ * what lets the sprite cache key on the id and never re-derive this.
+ *
+ * @param {import('../../data/schema/types.js').TowerDef} def
+ * @returns {{ hull: string, plinthSides: number, panels: number }}
+ */
+export function towerLivery(def) {
+  const seed = normalizeSeed('livery:' + (def.id ?? ''));
+  return {
+    hull: LIVERY[seed % LIVERY.length],
+    // Six, eight or ten sides. Enough to be told apart at a glance in a shop card,
+    // not so many that the plinth stops reading as a machined slab.
+    plinthSides: 6 + ((seed >>> 3) % 3) * 2,
+    panels: 2 + ((seed >>> 7) % 3),
+  };
+}
 
 /** Base world footprint of a placed tower, in map units. See docs/features on the renderer side for how this becomes on-screen pixels via camera zoom. */
 export const TOWER_WORLD_SIZE = 3;
@@ -73,7 +117,10 @@ export function drawTower(ctx, size, def, levelDef, rotationRadians) {
   const cx = size / 2;
   const cy = size / 2;
   const role = towerRole(levelDef);
-  const accent = roleColor(role);
+  const livery = towerLivery(def);
+  // Role still leads the hue, so what a tower DOES is what reads first; the hull pulls
+  // it far enough apart that two towers of the same role are not the same picture.
+  const accent = mixHex(roleColor(role), livery.hull, 0.38);
   const level = levelDef.level ?? 0;
 
   const footprintScale = clamp((def.footprintRadius ?? 1.5) / 1.5, 0.75, 1.6);
@@ -81,7 +128,7 @@ export function drawTower(ctx, size, def, levelDef, rotationRadians) {
   const r = size * 0.3 * footprintScale * levelScale;
 
   drawShadow(ctx, cx, cy, r);
-  drawPlinth(ctx, cx, cy, r, level);
+  drawPlinth(ctx, cx, cy, r, level, livery);
   drawArmorRing(ctx, cx, cy, r, level, accent);
 
   ctx.save();
@@ -106,20 +153,44 @@ function drawShadow(ctx, cx, cy, r) {
 }
 
 /** An octagonal plinth, two-tone so it reads as a solid slab rather than a flat disc. */
-function drawPlinth(ctx, cx, cy, r, level) {
+function drawPlinth(ctx, cx, cy, r, level, livery) {
+  const sides = livery?.plinthSides ?? 8;
+  const turn = Math.PI / sides;
   const plinthR = r * 1.05;
-  drawRegularPolygon(ctx, cx, cy, plinthR, 8, Math.PI / 8);
+  drawRegularPolygon(ctx, cx, cy, plinthR, sides, turn);
   ctx.fillStyle = TOWER.plinthDark;
   ctx.fill();
 
   const insetR = plinthR * 0.82;
-  drawRegularPolygon(ctx, cx, cy, insetR, 8, Math.PI / 8);
-  ctx.fillStyle = TOWER.plinth;
+  drawRegularPolygon(ctx, cx, cy, insetR, sides, turn);
+  // The hull colour, mixed well down into the neutral plinth. Enough to tell two
+  // towers apart in a 44 pixel shop card; not enough to turn a machine into a toy.
+  ctx.fillStyle = livery ? mixHex(TOWER.plinth, livery.hull, 0.5) : TOWER.plinth;
   ctx.fill();
 
   ctx.strokeStyle = shade(TOWER.plinth, level > 0 ? 0.15 : 0.05);
   ctx.lineWidth = Math.max(1, r * 0.03);
   ctx.stroke();
+
+  // Panel seams across the deck, so the slab reads as fabricated from plates rather
+  // than cast as one lump. The count is part of the livery, which is what makes two
+  // towers sharing a hull colour still distinguishable.
+  const panels = livery?.panels ?? 0;
+  if (panels > 0) {
+    ctx.save();
+    ctx.strokeStyle = withAlpha(TOWER.plinthDark, 0.55);
+    ctx.lineWidth = Math.max(0.6, r * 0.035);
+    for (let i = 0; i < panels; i += 1) {
+      const t = (i + 1) / (panels + 1);
+      const y = cy - insetR + insetR * 2 * t;
+      const halfWidth = Math.sqrt(Math.max(0, insetR * insetR - (y - cy) * (y - cy))) * 0.86;
+      ctx.beginPath();
+      ctx.moveTo(cx - halfWidth, y);
+      ctx.lineTo(cx + halfWidth, y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
 }
 
 /** Armor rivets around the plinth rim: more of them at higher level, so an upgraded tower reads as more heavily plated without a second art pass. */

@@ -1,4 +1,22 @@
 import { test } from 'node:test';
+import { before, after } from 'node:test';
+import { setCanvasFactory, useDefaultCanvasFactory, clearArtCache } from '../../src/render/art/cache.js';
+import { fakeCanvasFactory } from '../art/support/fake-context.js';
+
+// The shop draws each tower's real sprite in its card, so this module now reaches the
+// art cache, and the art cache wants a canvas. There is no document under `node --test`,
+// so the same fake factory the art checks use is installed here. Swapping it rather than
+// letting the shop shrug off a missing canvas is deliberate: a shop that silently falls
+// back to a letter when sprite drawing breaks would hide exactly the regression this
+// change exists to prevent.
+before(() => {
+  clearArtCache();
+  setCanvasFactory(fakeCanvasFactory());
+});
+after(() => {
+  useDefaultCanvasFactory();
+  clearArtCache();
+});
 import assert from 'node:assert/strict';
 import { createFakeContext } from './fake-context.js';
 import { createFakeHost } from './fake-dom.js';

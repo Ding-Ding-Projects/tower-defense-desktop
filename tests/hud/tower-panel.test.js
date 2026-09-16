@@ -1,4 +1,18 @@
 import { test } from 'node:test';
+import { before, after } from 'node:test';
+import { setCanvasFactory, useDefaultCanvasFactory, clearArtCache } from '../../src/render/art/cache.js';
+import { fakeCanvasFactory } from '../art/support/fake-context.js';
+
+// The panel draws the tower's own portrait now, so it reaches the art cache, and the
+// art cache wants a canvas that `node --test` does not have.
+before(() => {
+  clearArtCache();
+  setCanvasFactory(fakeCanvasFactory());
+});
+after(() => {
+  useDefaultCanvasFactory();
+  clearArtCache();
+});
 import assert from 'node:assert/strict';
 import { createFakeContext } from './fake-context.js';
 import { TowerPanelHud } from '../../src/render/hud/tower-panel.js';

@@ -33,6 +33,18 @@ export function createFakeContext() {
     clip: record('clip'),
     fill: record('fill'),
     stroke: record('stroke'),
+    // Recorded like everything else, so a check can assert that a card drew a
+    // portrait rather than merely that it did not throw while trying to.
+    drawImage: record('drawImage'),
+    // Returns a real stop-recording stub rather than being absent, so the checks
+    // exercise the gradient path the app actually takes instead of the flat fallback
+    // beside it. A fallback nobody notices being taken is a fallback that becomes the
+    // only path.
+    createRadialGradient: (...args) => {
+      const stops = [];
+      calls.push(['createRadialGradient', ...args]);
+      return { stops, addColorStop: (offset, color) => stops.push([offset, color]) };
+    },
     fillRect: record('fillRect'),
     strokeRect: record('strokeRect'),
     fillText: record('fillText'),

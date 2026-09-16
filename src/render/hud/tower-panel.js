@@ -13,11 +13,17 @@
 import { inset, stack, containsPoint } from './layout.js';
 import { Panel, Button, wrapText, wrappedTextHeight, PALETTE } from './widgets.js';
 import { deriveUpgradeState, deriveSellValue, targetingModeLabel, ALL_TARGETING_MODES, FIELD_LABELS, isAbilityReady } from './derive.js';
+import { IconSlot } from './widgets.js';
+import { getTowerSprite } from '../art/index.js';
 
 const PADDING = 12;
 const ROW_HEIGHT = 20;
 const BUTTON_HEIGHT = 34;
 const DETAIL_LINE_HEIGHT = 14;
+const PORTRAIT_SIZE = 40;
+// Facing up, matching the shop card, so the tower a player is looking at in the panel
+// is the same picture they picked out of the shop a minute earlier.
+const PORTRAIT_ANGLE = -Math.PI / 2;
 
 const STAT_FIELDS = ['damage', 'fireRate', 'range', 'aoeRadius', 'pierceCount', 'chainCount'];
 
@@ -77,8 +83,22 @@ export class TowerPanelHud {
     ctx.textBaseline = 'alphabetic';
     ctx.font = '700 16px "Roboto", system-ui, sans-serif';
     ctx.fillStyle = PALETTE.text;
-    ctx.fillText(`${towerDef.displayName} (Lv. ${tower.level + 1})`, inner.x, y + 16);
-    y += 16 + PADDING;
+    // The tower's own portrait, at the level it is actually standing at. Upgrading
+    // changes the picture, which is the one place a player can see what their money
+    // bought without squinting at the battlefield.
+    const portraitSlot = this._portraitSlot ?? (this._portraitSlot = new IconSlot());
+    const portraitRect = { x: inner.x, y, width: PORTRAIT_SIZE, height: PORTRAIT_SIZE };
+    portraitSlot.draw(ctx, portraitRect, {
+      sprite: getTowerSprite(towerDef, towerDef.levels[tower.level], PORTRAIT_SIZE, PORTRAIT_ANGLE),
+      glyph: towerDef.displayName,
+    });
+
+    const textX = inner.x + PORTRAIT_SIZE + PADDING;
+    ctx.fillText(`${towerDef.displayName}`, textX, y + 16);
+    ctx.font = '400 12px "Roboto", system-ui, sans-serif';
+    ctx.fillStyle = PALETTE.textMuted;
+    ctx.fillText(`Level ${tower.level + 1} of ${towerDef.levels.length}`, textX, y + 32);
+    y += PORTRAIT_SIZE + PADDING;
 
     const levelDef = towerDef.levels[tower.level];
     ctx.font = '400 12px "Roboto", system-ui, sans-serif';

@@ -170,6 +170,21 @@ export function withAlpha(hex, alpha) {
  * @param {number} t  0..1, 0 is hexA
  * @returns {string} 'rgb(r, g, b)'
  */
+export function mixHex(hexA, hexB, t) {
+  // The hex-returning sibling of mixColors, and it exists for a specific reason:
+  // withAlpha and shade parse hex and nothing else, so a colour that has been through
+  // mixColors comes back as 'rgb(...)' and quietly breaks the moment anything downstream
+  // tries to fade it. A mixed colour that is going to be mixed again has to stay hex.
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  const c = clamp01(t);
+  const channel = (from, to) => {
+    const value = Math.round(from + (to - from) * c);
+    return Math.max(0, Math.min(255, value)).toString(16).padStart(2, '0');
+  };
+  return '#' + channel(a.r, b.r) + channel(a.g, b.g) + channel(a.b, b.b);
+}
+
 export function mixColors(hexA, hexB, t) {
   const a = hexToRgb(hexA);
   const b = hexToRgb(hexB);

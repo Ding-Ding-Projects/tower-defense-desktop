@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { drawTower, getTowerSprite, towerRole } from '../../src/render/art/towers.js';
+import { drawTower, getTowerSprite, towerRole, towerLivery } from '../../src/render/art/towers.js';
 import { clearArtCache, setCanvasFactory, useDefaultCanvasFactory } from '../../src/render/art/cache.js';
 import { createFakeContext, fakeCanvasFactory } from './support/fake-context.js';
 
@@ -67,3 +67,62 @@ test('getTowerSprite caches by (tower, level, size, rotation bucket): same rotat
     useDefaultCanvasFactory();
   }
 });
+
+test('two towers with identical stats still draw as different towers', () => {
+  // Shape is derived from the level's mechanical fields, which is the right rule and
+  // stays the rule. Its consequence, unnoticed until the shop was looked at, is that
+  // four towers sharing every field at level 0 came out pixel-identical: Scout,
+  // Soldier, Freezer and Militant were all the same dark disc, in the shop and on the
+  // battlefield. Livery is hashed from the id to break exactly that tie.
+  const a = createFakeContext();
+  const b = createFakeContext();
+  const stats = level({});
+
+  drawTower(a.ctx, 96, { id: 'scout', footprintRadius: 1.5 }, stats, 0);
+  drawTower(b.ctx, 96, { id: 'soldier', footprintRadius: 1.5 }, stats, 0);
+
+  assert.notDeepEqual(
+    a.calls, b.calls,
+    'two towers with the same stats and different ids must not draw identically',
+  );
+});
+
+test('livery is stable for an id, so the sprite cache can key on it', () => {
+  // If this drifted, the cache would hand back a stale bitmap for a tower that now
+  // draws differently, and the wrong tower would appear on the field.
+  const first = createFakeContext();
+  const second = createFakeContext();
+  const stats = level({});
+  drawTower(first.ctx, 96, { id: 'militant', footprintRadius: 1.5 }, stats, 0);
+  drawTower(second.ctx, 96, { id: 'militant', footprintRadius: 1.5 }, stats, 0);
+  assert.deepEqual(first.calls, second.calls, 'the same id must always draw the same tower');
+});
+
+test('the role is still expressed, with the id held constant', () => {
+  // Livery must not have become the only thing that varies. Holding the id fixed and
+  // changing only a mechanical field has to change the picture, or a player would be
+  // learning paint colours instead of learning what a shape means.
+  const single = contextFor({ id: 'scout' }, level({}));
+  const splash = contextFor({ id: 'scout' }, level({ aoeRadius: 6 }));
+  assert.notDeepEqual(single.calls, splash.calls, 'a splash tower must not draw like a single-target one');
+
+  const support = contextFor({ id: 'scout' }, level({ aura: { stat: 'damage', mode: 'additive', radius: 10, value: 2 } }));
+  assert.notDeepEqual(splash.calls, support.calls, 'a support tower must not draw like a splash one');
+});
+
+test('livery depends on the id and nothing else', () => {
+  // It is hashed from the id alone on purpose. If it ever picked up the level or the
+  // footprint, the sprite cache — which keys on id, level and size — would still be
+  // correct, but two towers would start sharing a look as their stats converged, which
+  // is the exact problem livery was added to solve.
+  const base = towerLivery({ id: 'freezer', footprintRadius: 1.5 });
+  assert.deepEqual(towerLivery({ id: 'freezer', footprintRadius: 2 }), base, 'footprint must not change the livery');
+  assert.deepEqual(towerLivery({ id: 'freezer' }), base, 'an absent footprint must not change it either');
+  assert.notDeepEqual(towerLivery({ id: 'freezer-2' }), base, 'a different id must get a different livery');
+});
+
+function contextFor(def, levelDef) {
+  const recorder = createFakeContext();
+  drawTower(recorder.ctx, 96, { footprintRadius: 1.5, ...def }, levelDef, 0);
+  return recorder;
+}

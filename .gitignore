@@ -9,3 +9,7 @@ Thumbs.db
 # Raw fetched pages, kept only so a re-read does not hammer the source.
 # The distilled results in tools/wiki-cache/*.json are what gets committed.
 tools/wiki-cache/pages/
+
+# Ad-hoc verification captures. Evidence captures that are meant to last live in
+# their own documented place, not in a scratch folder a tool happened to write to.
+tools/shots/

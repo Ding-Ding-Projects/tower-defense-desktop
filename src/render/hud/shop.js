@@ -16,9 +16,18 @@
 import { inset, row, stack, containsPoint } from './layout.js';
 import { Panel, Button, IconSlot, wrapText, wrappedTextHeight, PALETTE } from './widgets.js';
 import { deriveShopEntryState } from './derive.js';
+import { getTowerSprite } from '../art/index.js';
+
+// Facing up the card rather than along its firing line. A shop portrait is a picture
+// of the tower, not a snapshot of it mid-engagement, and every card facing the same
+// way is what makes the roster scannable.
+const PORTRAIT_ANGLE = -Math.PI / 2;
 
 const PADDING = 12;
-const ICON_SIZE = 44;
+// Large enough that a tower is recognisable rather than merely present. At 44 the
+// plinth, barrel and sensor all landed inside about twenty pixels and every tower read
+// as the same dark disc.
+const ICON_SIZE = 56;
 const CARD_GAP = 8;
 const NAME_LINE_HEIGHT = 18;
 const REASON_LINE_HEIGHT = 14;
@@ -149,7 +158,19 @@ export class ShopHud {
     }
 
     const iconSlot = entry.iconSlot ?? (entry.iconSlot = new IconSlot());
-    iconSlot.draw(ctx, { x: iconRect.x, y: inner.y, width: ICON_SIZE, height: ICON_SIZE }, { glyph: def.displayName, tint: entry.disabled ? PALETTE.textMuted : PALETTE.text });
+    // The real sprite, at the level the money actually buys: level 0. Drawing the
+    // top-level portrait would be advertising something the player cannot have yet.
+    const portrait = getTowerSprite(def, def.levels[0], ICON_SIZE, PORTRAIT_ANGLE);
+    iconSlot.draw(
+      ctx,
+      { x: iconRect.x, y: inner.y, width: ICON_SIZE, height: ICON_SIZE },
+      {
+        sprite: portrait,
+        dimmed: entry.disabled,
+        glyph: def.displayName,
+        tint: entry.disabled ? PALETTE.textMuted : PALETTE.text,
+      },
+    );
 
     ctx.save();
     ctx.textAlign = 'left';
