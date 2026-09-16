@@ -1,0 +1,12 @@
+{
+  "id": "burn",
+  "displayName": "Burning",
+  "category": "dot",
+  "stackingRule": "stack",
+  "maxStacks": 5,
+  "damagePerTick": 1,
+  "source": {
+    "origin": "engine-default",
+    "reason": "the source game has this behaviour; its exact numbers are not yet sourced, so these are the engine values the simulation was tuned against"
+  }
+}

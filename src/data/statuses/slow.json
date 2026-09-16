@@ -1,0 +1,11 @@
+{
+  "id": "slow",
+  "displayName": "Slowed",
+  "category": "slow",
+  "stackingRule": "refresh",
+  "speedMultiplier": 0.65,
+  "source": {
+    "origin": "engine-default",
+    "reason": "the source game has this behaviour; its exact numbers are not yet sourced, so these are the engine values the simulation was tuned against"
+  }
+}

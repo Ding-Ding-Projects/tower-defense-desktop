@@ -1,0 +1,95 @@
+{
+  "id": "minigunner",
+  "displayName": "Minigunner",
+  "baseCost": 1850,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundPercent": 0.7,
+  "footprintRadius": 1.5,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 2,
+      "fireRate": 6.6667,
+      "range": 16,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Minigunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 1,
+      "cost": 350,
+      "damage": 2,
+      "fireRate": 8.3333,
+      "range": 16,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Minigunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 2,
+      "cost": 1500,
+      "damage": 3,
+      "fireRate": 8.3333,
+      "range": 18,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Minigunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 3,
+      "cost": 6500,
+      "damage": 7,
+      "fireRate": 10,
+      "range": 18,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Minigunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 4,
+      "cost": 21500,
+      "damage": 16,
+      "fireRate": 10,
+      "range": 21,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Minigunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Minigunner",
+    "retrievedAt": "2026-09-16"
+  }
+}

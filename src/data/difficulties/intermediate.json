@@ -1,0 +1,15 @@
+{
+  "id": "intermediate",
+  "displayName": "Intermediate",
+  "selectable": true,
+  "startingCash": 450,
+  "cashMultiplier": 1,
+  "enemyHpMultiplier": 1.35,
+  "enemySpeedMultiplier": 1.05,
+  "livesOverride": null,
+  "disallowedTowers": [],
+  "source": {
+    "origin": "engine-default",
+    "reason": "difficulty names follow the source game; the multipliers are engine values chosen for this project and are not sourced"
+  }
+}

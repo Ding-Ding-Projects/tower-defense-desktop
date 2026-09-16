@@ -1,0 +1,95 @@
+{
+  "id": "ranger",
+  "displayName": "Ranger",
+  "baseCost": 4500,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundPercent": 0.7,
+  "footprintRadius": 1.5,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 100,
+      "fireRate": 0.1667,
+      "range": 70,
+      "detectsHidden": true,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 1,
+      "cost": 1500,
+      "damage": 100,
+      "fireRate": 0.2105,
+      "range": 70,
+      "detectsHidden": true,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 2,
+      "cost": 5500,
+      "damage": 185,
+      "fireRate": 0.2105,
+      "range": 70,
+      "detectsHidden": true,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 3,
+      "cost": 15750,
+      "damage": 430,
+      "fireRate": 0.2222,
+      "range": 70,
+      "detectsHidden": true,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 4,
+      "cost": 25000,
+      "damage": 875,
+      "fireRate": 0.125,
+      "range": 70,
+      "detectsHidden": true,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+    "retrievedAt": "2026-09-16"
+  }
+}

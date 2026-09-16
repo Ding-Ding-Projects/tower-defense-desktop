@@ -13,9 +13,16 @@
  * Where a number came from. Required on every top-level row, because a statistic
  * with no provenance is a rumour, and this project claims parity with a live game
  * that gets balance patches.
+ * A row is either sourced from the wiki, in which case it carries the URL and the
+ * date it was read, or it is an engine default nobody has sourced yet, in which case
+ * it says so outright. There is deliberately no third option: a row may not carry a
+ * citation it did not come from, and it may not carry nothing at all.
+ *
  * @typedef {object} Source
- * @property {string} wikiUrl
- * @property {string} retrievedAt  ISO yyyy-mm-dd
+ * @property {string} [wikiUrl]         required unless origin is engine-default
+ * @property {string} [retrievedAt]     ISO yyyy-mm-dd; required alongside wikiUrl
+ * @property {'engine-default'} [origin]  this value was chosen here, not sourced
+ * @property {string} [reason]          required alongside origin
  * @property {string} [wikiRevision]
  * @property {string} [notes]
  */

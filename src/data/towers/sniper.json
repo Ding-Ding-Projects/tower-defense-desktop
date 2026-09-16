@@ -1,0 +1,95 @@
+{
+  "id": "sniper",
+  "displayName": "Sniper",
+  "baseCost": 450,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundPercent": 0.7,
+  "footprintRadius": 1.5,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 10,
+      "fireRate": 0.2,
+      "range": 28,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 1,
+      "cost": 200,
+      "damage": 12,
+      "fireRate": 0.25,
+      "range": 28,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 2,
+      "cost": 750,
+      "damage": 25,
+      "fireRate": 0.25,
+      "range": 30,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 3,
+      "cost": 2000,
+      "damage": 60,
+      "fireRate": 0.25,
+      "range": 35,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 4,
+      "cost": 5000,
+      "damage": 100,
+      "fireRate": 0.3125,
+      "range": 45,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Sniper",
+    "retrievedAt": "2026-09-16"
+  }
+}

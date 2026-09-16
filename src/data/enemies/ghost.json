@@ -1,0 +1,20 @@
+{
+  "id": "ghost",
+  "displayName": "Ghost",
+  "maxHp": 45,
+  "shieldHp": 0,
+  "defense": 0,
+  "speed": 4,
+  "leakDamage": 1,
+  "killReward": 50,
+  "hidden": true,
+  "flying": false,
+  "boss": false,
+  "immunities": [],
+  "abilities": [],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Ghost",
+    "retrievedAt": "2026-09-16",
+    "notes": "health, speed and reward read from the infobox. Concealment, flight, leak damage and abilities are engine values, not sourced: see docs/data-sources.md."
+  }
+}

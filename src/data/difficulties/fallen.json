@@ -1,0 +1,15 @@
+{
+  "id": "fallen",
+  "displayName": "Fallen",
+  "selectable": true,
+  "startingCash": 650,
+  "cashMultiplier": 1,
+  "enemyHpMultiplier": 3.2,
+  "enemySpeedMultiplier": 1.2,
+  "livesOverride": null,
+  "disallowedTowers": [],
+  "source": {
+    "origin": "engine-default",
+    "reason": "difficulty names follow the source game; the multipliers are engine values chosen for this project and are not sourced"
+  }
+}

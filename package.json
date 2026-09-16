@@ -8,11 +8,11 @@
   "main": "electron/main.cjs",
   "scripts": {
     "start": "electron .",
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",
     "validate:data": "node tools/validate-data.mjs",
     "check:determinism": "node tools/check-determinism.mjs",
     "test": "node --test \"tests/**/*.test.js\" \"tests/**/*.test.mjs\"",
-    "check": "npm run typecheck && npm run check:determinism && npm run check:site && npm run check:docs && npm test",
+    "check": "npm run typecheck && npm run check:determinism && npm run validate:data && npm run check:site && npm run check:docs && npm test",
     "count": "node tools/count-lines.mjs",
     "dist": "electron-builder --win squirrel --publish never",
     "check:site": "node tools/check-site-contract.mjs",

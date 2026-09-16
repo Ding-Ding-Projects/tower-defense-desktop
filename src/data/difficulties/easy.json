@@ -1,0 +1,15 @@
+{
+  "id": "easy",
+  "displayName": "Easy",
+  "selectable": true,
+  "startingCash": 350,
+  "cashMultiplier": 1,
+  "enemyHpMultiplier": 0.8,
+  "enemySpeedMultiplier": 0.9,
+  "livesOverride": null,
+  "disallowedTowers": [],
+  "source": {
+    "origin": "engine-default",
+    "reason": "difficulty names follow the source game; the multipliers are engine values chosen for this project and are not sourced"
+  }
+}

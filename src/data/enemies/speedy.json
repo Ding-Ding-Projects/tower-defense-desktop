@@ -1,0 +1,20 @@
+{
+  "id": "speedy",
+  "displayName": "Speedy",
+  "maxHp": 4,
+  "shieldHp": 0,
+  "defense": 0,
+  "speed": 5.5,
+  "leakDamage": 1,
+  "killReward": 5,
+  "hidden": false,
+  "flying": false,
+  "boss": false,
+  "immunities": [],
+  "abilities": [],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Speedy",
+    "retrievedAt": "2026-09-16",
+    "notes": "health, speed and reward read from the infobox. Concealment, flight, leak damage and abilities are engine values, not sourced: see docs/data-sources.md."
+  }
+}

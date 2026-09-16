@@ -1,0 +1,17 @@
+{
+  "id": "hardcore",
+  "displayName": "Hardcore",
+  "selectable": false,
+  "startingCash": 750,
+  "cashMultiplier": 1,
+  "enemyHpMultiplier": 6,
+  "enemySpeedMultiplier": 1.3,
+  "livesOverride": 20,
+  "disallowedTowers": [
+    "scout"
+  ],
+  "source": {
+    "origin": "engine-default",
+    "reason": "difficulty names follow the source game; the multipliers are engine values chosen for this project and are not sourced"
+  }
+}

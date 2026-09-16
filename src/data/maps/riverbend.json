@@ -1,0 +1,220 @@
+{
+  "id": "riverbend",
+  "displayName": "Riverbend",
+  "baseLives": 100,
+  "width": 220,
+  "height": 120,
+  "lanes": [
+    {
+      "id": "main",
+      "waypoints": [
+        {
+          "x": 0,
+          "y": 30
+        },
+        {
+          "x": 70,
+          "y": 30
+        },
+        {
+          "x": 70,
+          "y": 90
+        },
+        {
+          "x": 150,
+          "y": 90
+        },
+        {
+          "x": 150,
+          "y": 35
+        },
+        {
+          "x": 220,
+          "y": 35
+        }
+      ]
+    }
+  ],
+  "placementZones": [
+    {
+      "id": "north-verge",
+      "terrain": "ground",
+      "polygon": [
+        [
+          4,
+          16
+        ],
+        [
+          64,
+          16
+        ],
+        [
+          64,
+          24
+        ],
+        [
+          4,
+          24
+        ]
+      ]
+    },
+    {
+      "id": "north-bank",
+      "terrain": "ground",
+      "polygon": [
+        [
+          4,
+          36
+        ],
+        [
+          62,
+          36
+        ],
+        [
+          62,
+          46
+        ],
+        [
+          4,
+          46
+        ]
+      ]
+    },
+    {
+      "id": "bend-west",
+      "terrain": "ground",
+      "polygon": [
+        [
+          56,
+          52
+        ],
+        [
+          64,
+          52
+        ],
+        [
+          64,
+          82
+        ],
+        [
+          56,
+          82
+        ]
+      ]
+    },
+    {
+      "id": "bend-east",
+      "terrain": "ground",
+      "polygon": [
+        [
+          78,
+          48
+        ],
+        [
+          142,
+          48
+        ],
+        [
+          142,
+          60
+        ],
+        [
+          78,
+          60
+        ]
+      ]
+    },
+    {
+      "id": "shallows",
+      "terrain": "water",
+      "polygon": [
+        [
+          78,
+          96
+        ],
+        [
+          142,
+          96
+        ],
+        [
+          142,
+          112
+        ],
+        [
+          78,
+          112
+        ]
+      ]
+    },
+    {
+      "id": "east-bend",
+      "terrain": "ground",
+      "polygon": [
+        [
+          156,
+          50
+        ],
+        [
+          166,
+          50
+        ],
+        [
+          166,
+          84
+        ],
+        [
+          156,
+          84
+        ]
+      ]
+    },
+    {
+      "id": "east-verge",
+      "terrain": "ground",
+      "polygon": [
+        [
+          172,
+          42
+        ],
+        [
+          214,
+          42
+        ],
+        [
+          214,
+          54
+        ],
+        [
+          172,
+          54
+        ]
+      ]
+    },
+    {
+      "id": "bluff",
+      "terrain": "cliff",
+      "polygon": [
+        [
+          172,
+          16
+        ],
+        [
+          214,
+          16
+        ],
+        [
+          214,
+          28
+        ],
+        [
+          172,
+          28
+        ]
+      ]
+    }
+  ],
+  "source": {
+    "origin": "engine-default",
+    "reason": "an original layout authored for this project, not a reproduction of any map from the source game. Zones hug the lane because tower ranges are in the same units as the map, and a zone placed further away than the cheapest tower can shoot is a zone nothing can be usefully built in"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "casual",
+  "displayName": "Casual",
+  "selectable": true,
+  "startingCash": 400,
+  "cashMultiplier": 1,
+  "enemyHpMultiplier": 1,
+  "enemySpeedMultiplier": 1,
+  "livesOverride": null,
+  "disallowedTowers": [],
+  "source": {
+    "origin": "engine-default",
+    "reason": "difficulty names follow the source game; the multipliers are engine values chosen for this project and are not sourced"
+  }
+}

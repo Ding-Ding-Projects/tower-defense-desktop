@@ -20,7 +20,6 @@
   },
   "include": [
     "src/sim/**/*.js",
-    "src/data/**/*.js",
-    "tools/**/*.mjs"
+    "src/data/**/*.js"
   ]
 }

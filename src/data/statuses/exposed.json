@@ -1,0 +1,12 @@
+{
+  "id": "exposed",
+  "displayName": "Exposed",
+  "category": "debuff",
+  "stackingRule": "refresh",
+  "revealsHidden": true,
+  "tag": "marked",
+  "source": {
+    "origin": "engine-default",
+    "reason": "the source game has this behaviour; its exact numbers are not yet sourced, so these are the engine values the simulation was tuned against"
+  }
+}

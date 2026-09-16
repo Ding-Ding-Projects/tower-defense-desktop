@@ -1,0 +1,95 @@
+{
+  "id": "militant",
+  "displayName": "Militant",
+  "baseCost": 600,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundPercent": 0.7,
+  "footprintRadius": 1.5,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 1,
+      "fireRate": 4.4444,
+      "range": 14,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Militant",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 1,
+      "cost": 300,
+      "damage": 1,
+      "fireRate": 5.7143,
+      "range": 17,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Militant",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 2,
+      "cost": 850,
+      "damage": 2,
+      "fireRate": 5.7143,
+      "range": 17,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Militant",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 3,
+      "cost": 2750,
+      "damage": 5,
+      "fireRate": 5.7143,
+      "range": 17,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Militant",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 4,
+      "cost": 8000,
+      "damage": 12,
+      "fireRate": 5.7143,
+      "range": 20,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Militant",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Militant",
+    "retrievedAt": "2026-09-16"
+  }
+}

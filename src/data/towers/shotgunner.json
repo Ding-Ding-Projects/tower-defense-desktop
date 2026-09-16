@@ -1,0 +1,95 @@
+{
+  "id": "shotgunner",
+  "displayName": "Shotgunner",
+  "baseCost": 1500,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundPercent": 0.7,
+  "footprintRadius": 1.5,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 2,
+      "fireRate": 0.9091,
+      "range": 8,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 1,
+      "cost": 750,
+      "damage": 3,
+      "fireRate": 0.9091,
+      "range": 8,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 2,
+      "cost": 1500,
+      "damage": 3,
+      "fireRate": 1.25,
+      "range": 9.5,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 3,
+      "cost": 6500,
+      "damage": 7,
+      "fireRate": 1.25,
+      "range": 11,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 4,
+      "cost": 18777,
+      "damage": 14,
+      "fireRate": 1.25,
+      "range": 13.5,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
+    "retrievedAt": "2026-09-16"
+  }
+}

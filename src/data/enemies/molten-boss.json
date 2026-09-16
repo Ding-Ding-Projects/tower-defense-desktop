@@ -1,0 +1,29 @@
+{
+  "id": "molten-boss",
+  "displayName": "Molten Boss",
+  "maxHp": 70000,
+  "shieldHp": 0,
+  "defense": 0,
+  "speed": 1,
+  "leakDamage": 25,
+  "killReward": 0,
+  "hidden": false,
+  "flying": false,
+  "boss": true,
+  "immunities": [
+    "stun"
+  ],
+  "abilities": [
+    {
+      "kind": "summon",
+      "cooldownSeconds": 12,
+      "summonEnemyId": "molten",
+      "count": 3
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Molten_Boss",
+    "retrievedAt": "2026-09-16",
+    "notes": "health, speed and reward read from the infobox. Concealment, flight, leak damage and abilities are engine values, not sourced: see docs/data-sources.md."
+  }
+}

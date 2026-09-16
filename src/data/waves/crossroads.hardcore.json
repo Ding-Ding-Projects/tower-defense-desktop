@@ -1,0 +1,213 @@
+{
+  "mapId": "crossroads",
+  "difficultyId": "hardcore",
+  "source": {
+    "origin": "engine-default",
+    "reason": "an original wave schedule authored for this project, tuned against the engine rather than copied"
+  },
+  "waves": [
+    {
+      "index": 1,
+      "intermissionSeconds": 8,
+      "completionBonus": 132,
+      "groups": [
+        {
+          "enemyId": "normal",
+          "count": 8,
+          "spawnIntervalSeconds": 1.2,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "intermissionSeconds": 8,
+      "completionBonus": 165,
+      "groups": [
+        {
+          "enemyId": "normal",
+          "count": 10,
+          "spawnIntervalSeconds": 1,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "speedy",
+          "count": 3,
+          "spawnIntervalSeconds": 1.5,
+          "startDelaySeconds": 6,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "intermissionSeconds": 8,
+      "completionBonus": 198.00000000000003,
+      "groups": [
+        {
+          "enemyId": "speedy",
+          "count": 8,
+          "spawnIntervalSeconds": 0.9,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "slow",
+          "count": 3,
+          "spawnIntervalSeconds": 2,
+          "startDelaySeconds": 5,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "intermissionSeconds": 8,
+      "completionBonus": 242.00000000000003,
+      "groups": [
+        {
+          "enemyId": "normal",
+          "count": 14,
+          "spawnIntervalSeconds": 0.7,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "ghost",
+          "count": 4,
+          "spawnIntervalSeconds": 2,
+          "startDelaySeconds": 8,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "intermissionSeconds": 10,
+      "completionBonus": 308,
+      "groups": [
+        {
+          "enemyId": "slow",
+          "count": 8,
+          "spawnIntervalSeconds": 1.4,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "quick",
+          "count": 8,
+          "spawnIntervalSeconds": 0.8,
+          "startDelaySeconds": 4,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "intermissionSeconds": 10,
+      "completionBonus": 374.00000000000006,
+      "groups": [
+        {
+          "enemyId": "molten",
+          "count": 10,
+          "spawnIntervalSeconds": 1,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "ghost",
+          "count": 6,
+          "spawnIntervalSeconds": 1.6,
+          "startDelaySeconds": 6,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "intermissionSeconds": 10,
+      "completionBonus": 462.00000000000006,
+      "groups": [
+        {
+          "enemyId": "slime",
+          "count": 6,
+          "spawnIntervalSeconds": 2,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "quick",
+          "count": 12,
+          "spawnIntervalSeconds": 0.6,
+          "startDelaySeconds": 4,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "intermissionSeconds": 12,
+      "completionBonus": 572,
+      "groups": [
+        {
+          "enemyId": "molten",
+          "count": 14,
+          "spawnIntervalSeconds": 0.8,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "slow",
+          "count": 8,
+          "spawnIntervalSeconds": 1.5,
+          "startDelaySeconds": 6,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "intermissionSeconds": 12,
+      "completionBonus": 704,
+      "groups": [
+        {
+          "enemyId": "slime",
+          "count": 10,
+          "spawnIntervalSeconds": 1.5,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "molten",
+          "count": 16,
+          "spawnIntervalSeconds": 0.7,
+          "startDelaySeconds": 5,
+          "lane": "main"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "intermissionSeconds": 15,
+      "completionBonus": 1760.0000000000002,
+      "groups": [
+        {
+          "enemyId": "molten-boss",
+          "count": 1,
+          "spawnIntervalSeconds": 1,
+          "startDelaySeconds": 0,
+          "lane": "main"
+        },
+        {
+          "enemyId": "molten",
+          "count": 12,
+          "spawnIntervalSeconds": 1,
+          "startDelaySeconds": 8,
+          "lane": "main"
+        }
+      ]
+    }
+  ]
+}

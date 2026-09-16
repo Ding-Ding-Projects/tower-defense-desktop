@@ -1,0 +1,272 @@
+{
+  "id": "crossroads",
+  "displayName": "Crossroads",
+  "baseLives": 100,
+  "width": 200,
+  "height": 120,
+  "lanes": [
+    {
+      "id": "main",
+      "waypoints": [
+        {
+          "x": 0,
+          "y": 60
+        },
+        {
+          "x": 45,
+          "y": 60
+        },
+        {
+          "x": 45,
+          "y": 20
+        },
+        {
+          "x": 110,
+          "y": 20
+        },
+        {
+          "x": 110,
+          "y": 100
+        },
+        {
+          "x": 165,
+          "y": 100
+        },
+        {
+          "x": 165,
+          "y": 60
+        },
+        {
+          "x": 200,
+          "y": 60
+        }
+      ]
+    }
+  ],
+  "placementZones": [
+    {
+      "id": "west-verge",
+      "terrain": "ground",
+      "polygon": [
+        [
+          4,
+          66
+        ],
+        [
+          40,
+          66
+        ],
+        [
+          40,
+          78
+        ],
+        [
+          4,
+          78
+        ]
+      ]
+    },
+    {
+      "id": "west-bank",
+      "terrain": "ground",
+      "polygon": [
+        [
+          4,
+          44
+        ],
+        [
+          40,
+          44
+        ],
+        [
+          40,
+          54
+        ],
+        [
+          4,
+          54
+        ]
+      ]
+    },
+    {
+      "id": "elbow",
+      "terrain": "ground",
+      "polygon": [
+        [
+          52,
+          28
+        ],
+        [
+          64,
+          28
+        ],
+        [
+          64,
+          54
+        ],
+        [
+          52,
+          54
+        ]
+      ]
+    },
+    {
+      "id": "north-verge",
+      "terrain": "ground",
+      "polygon": [
+        [
+          52,
+          6
+        ],
+        [
+          104,
+          6
+        ],
+        [
+          104,
+          14
+        ],
+        [
+          52,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "centre-west",
+      "terrain": "ground",
+      "polygon": [
+        [
+          52,
+          62
+        ],
+        [
+          100,
+          62
+        ],
+        [
+          100,
+          74
+        ],
+        [
+          52,
+          74
+        ]
+      ]
+    },
+    {
+      "id": "centre-east",
+      "terrain": "ground",
+      "polygon": [
+        [
+          116,
+          30
+        ],
+        [
+          128,
+          30
+        ],
+        [
+          128,
+          92
+        ],
+        [
+          116,
+          92
+        ]
+      ]
+    },
+    {
+      "id": "south-verge",
+      "terrain": "ground",
+      "polygon": [
+        [
+          118,
+          106
+        ],
+        [
+          158,
+          106
+        ],
+        [
+          158,
+          116
+        ],
+        [
+          118,
+          116
+        ]
+      ]
+    },
+    {
+      "id": "east-elbow",
+      "terrain": "ground",
+      "polygon": [
+        [
+          150,
+          66
+        ],
+        [
+          159,
+          66
+        ],
+        [
+          159,
+          94
+        ],
+        [
+          150,
+          94
+        ]
+      ]
+    },
+    {
+      "id": "east-verge",
+      "terrain": "ground",
+      "polygon": [
+        [
+          172,
+          66
+        ],
+        [
+          196,
+          66
+        ],
+        [
+          196,
+          78
+        ],
+        [
+          172,
+          78
+        ]
+      ]
+    },
+    {
+      "id": "ridge",
+      "terrain": "cliff",
+      "polygon": [
+        [
+          172,
+          44
+        ],
+        [
+          196,
+          44
+        ],
+        [
+          196,
+          54
+        ],
+        [
+          172,
+          54
+        ]
+      ]
+    }
+  ],
+  "source": {
+    "origin": "engine-default",
+    "reason": "an original layout authored for this project, not a reproduction of any map from the source game. Zones hug the lane because tower ranges are in the same units as the map, and a zone placed further away than the cheapest tower can shoot is a zone nothing can be usefully built in"
+  }
+}
