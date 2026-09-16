@@ -51,6 +51,7 @@ const RATCHETED_IN = [
   'src/render/hud/tower-panel.js',
   'src/render/hud/widgets.js',
   'src/render/interpolation.js',
+  'src/render/loop.js',
   'src/render/object-pool.js',
   'src/render/particles.js',
   'src/render/renderer.js',
@@ -59,8 +60,10 @@ const RATCHETED_IN = [
   'src/render/view-model.js',
   'src/ui/affordability.js',
   'src/ui/hud.js',
+  'src/ui/selected-tower-panel.js',
   'src/ui/shop.js',
   'src/ui/targeting.js',
+  'src/ui/titlebar.js',
 ];
 
 test('every file the ratchet has claimed is still in the TypeScript config', () => {

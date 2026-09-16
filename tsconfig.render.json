@@ -27,6 +27,7 @@
     "src/render/hud/tower-panel.js",
     "src/render/hud/widgets.js",
     "src/render/interpolation.js",
+    "src/render/loop.js",
     "src/render/object-pool.js",
     "src/render/particles.js",
     "src/render/renderer.js",
@@ -35,7 +36,9 @@
     "src/render/view-model.js",
     "src/ui/affordability.js",
     "src/ui/hud.js",
+    "src/ui/selected-tower-panel.js",
     "src/ui/shop.js",
-    "src/ui/targeting.js"
+    "src/ui/targeting.js",
+    "src/ui/titlebar.js"
   ]
 }

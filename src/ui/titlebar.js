@@ -17,7 +17,12 @@ export function createTitleBar(doc = document) {
   const controls = doc.createElement('div');
   controls.className = 'title-bar__controls';
 
-  const api = typeof window !== 'undefined' ? window.towerDefence : undefined;
+  // The preload bridge, which is the only way this renderer can touch the real window.
+  // It is attached by the desktop shell at run time, so it is not part of the standard
+  // Window type and has to be reached through a cast rather than pretended into one.
+  const bridge = /** @type {any} */ (typeof window !== 'undefined' ? window : {});
+  /** @type {{minimize?: () => void, maximize?: () => void, close?: () => void}|undefined} */
+  const api = bridge.towerDefence;
 
   const minimizeBtn = makeIconButton(doc, 'minimize', 'Minimize window', () => api?.minimize?.());
   const maximizeBtn = makeIconButton(doc, 'maximize', 'Maximize window', () => api?.maximize?.());
@@ -37,6 +42,13 @@ export function createTitleBar(doc = document) {
   return bar;
 }
 
+/**
+ * @param {Document} doc
+ * @param {string} icon
+ * @param {string} label
+ * @param {() => void} onClick
+ * @returns {HTMLElement}
+ */
 function makeIconButton(doc, icon, label, onClick) {
   const btn = doc.createElement('md3-icon-button');
   btn.setAttribute('aria-label', label);

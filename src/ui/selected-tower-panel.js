@@ -9,6 +9,12 @@
 import { deriveUpgradeState, deriveSellValue } from './affordability.js';
 import { cycleTargetingMode, targetingModeLabel } from './targeting.js';
 
+/**
+ * A partial lookup, so the `?? field` fallback below is meaningful rather than dead: a
+ * field with no friendly label falls back to its own name, which is ugly and readable,
+ * instead of printing "undefined" at a player.
+ * @type {Partial<Record<string, string>>}
+ */
 const FIELD_LABELS = {
   damage: 'Damage',
   fireRate: 'Fire rate',
@@ -18,6 +24,21 @@ const FIELD_LABELS = {
   chainCount: 'Chain',
   burstCount: 'Burst shots',
 };
+
+/**
+ * A Material Design button element. `disabled` is the component's own property, not
+ * part of HTMLElement, so createElement hands back something that does not admit to
+ * having it.
+ * @typedef {HTMLElement & { disabled: boolean }} Md3Button
+ */
+
+/**
+ * The stats this panel lists, typed against the schema's own field names so one renamed
+ * there turns this red rather than quietly printing nothing.
+ * @type {Array<Extract<keyof import('../data/schema/types.js').TowerLevel,
+ *   'damage'|'fireRate'|'range'|'aoeRadius'|'pierceCount'|'chainCount'>>}
+ */
+const STAT_FIELDS = ['damage', 'fireRate', 'range', 'aoeRadius', 'pierceCount', 'chainCount'];
 
 export class SelectedTowerPanel {
   constructor(doc = document) {
@@ -33,19 +54,19 @@ export class SelectedTowerPanel {
     this.statsEl = doc.createElement('dl');
     this.statsEl.className = 'tower-panel__stats';
 
-    this.targetingButton = doc.createElement('md3-button');
+    this.targetingButton = /** @type {Md3Button} */ (doc.createElement('md3-button'));
     this.targetingButton.setAttribute('variant', 'outlined');
     this.targetingButton.addEventListener('click', () => {
       this.el.dispatchEvent(new CustomEvent('tower-panel-cycle-targeting', { bubbles: true }));
     });
 
-    this.abilityButton = doc.createElement('md3-button');
+    this.abilityButton = /** @type {Md3Button} */ (doc.createElement('md3-button'));
     this.abilityButton.setAttribute('variant', 'tonal');
     this.abilityButton.addEventListener('click', () => {
       this.el.dispatchEvent(new CustomEvent('tower-panel-cast-ability', { bubbles: true }));
     });
 
-    this.upgradeButton = doc.createElement('md3-button');
+    this.upgradeButton = /** @type {Md3Button} */ (doc.createElement('md3-button'));
     this.upgradeButton.setAttribute('variant', 'filled');
     this.upgradeButton.addEventListener('click', () => {
       this.el.dispatchEvent(new CustomEvent('tower-panel-upgrade', { bubbles: true }));
@@ -53,7 +74,7 @@ export class SelectedTowerPanel {
     this.upgradeDetail = doc.createElement('p');
     this.upgradeDetail.className = 'tower-panel__upgrade-detail';
 
-    this.sellButton = doc.createElement('md3-button');
+    this.sellButton = /** @type {Md3Button} */ (doc.createElement('md3-button'));
     this.sellButton.setAttribute('variant', 'outlined');
     this.sellButton.addEventListener('click', () => {
       this.el.dispatchEvent(new CustomEvent('tower-panel-sell', { bubbles: true }));
@@ -85,7 +106,7 @@ export class SelectedTowerPanel {
 
     const levelDef = towerDef.levels[tower.level];
     this.statsEl.innerHTML = '';
-    for (const field of ['damage', 'fireRate', 'range', 'aoeRadius', 'pierceCount', 'chainCount']) {
+    for (const field of STAT_FIELDS) {
       if (levelDef[field] == null) continue;
       const dt = this.doc.createElement('dt');
       dt.textContent = FIELD_LABELS[field] ?? field;

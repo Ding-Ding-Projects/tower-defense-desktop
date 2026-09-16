@@ -33,13 +33,18 @@ export class RenderLoop {
     if (this._running) return;
     this._running = true;
     this._lastFrameMs = performance.now();
+    /** @param {number} nowMs */
     const frame = (nowMs) => {
       if (!this._running) return;
       const dt = Math.min(0.1, (nowMs - this._lastFrameMs) / 1000);
       this._lastFrameMs = nowMs;
       this.particles.update(dt);
 
-      const { prev, next, alpha } = this.buffer.sample(nowMs);
+      const { prev, next, alpha } = /** @type {{
+        prev: import('./sim-interface.js').Snapshot|null,
+        next: import('./sim-interface.js').Snapshot|null,
+        alpha: number,
+      }} */ (this.buffer.sample(nowMs));
       const viewModel = buildViewModel(prev, next, alpha);
       this.renderer.draw(viewModel, this.camera ?? { x: 0, y: 0, zoom: 1 }, this.particles);
 
