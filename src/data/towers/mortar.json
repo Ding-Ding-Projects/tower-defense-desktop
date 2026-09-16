@@ -1,14 +1,14 @@
 {
-  "id": "ranger",
-  "displayName": "Ranger",
-  "baseCost": 4500,
+  "id": "mortar",
+  "displayName": "Mortar",
+  "baseCost": 1000,
   "allowedTerrain": [
     "ground"
   ],
   "placementPool": "default",
   "maxCount": null,
   "sellRefundFraction": 0.3333333333333333,
-  "footprintRadius": 1.5,
+  "footprintRadius": 1.75,
   "targetingModes": [
     "first",
     "last",
@@ -20,77 +20,96 @@
     {
       "level": 0,
       "cost": 0,
-      "damage": 100,
-      "fireRate": 0.1667,
-      "range": 70,
+      "damage": 15,
+      "fireRate": 0.25,
+      "range": 24,
       "detectsHidden": false,
       "hitsAir": true,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
-        "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
-    },
-    {
-      "level": 1,
-      "cost": 1500,
-      "damage": 100,
-      "fireRate": 0.2105,
-      "range": 70,
-      "detectsHidden": false,
-      "hitsAir": true,
-      "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
-        "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
-    },
-    {
-      "level": 2,
-      "cost": 5500,
-      "damage": 185,
-      "fireRate": 0.2105,
-      "range": 70,
-      "detectsHidden": false,
-      "hitsAir": true,
-      "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
-        "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
-    },
-    {
-      "level": 3,
-      "cost": 15750,
-      "damage": 430,
-      "fireRate": 0.2222,
-      "range": 70,
-      "detectsHidden": false,
-      "hitsAir": true,
-      "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
-        "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
-    },
-    {
-      "level": 4,
-      "cost": 25000,
-      "damage": 875,
-      "fireRate": 0.125,
-      "range": 70,
-      "detectsHidden": false,
-      "hitsAir": true,
-      "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "wikiUrl": "https://tds.fandom.com/wiki/Mortar",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "aoeRadius": 5
+    },
+    {
+      "level": 1,
+      "cost": 500,
+      "damage": 15,
+      "fireRate": 0.3636,
+      "range": 27,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Mortar",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 5
+    },
+    {
+      "level": 2,
+      "cost": 2250,
+      "damage": 35,
+      "fireRate": 0.3636,
+      "range": 27,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Mortar",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 7.5
+    },
+    {
+      "level": 3,
+      "cost": 4250,
+      "damage": 65,
+      "fireRate": 0.3636,
+      "range": 30,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Mortar",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 8.5
+    },
+    {
+      "level": 4,
+      "cost": 13500,
+      "damage": 100,
+      "fireRate": 0.3636,
+      "range": 34,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Mortar",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 8.5
+    },
+    {
+      "level": 5,
+      "cost": 30000,
+      "damage": 235,
+      "fireRate": 0.3636,
+      "range": 34,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Mortar",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 9
     }
   ],
   "source": {
-    "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+    "wikiUrl": "https://tds.fandom.com/wiki/Mortar",
     "retrievedAt": "2026-09-16",
     "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }

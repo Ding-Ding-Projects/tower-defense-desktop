@@ -106,31 +106,48 @@ trusted.
 
 Reading the infobox is `tools/fetch-wiki-attributes.mjs`.
 
+## Checking the transcription against the source's own arithmetic
+
+Every upgrade table publishes a damage-per-second column. The scraper now carries it
+through unread into the cache, and `tests/data/sourced-attributes.test.js` recomputes
+it from each shipped row: 83 levels, checked against a figure this project did not
+compute. It is the only independent arithmetic the source offers, and it has earned
+its keep four times over.
+
+| What it caught | The symptom |
+| --- | --- |
+| Shotgunner fires 8 pellets per shot | The simulation fired one, so the tower did an eighth of its damage |
+| Rocketeer's top level fires a salvo of 4 | Its damage per second read 21.11 against a published 84.44 |
+| Gatling Gun has a magazine and a reload | Its listed `Ammo` and `Reload Time` columns were not being read at all |
+| **Every burst tower fired one interval too fast** | The reload replaced the last shot's own interval instead of following it. Soldier cycled in 0.85 seconds where the source takes 1.025, so it did 3.53 damage per second against a published 2.93 |
+
+The last of those was in the simulation, not the data, and it had been there from the
+beginning. Nothing caught it because nothing checked burst timing at all: changing the
+cycle moved no test in either direction. `tests/sim/burst-cadence.test.js` pins it now,
+and was watched failing against the old behaviour first.
+
+**One tower is excluded, by name and with its reason.** Cowboy publishes 2.57 at level
+0 from 3 damage on a 1 second interval, and its table also lists a 2 second wind-up and
+a cash shot every 6. The published figure fits neither a magazine of 6 using the wind-up
+as a reload, nor the wind-up amortised over any consistent number of shots: solving for
+the implied extra time per cycle gives 1, 0.35, 0.35, 0.4, 0.65 and 0.65 seconds across
+six levels against listed wind-ups of 2, 1.25, 1.25, 1, 1 and 1. Its wind-up is recorded
+as sourced data regardless; what is not claimed is that the simulation reproduces a
+number nobody has managed to derive. The check asserts the exclusion still has its
+reason, so it cannot quietly become a place to put anything inconvenient.
+
 ## The rest of the roster, and why each one is still absent
 
 Every remaining tower was fetched and its page read. They are not all the same kind of
 missing, and lumping them together as "not done yet" would hide the fact that some are
 a line of data and others need the engine to grow a feature it does not have.
 
-### Ready to add: their tables are readable and their arithmetic checks out
+### Shipped since
 
-The scraper now reads the alternate column names these pages use (`Splash Damage`,
-`Swingrate`, `Missile Count`, `Explosion Range`). Each was verified by reproducing the
-page's own DPS column from the damage and rate columns, which is the only independent
-arithmetic the source offers.
-
-| Tower | Cross-check against the page's DPS column |
-| --- | --- |
-| Paintballer | Exact at all 6 levels |
-| Demoman | Exact at all 5 levels |
-| Mortar | Exact at all 6 levels |
-| Rocketeer | Exact at all 5 levels, once the missile count is folded in |
-
-What still blocks them is not the numbers: it is whether each one sees hidden enemies
-and whether it can shoot flying ones. Those live in the page's infobox rather than the
-table, and the site began refusing requests before they could be read. The generator
-now refuses to emit a row whose detection fields are unread, so these cannot ship as a
-quiet "no" in the meantime.
+Paintballer, Demoman, Mortar and Rocketeer are in the game. Their tables head the damage
+column "Splash Damage" and carry the blast size in "Explosion Range", which is read
+rather than hand-written, and each reproduces its page's damage-per-second column at
+every level.
 
 ### Blocked on an engine feature, not on data
 

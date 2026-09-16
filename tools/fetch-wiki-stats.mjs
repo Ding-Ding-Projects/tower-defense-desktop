@@ -23,7 +23,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { writeFileSync, mkdirSync, readFileSync, unlinkSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, unlinkSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -32,11 +32,40 @@ const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '
 const BROWSER_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36';
 
+const PAGE_CACHE = join(ROOT, 'tools', 'wiki-cache', 'pages');
+
 /**
+ * Where a fetched page is parked on disk.
+ *
+ * Cached because the site throttles: a run of seventeen requests gets everything
+ * refused for several minutes afterwards, and re-fetching a page already on disk to
+ * re-read one field off it is exactly what earns that. The cache holds raw
+ * third-party HTML, so it is ignored by Git; the distilled JSON beside it is what
+ * gets committed.
+ *
  * @param {string} url
  * @returns {string}
  */
-export function fetchPage(url) {
+function cachePathFor(url) {
+  const slug = decodeURIComponent(url.split('/').pop() ?? 'page').replace(/[^A-Za-z0-9]+/g, '_');
+  return join(PAGE_CACHE, slug + '.html');
+}
+
+/**
+ * @param {string} url
+ * @param {{ refresh?: boolean }} [options]
+ * @returns {string}
+ */
+export function fetchPage(url, options = {}) {
+  const cached = cachePathFor(url);
+  if (!options.refresh && existsSync(cached)) {
+    const html = readFileSync(cached, 'utf8');
+    // The same length guard as a live fetch. A truncated page that reached the cache
+    // would otherwise be served forever, and would look exactly like a page with no
+    // statistics table on it.
+    if (html.length >= 50000) return html;
+  }
+
   // Written to a file and read back, rather than captured from standard output.
   //
   // Capturing stdout returned a valid but TRUNCATED page: 5,627 bytes of a 603,508
@@ -61,6 +90,8 @@ export function fetchPage(url) {
           'short response (' + html.length + ' bytes); a real article is hundreds of kilobytes',
         );
       }
+      mkdirSync(PAGE_CACHE, { recursive: true });
+      writeFileSync(cached, html);
       return html;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
@@ -178,6 +209,13 @@ export function extractLevels(html) {
     // the kind of plausible invention the overlay exists to keep visible.
     const iAoe = firstCol('explosion range', 'explosion radius');
 
+    // The page's own damage-per-second column, carried through unread by anything that
+    // builds a row. It is the only independent arithmetic the source offers, and it has
+    // caught two real errors already: reading the rate column as a rate rather than a
+    // cooldown, which inverts every tower, and dropping a salvo's projectile count,
+    // which quartered Rocketeer. Both produced numbers that looked entirely reasonable.
+    const iDps = col('dps');
+
     // A burst tower carries both columns: "firerate" is the gap between shots inside
     // a burst, and "cooldown" is the reload between bursts. A single-shot tower has
     // only the first, and for it that column IS the whole cycle.
@@ -185,8 +223,12 @@ export function extractLevels(html) {
     // the tower per cycle. Reading it matters for more than flavour, because the
     // page's own DPS column folds it in — Rocketeer's top level lists 84.44, and
     // 95 damage over a 4.5 second cycle is 21.11 unless the four missiles are counted.
-    const iBurst = firstCol('burst count', 'missile count');
-    const iCooldown = col('cooldown');
+    const iBurst = firstCol('burst count', 'missile count', 'bullet count', 'ammo');
+    const iCooldown = firstCol('cooldown', 'reload time');
+
+    // A wind-up before the first shot. The engine has a field for it, and without it a
+    // tower that is supposed to take a second to get going opens fire instantly.
+    const iSpin = firstCol('spin time', 'charge-up');
 
     const levels = [];
     for (const row of rows.slice(1)) {
@@ -203,6 +245,14 @@ export function extractLevels(html) {
       if (iAoe >= 0) {
         const aoe = money(row[iAoe]);
         if (aoe !== null && aoe > 0) entry.aoeRadius = aoe;
+      }
+      if (iSpin >= 0) {
+        const spin = money(row[iSpin]);
+        if (spin !== null && spin > 0) entry.spinUpSeconds = spin;
+      }
+      if (iDps >= 0) {
+        const pageDps = money(row[iDps]);
+        if (pageDps !== null) entry.pageDps = pageDps;
       }
       if (iBurst >= 0) {
         const burst = money(row[iBurst]);
@@ -272,6 +322,23 @@ for (const name of args) {
   }
 }
 
-writeFileSync(join(outDir, 'towers.json'), JSON.stringify({ retrievedAt, results }, null, 2) + '\n');
-console.log('\nwrote ' + results.length + ' tower(s) to tools/wiki-cache/towers.json');
+// Merged into what is already there, not written over it. Scraping two more towers
+// used to throw away every tower scraped before them, and the loss was silent: the
+// cache simply came back smaller, and the generator dutifully produced a smaller
+// roster from it. Each record keeps the date it was read, so a merged file can still
+// say which parts of it are old.
+const outPath = join(outDir, 'towers.json');
+/** @type {Map<string, any>} */
+const merged = new Map();
+if (existsSync(outPath)) {
+  const previous = JSON.parse(readFileSync(outPath, 'utf8'));
+  for (const record of previous.results ?? []) {
+    merged.set(record.id, { retrievedAt: previous.retrievedAt, ...record });
+  }
+}
+for (const record of results) merged.set(record.id, record);
+
+const all = [...merged.values()].sort((a, b) => a.id.localeCompare(b.id));
+writeFileSync(outPath, JSON.stringify({ retrievedAt, results: all }, null, 2) + '\n');
+console.log('\nwrote ' + results.length + ' tower(s); the cache now holds ' + all.length);
 }

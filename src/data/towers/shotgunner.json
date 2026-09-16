@@ -21,71 +21,81 @@
       "level": 0,
       "cost": 0,
       "damage": 2,
-      "fireRate": 0.9091,
+      "fireRate": 30,
       "range": 8,
       "detectsHidden": false,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
         "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+        "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
+      },
+      "burstCount": 8,
+      "reloadSeconds": 0.8333
     },
     {
       "level": 1,
       "cost": 750,
       "damage": 3,
-      "fireRate": 0.9091,
+      "fireRate": 30,
       "range": 8,
       "detectsHidden": true,
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
         "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+        "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
+      },
+      "burstCount": 8,
+      "reloadSeconds": 0.8333
     },
     {
       "level": 2,
       "cost": 1500,
       "damage": 3,
-      "fireRate": 1.25,
+      "fireRate": 30,
       "range": 9.5,
       "detectsHidden": true,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
         "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+        "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
+      },
+      "burstCount": 9,
+      "reloadSeconds": 0.5
     },
     {
       "level": 3,
       "cost": 6500,
       "damage": 7,
-      "fireRate": 1.25,
+      "fireRate": 30,
       "range": 11,
       "detectsHidden": true,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
         "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+        "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
+      },
+      "burstCount": 9,
+      "reloadSeconds": 0.5
     },
     {
       "level": 4,
       "cost": 18777,
       "damage": 14,
-      "fireRate": 1.25,
+      "fireRate": 30,
       "range": 13.5,
       "detectsHidden": true,
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
         "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+        "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
+      },
+      "burstCount": 12,
+      "reloadSeconds": 0.4
     }
   ],
   "source": {

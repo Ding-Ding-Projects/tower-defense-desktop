@@ -48,6 +48,10 @@ const OVERLAY = {
   cowboy: { terrain: ['ground'], pool: 'default', max: null },
   turret: { terrain: ['ground'], pool: 'default', max: null },
   'gatling-gun': { terrain: ['ground'], pool: 'default', max: null },
+  paintballer: { terrain: ['ground'], pool: 'default', max: null },
+  demoman: { terrain: ['ground'], pool: 'default', max: null },
+  mortar: { terrain: ['ground'], pool: 'default', max: null },
+  rocketeer: { terrain: ['ground'], pool: 'default', max: null },
 };
 
 const ALL_MODES = ['first', 'last', 'closest', 'strongest', 'weakest'];
@@ -102,6 +106,7 @@ function toLevel(row, overlay, attributes, source) {
     source: { ...source, notes: 'upgrade table; firerate column read as a cooldown in seconds' },
   };
   if (row.aoeRadius) level.aoeRadius = row.aoeRadius;
+  if (row.spinUpSeconds) level.spinUpSeconds = row.spinUpSeconds;
   if (row.burstCount && row.burstCount > 1) {
     level.burstCount = row.burstCount;
     if (row.reloadSeconds !== undefined) {
@@ -122,7 +127,7 @@ function toLevel(row, overlay, attributes, source) {
       const salvoGapSeconds = 1 / 30;
       level.fireRate = 30;
       level.reloadSeconds = Number(
-        Math.max(salvoGapSeconds, row.shotIntervalSeconds - (row.burstCount - 1) * salvoGapSeconds).toFixed(4),
+        Math.max(salvoGapSeconds, row.shotIntervalSeconds - row.burstCount * salvoGapSeconds).toFixed(4),
       );
       level.source = {
         ...level.source,
@@ -180,6 +185,18 @@ for (const scraped of cache.results) {
   if (attributes.footprint == null) unread.push('placement footprint');
   if (unread.length > 0) {
     skipped.push(scraped.id + ' (' + unread.join(', ') + ' not on the fetched page; a guess here is invisible)');
+    continue;
+  }
+
+  // The two caches are read from the same page, so they have to agree about it. If the
+  // table's placement cost and the infobox's base cost differ, one of them is stale,
+  // and whichever it is the row built from them would mix a price from one reading with
+  // detection from another.
+  if (attributes.baseCost != null && attributes.baseCost !== scraped.levels[0].cost) {
+    skipped.push(
+      scraped.id + ' (the upgrade table says it costs $' + scraped.levels[0].cost +
+        ' and the infobox says $' + attributes.baseCost + '; one of the two readings is stale)',
+    );
     continue;
   }
 

@@ -1,7 +1,7 @@
 {
-  "id": "ranger",
-  "displayName": "Ranger",
-  "baseCost": 4500,
+  "id": "demoman",
+  "displayName": "Demoman",
+  "baseCost": 700,
   "allowedTerrain": [
     "ground"
   ],
@@ -20,77 +20,81 @@
     {
       "level": 0,
       "cost": 0,
-      "damage": 100,
-      "fireRate": 0.1667,
-      "range": 70,
+      "damage": 8,
+      "fireRate": 0.3846,
+      "range": 10,
       "detectsHidden": false,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "wikiUrl": "https://tds.fandom.com/wiki/Demoman",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "aoeRadius": 4.5
     },
     {
       "level": 1,
-      "cost": 1500,
-      "damage": 100,
-      "fireRate": 0.2105,
-      "range": 70,
+      "cost": 300,
+      "damage": 8,
+      "fireRate": 0.5263,
+      "range": 12,
       "detectsHidden": false,
-      "hitsAir": true,
+      "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "wikiUrl": "https://tds.fandom.com/wiki/Demoman",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "aoeRadius": 4.5
     },
     {
       "level": 2,
-      "cost": 5500,
-      "damage": 185,
-      "fireRate": 0.2105,
-      "range": 70,
-      "detectsHidden": false,
-      "hitsAir": true,
+      "cost": 950,
+      "damage": 18,
+      "fireRate": 0.5263,
+      "range": 12,
+      "detectsHidden": true,
+      "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
-        "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
-    },
-    {
-      "level": 3,
-      "cost": 15750,
-      "damage": 430,
-      "fireRate": 0.2222,
-      "range": 70,
-      "detectsHidden": false,
-      "hitsAir": true,
-      "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
-        "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
-    },
-    {
-      "level": 4,
-      "cost": 25000,
-      "damage": 875,
-      "fireRate": 0.125,
-      "range": 70,
-      "detectsHidden": false,
-      "hitsAir": true,
-      "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+        "wikiUrl": "https://tds.fandom.com/wiki/Demoman",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "aoeRadius": 5
+    },
+    {
+      "level": 3,
+      "cost": 2400,
+      "damage": 25,
+      "fireRate": 0.6667,
+      "range": 14,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Demoman",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 5.5
+    },
+    {
+      "level": 4,
+      "cost": 5500,
+      "damage": 35,
+      "fireRate": 1,
+      "range": 16,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Demoman",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 5.5
     }
   ],
   "source": {
-    "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
+    "wikiUrl": "https://tds.fandom.com/wiki/Demoman",
     "retrievedAt": "2026-09-16",
     "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }

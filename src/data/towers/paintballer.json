@@ -1,7 +1,7 @@
 {
-  "id": "cowboy",
-  "displayName": "Cowboy",
-  "baseCost": 550,
+  "id": "paintballer",
+  "displayName": "Paintballer",
+  "baseCost": 100,
   "allowedTerrain": [
     "ground"
   ],
@@ -20,96 +20,96 @@
     {
       "level": 0,
       "cost": 0,
-      "damage": 3,
-      "fireRate": 1,
-      "range": 13,
+      "damage": 1,
+      "fireRate": 0.5882,
+      "range": 7.5,
       "detectsHidden": false,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Paintballer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 2
+      "aoeRadius": 3
     },
     {
       "level": 1,
-      "cost": 200,
-      "damage": 3,
-      "fireRate": 1.1111,
-      "range": 15,
-      "detectsHidden": false,
+      "cost": 25,
+      "damage": 1,
+      "fireRate": 0.5882,
+      "range": 9,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Paintballer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1.25
+      "aoeRadius": 3.5
     },
     {
       "level": 2,
-      "cost": 600,
-      "damage": 5,
-      "fireRate": 1.1111,
-      "range": 15,
-      "detectsHidden": false,
+      "cost": 150,
+      "damage": 2,
+      "fireRate": 0.7143,
+      "range": 9,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Paintballer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1.25
+      "aoeRadius": 4
     },
     {
       "level": 3,
-      "cost": 2000,
-      "damage": 10,
-      "fireRate": 1.6667,
-      "range": 17.5,
+      "cost": 600,
+      "damage": 3,
+      "fireRate": 1.4286,
+      "range": 9,
       "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Paintballer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1
+      "aoeRadius": 4
     },
     {
       "level": 4,
-      "cost": 3000,
-      "damage": 10,
-      "fireRate": 2.8571,
-      "range": 20,
+      "cost": 1500,
+      "damage": 8,
+      "fireRate": 1.4286,
+      "range": 10.5,
       "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Paintballer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1
+      "aoeRadius": 4.5
     },
     {
       "level": 5,
-      "cost": 7777,
-      "damage": 24,
-      "fireRate": 2.8571,
-      "range": 20,
+      "cost": 3600,
+      "damage": 20,
+      "fireRate": 1.4286,
+      "range": 10.5,
       "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Paintballer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1
+      "aoeRadius": 5
     }
   ],
   "source": {
-    "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+    "wikiUrl": "https://tds.fandom.com/wiki/Paintballer",
     "retrievedAt": "2026-09-16",
     "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }

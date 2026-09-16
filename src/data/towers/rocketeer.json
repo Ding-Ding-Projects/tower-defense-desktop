@@ -1,14 +1,14 @@
 {
-  "id": "cowboy",
-  "displayName": "Cowboy",
-  "baseCost": 550,
+  "id": "rocketeer",
+  "displayName": "Rocketeer",
+  "baseCost": 2000,
   "allowedTerrain": [
     "ground"
   ],
   "placementPool": "default",
   "maxCount": null,
   "sellRefundFraction": 0.3333333333333333,
-  "footprintRadius": 1.25,
+  "footprintRadius": 1.5,
   "targetingModes": [
     "first",
     "last",
@@ -20,96 +20,83 @@
     {
       "level": 0,
       "cost": 0,
-      "damage": 3,
-      "fireRate": 1,
-      "range": 13,
+      "damage": 30,
+      "fireRate": 0.2667,
+      "range": 20,
       "detectsHidden": false,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Rocketeer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 2
+      "aoeRadius": 3
     },
     {
       "level": 1,
-      "cost": 200,
-      "damage": 3,
-      "fireRate": 1.1111,
-      "range": 15,
+      "cost": 600,
+      "damage": 30,
+      "fireRate": 0.3333,
+      "range": 20,
       "detectsHidden": false,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Rocketeer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1.25
+      "aoeRadius": 3
     },
     {
       "level": 2,
-      "cost": 600,
-      "damage": 5,
-      "fireRate": 1.1111,
-      "range": 15,
-      "detectsHidden": false,
+      "cost": 1800,
+      "damage": 50,
+      "fireRate": 0.3333,
+      "range": 22.5,
+      "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Rocketeer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1.25
+      "aoeRadius": 4
     },
     {
       "level": 3,
-      "cost": 2000,
-      "damage": 10,
-      "fireRate": 1.6667,
-      "range": 17.5,
+      "cost": 6000,
+      "damage": 95,
+      "fireRate": 0.3636,
+      "range": 22.5,
       "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Rocketeer",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
-      "spinUpSeconds": 1
+      "aoeRadius": 5
     },
     {
       "level": 4,
-      "cost": 3000,
-      "damage": 10,
-      "fireRate": 2.8571,
-      "range": 20,
+      "cost": 18500,
+      "damage": 95,
+      "fireRate": 30,
+      "range": 24,
       "detectsHidden": true,
       "hitsAir": false,
       "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+        "wikiUrl": "https://tds.fandom.com/wiki/Rocketeer",
         "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+        "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
       },
-      "spinUpSeconds": 1
-    },
-    {
-      "level": 5,
-      "cost": 7777,
-      "damage": 24,
-      "fireRate": 2.8571,
-      "range": 20,
-      "detectsHidden": true,
-      "hitsAir": false,
-      "source": {
-        "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
-        "retrievedAt": "2026-09-16",
-        "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      },
-      "spinUpSeconds": 1
+      "aoeRadius": 5,
+      "burstCount": 4,
+      "reloadSeconds": 4.3667
     }
   ],
   "source": {
-    "wikiUrl": "https://tds.fandom.com/wiki/Cowboy",
+    "wikiUrl": "https://tds.fandom.com/wiki/Rocketeer",
     "retrievedAt": "2026-09-16",
     "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
   }

@@ -114,3 +114,76 @@ test('footprints come off the page, not from a default', () => {
     );
   }
 });
+
+const towerTables = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../../tools/wiki-cache/towers.json', import.meta.url)), 'utf8'),
+);
+const tableById = new Map(towerTables.results.map((r) => [r.id, r]));
+
+test('every shipped level reproduces the damage per second its page states', () => {
+  // The source computes this column itself, which makes it the one piece of arithmetic
+  // available to check the transcription against rather than against itself. It has
+  // already caught two errors that produced entirely reasonable-looking numbers:
+  // reading the rate column as a rate instead of a cooldown, which inverts every tower,
+  // and ignoring a salvo's projectile count, which quartered Rocketeer's top level.
+  // Named individually, with the reason, because "it did not match so it was excluded"
+  // is how a cross-check quietly stops checking anything.
+  //
+  // Cowboy publishes 2.57 at level 0 from 3 damage on a 1 second interval, and 3 / 1 is
+  // 3.00. Its table also carries a 2 second wind-up and a cash shot every 6, and the
+  // published figure fits neither a magazine of 6 with the wind-up as its reload (2.25)
+  // nor the wind-up amortised over any consistent number of shots: solving for the
+  // implied extra time per magazine gives 1, 0.35, 0.35, 0.4, 0.65 and 0.65 seconds
+  // across the six levels against listed wind-ups of 2, 1.25, 1.25, 1, 1 and 1. Its
+  // wind-up is recorded as sourced data either way; what is not claimed is that the
+  // simulation reproduces a published figure nobody has been able to derive.
+  const UNDERIVABLE = new Map([
+    ['cowboy', 'its published figure folds in a wind-up by a rule the table does not state'],
+  ]);
+
+  let checked = 0;
+  for (const tower of RAW.towers) {
+    if (UNDERIVABLE.has(tower.id)) continue;
+    const table = tableById.get(tower.id);
+    assert.ok(table, tower.id + ' has no scrape record to check against');
+    for (const level of tower.levels) {
+      const scraped = table.levels.find((l) => l.level === level.level);
+      // Freezer and Ranger publish no such column; nothing to check, and nothing to
+      // pretend was checked.
+      if (!scraped || scraped.pageDps == null) continue;
+
+      const shots = level.burstCount && level.burstCount > 1 ? level.burstCount : 1;
+      // Every shot is followed by its own interval, and the reload comes on top of the
+      // last one. Counting only the gaps BETWEEN shots makes the cycle one gap short,
+      // which is exactly the error this check found in the simulation itself.
+      const cycleSeconds = shots > 1
+        ? shots / level.fireRate + (level.reloadSeconds ?? 0)
+        : 1 / level.fireRate;
+      const dps = (level.damage * shots) / cycleSeconds;
+
+      // A tenth of a percent, to absorb the four decimal places the rate is rounded to
+      // and nothing wider. Every class of error this has caught was off by a factor,
+      // not by a rounding.
+      const tolerance = Math.max(0.02, scraped.pageDps * 0.001);
+      assert.ok(
+        Math.abs(dps - scraped.pageDps) <= tolerance,
+        tower.id + ' level ' + level.level + ' works out to ' + dps.toFixed(2) +
+          ' damage per second, and its page states ' + scraped.pageDps,
+      );
+      checked += 1;
+    }
+  }
+  assert.ok(checked >= 60, 'only ' + checked + ' levels were actually checked; the cross-check has gone hollow');
+
+  // The excluded towers still have to exist and still have to carry the field that
+  // earned them the exclusion. Otherwise the exclusion list outlives its reason and
+  // becomes a place to quietly put anything inconvenient.
+  for (const [id, reason] of UNDERIVABLE) {
+    const tower = RAW.towers.find((t) => t.id === id);
+    assert.ok(tower, id + ' is excluded from the cross-check but is not in the roster');
+    assert.ok(
+      tower.levels.some((l) => l.spinUpSeconds > 0),
+      id + ' is excluded because ' + reason + ', but no level carries a wind-up any more',
+    );
+  }
+});

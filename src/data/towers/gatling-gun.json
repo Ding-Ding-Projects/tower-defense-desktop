@@ -29,7 +29,9 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "burstCount": 50,
+      "reloadSeconds": 2.5
     },
     {
       "level": 1,
@@ -43,7 +45,9 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "burstCount": 50,
+      "reloadSeconds": 2.5
     },
     {
       "level": 2,
@@ -57,7 +61,9 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "burstCount": 100,
+      "reloadSeconds": 2
     },
     {
       "level": 3,
@@ -71,7 +77,9 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "burstCount": 200,
+      "reloadSeconds": 2
     },
     {
       "level": 4,
@@ -85,7 +93,9 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "burstCount": 200,
+      "reloadSeconds": 2
     },
     {
       "level": 5,
@@ -99,7 +109,9 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "burstCount": 400,
+      "reloadSeconds": 6
     },
     {
       "level": 6,
@@ -113,7 +125,9 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
         "retrievedAt": "2026-09-16",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "burstCount": 600,
+      "reloadSeconds": 6
     }
   ],
   "source": {

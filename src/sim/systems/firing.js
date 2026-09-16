@@ -70,8 +70,16 @@ export function fireTowers(state, gameData) {
       if (tower.burstLeft <= 0) tower.burstLeft = level.burstCount;
       tower.burstLeft -= 1;
       if (tower.burstLeft <= 0) {
+        // The reload comes ON TOP of the last shot's own interval, not instead of it.
+        //
+        // This used to zero the cooldown, making the burst cycle one gap shorter than
+        // the source's: Soldier fired three shots in 0.85 seconds where the source
+        // takes 1.025, so it did 3.53 damage per second against a published 2.93, and
+        // the same twenty percent overstatement rode on every burst tower in the game.
+        // Nothing caught it until the pages' own damage-per-second column was scraped
+        // and compared against, because 3.53 is a thoroughly plausible number.
         tower.reloadTicks = secondsToTicks(level.reloadSeconds ?? 1);
-        tower.cooldownTicks = 0;
+        tower.cooldownTicks = Math.max(1, Math.round(1 / (stats.fireRate * TICK_SECONDS)));
       } else {
         tower.cooldownTicks = Math.max(1, Math.round(1 / (stats.fireRate * TICK_SECONDS)));
       }
