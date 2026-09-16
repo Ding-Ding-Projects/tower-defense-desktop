@@ -1,0 +1,123 @@
+{
+  "id": "gatling-gun",
+  "displayName": "Gatling Gun",
+  "baseCost": 5250,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundFraction": 0.7,
+  "footprintRadius": 2,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 5,
+      "fireRate": 5.8824,
+      "range": 25,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 1,
+      "cost": 3000,
+      "damage": 8,
+      "fireRate": 5.8824,
+      "range": 30,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 2,
+      "cost": 7500,
+      "damage": 12,
+      "fireRate": 5.8824,
+      "range": 30,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 3,
+      "cost": 15000,
+      "damage": 13,
+      "fireRate": 8.3333,
+      "range": 35,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 4,
+      "cost": 32500,
+      "damage": 20,
+      "fireRate": 11.1111,
+      "range": 45,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 5,
+      "cost": 50000,
+      "damage": 36,
+      "fireRate": 11.1111,
+      "range": 50,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 6,
+      "cost": 100000,
+      "damage": 67,
+      "fireRate": 11.1111,
+      "range": 50,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+        "retrievedAt": "2026-09-16",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
+    "retrievedAt": "2026-09-16"
+  }
+}

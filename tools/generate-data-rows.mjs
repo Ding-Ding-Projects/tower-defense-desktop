@@ -40,6 +40,7 @@ const OVERLAY = {
   electroshocker: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false, chain: 3, chainRadius: 8 },
   cowboy: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 1.5, detectsHidden: false, hitsAir: false },
   turret: { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 2, detectsHidden: true, hitsAir: true },
+  'gatling-gun': { terrain: ['ground'], pool: 'default', max: null, refund: 0.7, footprint: 2, detectsHidden: false, hitsAir: false },
 };
 
 const ALL_MODES = ['first', 'last', 'closest', 'strongest', 'weakest'];

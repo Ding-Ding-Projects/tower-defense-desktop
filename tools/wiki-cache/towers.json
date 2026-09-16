@@ -554,6 +554,63 @@
         }
       ],
       "retrievedAt": "2026-09-16"
+    },
+    {
+      "id": "gatling-gun",
+      "displayName": "Gatling Gun",
+      "url": "https://tds.fandom.com/wiki/Gatling_Gun",
+      "levels": [
+        {
+          "level": 0,
+          "cost": 5250,
+          "damage": 5,
+          "shotIntervalSeconds": 0.17,
+          "range": 25
+        },
+        {
+          "level": 1,
+          "cost": 3000,
+          "damage": 8,
+          "shotIntervalSeconds": 0.17,
+          "range": 30
+        },
+        {
+          "level": 2,
+          "cost": 7500,
+          "damage": 12,
+          "shotIntervalSeconds": 0.17,
+          "range": 30
+        },
+        {
+          "level": 3,
+          "cost": 15000,
+          "damage": 13,
+          "shotIntervalSeconds": 0.12,
+          "range": 35
+        },
+        {
+          "level": 4,
+          "cost": 32500,
+          "damage": 20,
+          "shotIntervalSeconds": 0.09,
+          "range": 45
+        },
+        {
+          "level": 5,
+          "cost": 50000,
+          "damage": 36,
+          "shotIntervalSeconds": 0.09,
+          "range": 50
+        },
+        {
+          "level": 6,
+          "cost": 100000,
+          "damage": 67,
+          "shotIntervalSeconds": 0.09,
+          "range": 50
+        }
+      ],
+      "retrievedAt": "2026-09-16"
     }
   ]
 }

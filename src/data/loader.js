@@ -24,6 +24,7 @@ import ranger from './towers/ranger.json' with { type: 'json' };
 import electroshocker from './towers/electroshocker.json' with { type: 'json' };
 import cowboy from './towers/cowboy.json' with { type: 'json' };
 import turret from './towers/turret.json' with { type: 'json' };
+import gatlingGun from './towers/gatling-gun.json' with { type: 'json' };
 
 import normal from './enemies/normal.json' with { type: 'json' };
 import speedy from './enemies/speedy.json' with { type: 'json' };
@@ -72,6 +73,7 @@ export const RAW = Object.freeze({
   towers: [
     scout, sniper, soldier, freezer, militant, shotgunner,
     hunter, minigunner, ranger, electroshocker, cowboy, turret,
+    gatlingGun,
   ],
   enemies: [
     normal, speedy, slowEnemy, quick, slime, molten, ghost,
