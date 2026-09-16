@@ -93,7 +93,10 @@ export function artCacheSize() {
  * Runtime code never calls this. Always pair with useDefaultCanvasFactory()
  * to restore real behaviour, and clearArtCache() so a later test does not
  * see a fake canvas returned for a signature a real one should now serve.
- * @param {(width: number, height: number) => { getContext: (kind: '2d') => any }} factory
+ * The factory must also report its own size. A canvas is drawn onto AND then drawn
+ * FROM, and the blit reads width and height off the object; a fake that omits them
+ * produces a zero-sized draw with nothing to say about it.
+ * @param {(width: number, height: number) => { getContext: (kind: '2d') => any, width: number, height: number }} factory
  */
 export function setCanvasFactory(factory) {
   activeCanvasFactory = factory;

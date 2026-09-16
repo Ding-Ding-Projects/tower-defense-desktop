@@ -90,14 +90,22 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
   It is now a ratchet rather than an open hole. `tsconfig.render.json` carries an
   explicit list of the files that DO pass, runs as part of `npm run typecheck`, and
   `tests/ui/typecheck-ratchet.test.js` refuses to let a file be quietly dropped from
-  that list to make a red check green. Five files are in so far:
-  `interpolation.js`, `sim-interface.js`, `sim-source.js`, `view-model.js` and
-  `targeting.js`. The remaining 38 go in one at a time.
+  that list to make a red check green. Nine files are in so far: `noise.js`,
+  `derive.js`, `interpolation.js`, `object-pool.js`, `sim-interface.js`,
+  `sim-source.js`, `view-model.js`, `affordability.js` and `targeting.js`. The
+  remaining 34 go in one at a time.
 
-  Bringing the first of them in paid for itself immediately. `sim-interface.js` carried
+  Bringing them in keeps paying for itself. `sim-interface.js` carried
   a `@typedef` whose type expression spanned several lines, which does not parse: the
   compiler stopped at the first line break and then could not find `Command` anywhere,
-  so every signature mentioning it had silently lost its type.
+  so every signature mentioning it had silently lost its type. `object-pool.js` declared
+  its type parameter on the constructor, which TypeScript rejects outright, and the
+  knock-on effect was worse than the error: `T` then existed nowhere, so both pools in
+  `particles.js` were handing out untyped objects with nothing objecting. `Button` took
+  its parameter types from its own default values, so `action` was typed `null` and
+  every real action assigned to it was a type error nobody was seeing. `Widget` never
+  declared the `_draw` its own `draw` calls, so a subclass that forgot to provide one
+  would have failed at run time in silence.
 
 ## Deliberately not doing
 

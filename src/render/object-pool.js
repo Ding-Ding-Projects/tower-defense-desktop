@@ -5,12 +5,21 @@
  * When the pool is full, `acquire` returns null and the caller drops the effect
  * rather than growing the pool; that dropped frame is the hard particle budget.
  */
+/**
+ * @template T  the kind of thing this pool hands out
+ *
+ * The type parameter belongs on the CLASS, not on the constructor. TypeScript rejects
+ * `@template` on a constructor outright ("type parameters cannot appear on a
+ * constructor declaration"), and the knock-on effect was worse than the error itself:
+ * `T` then existed nowhere, so every method mentioning it silently became `any`, and
+ * the two pools in particles.js were handing out untyped objects with no complaint
+ * from anywhere.
+ */
 export class ObjectPool {
   /**
    * @param {number} capacity
    * @param {() => T} factory  builds one reusable item
    * @param {(item: T) => void} [reset]  called when an item is released back to the pool
-   * @template T
    */
   constructor(capacity, factory, reset) {
     if (capacity <= 0) throw new Error('ObjectPool: capacity must be > 0');

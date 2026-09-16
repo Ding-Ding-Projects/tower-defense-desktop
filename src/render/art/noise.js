@@ -53,7 +53,9 @@ export function createRng(seed) {
  * numbers were already drawn from it.
  * @param {number} x
  * @param {number} y
- * @param {number} seed
+ * @param {string|number} seed  normalizeSeed accepts either, and callers genuinely
+ *   pass a composed string such as `${seed}:${side}` to get two independent streams
+ *   out of one seed. The annotation said number and the code always handled both.
  * @returns {number} in [0, 1)
  */
 export function hash2(x, y, seed) {
@@ -65,6 +67,10 @@ export function hash2(x, y, seed) {
   return (h >>> 0) / 4294967296;
 }
 
+/**
+ * @param {number} t
+ * @returns {number}
+ */
 function smoothstep(t) {
   return t * t * (3 - 2 * t);
 }

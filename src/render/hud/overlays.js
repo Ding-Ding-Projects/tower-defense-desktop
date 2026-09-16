@@ -57,20 +57,26 @@ export const COPY = {
   },
 };
 
+/**
+ * Which overlay is showing, or null for none.
+ * @typedef {'waveStart'|'waveClear'|'victory'|'defeat'|null} OverlayKind
+ */
+
 export class OverlayHud {
   constructor() {
     this.rect = null;
     this._button = new Button({ id: 'overlay-dismiss', action: null });
+    /** @type {OverlayKind} */
     this._kind = null;
   }
 
   /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {import('./layout.js').Rect} viewportRect
-   * @param {{kind: 'waveStart'|'waveClear'|'victory'|'defeat'|null, payload?: object}} state
+   * @param {{kind?: OverlayKind, payload?: any}} [state]
    */
   draw(ctx, viewportRect, state = {}) {
-    const { kind, payload = {} } = state;
+    const { kind = null, payload = {} } = state;
     this._kind = kind;
     if (!kind || !COPY[kind]) {
       this.rect = null;

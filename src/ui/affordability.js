@@ -28,10 +28,27 @@ export function deriveShopEntryState(towerDef, cash, placementPoolCounts, disall
   return { affordable: true, disabledReason: null };
 }
 
+/**
+ * The stat fields an upgrade can change.
+ *
+ * Typed as keys of TowerLevel rather than as plain strings, so a field renamed in
+ * the schema turns this red instead of quietly diffing a property that no longer
+ * exists and reporting that nothing changed.
+ * Each name is also asserted to be a real key of TowerLevel, so a field renamed in
+ * the schema turns this red rather than quietly diffing a property that no longer
+ * exists and reporting that nothing changed.
+ * @type {Array<Extract<keyof import('../data/schema/types.js').TowerLevel,
+ *   'damage'|'fireRate'|'range'|'aoeRadius'|'pierceCount'|'chainCount'|'burstCount'>>}
+ */
 const DIFFABLE_FIELDS = ['damage', 'fireRate', 'range', 'aoeRadius', 'pierceCount', 'chainCount', 'burstCount'];
 
 /**
  * @param {import('../data/schema/types.js').TowerLevel} currentLevelDef
+ * @param {import('../data/schema/types.js').TowerLevel} nextLevelDef
+ * @returns {{ field: string, before: number, after: number }[]}
+ */
+/**
+ * @param {import('../data/schema/types.js').TowerLevel|null|undefined} currentLevelDef
  * @param {import('../data/schema/types.js').TowerLevel} nextLevelDef
  * @returns {{ field: string, before: number, after: number }[]}
  */
@@ -58,7 +75,9 @@ export function deriveUpgradeState(towerDef, currentLevel, cash) {
   if (!nextLevelDef) {
     return { available: false, disabledReason: 'Max level', cost: 0, changes: [] };
   }
-  const currentLevelDef = towerDef.levels.find((l) => l.level === currentLevel);
+  // May genuinely be absent; diffLevels treats a missing current level as "everything
+  // is new" rather than throwing.
+  const currentLevelDef = towerDef.levels.find((l) => l.level === currentLevel) ?? null;
   const changes = diffLevels(currentLevelDef, nextLevelDef);
   if (cash < nextLevelDef.cost) {
     return { available: false, disabledReason: `Need ${nextLevelDef.cost - cash} more cash`, cost: nextLevelDef.cost, changes };

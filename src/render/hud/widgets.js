@@ -116,9 +116,25 @@ class Widget {
   }
 
   /**
+   * What a subclass actually paints. Declared here rather than left implicit, because
+   * `draw` below calls it on the base type: without a declaration the compiler cannot
+   * see it at all, and a subclass that forgot to provide one would fail at run time
+   * with nothing having objected.
+   *
+   * @param {CanvasRenderingContext2D} _ctx
+   * @param {import('./layout.js').Rect} _rect
+   * @param {any} _state
+   * @returns {void}
+   */
+  // eslint-disable-next-line no-unused-vars
+  _draw(_ctx, _rect, _state) {
+    throw new Error(this.constructor.name + ' does not implement _draw');
+  }
+
+  /**
    * @param {CanvasRenderingContext2D} ctx
    * @param {import('./layout.js').Rect} rect
-   * @param {object} [state]
+   * @param {any} [state]
    */
   draw(ctx, rect, state = {}) {
     this.rect = rect;
@@ -132,6 +148,7 @@ class Widget {
 
 /** A bevelled panel with an inner shadow and a hairline border. */
 export class Panel extends Widget {
+  /** @override */
   _draw(ctx, rect, state) {
     const { radius = 10, elevated = false } = state;
     ctx.save();
@@ -180,6 +197,14 @@ const BUTTON_FILL_BY_VISUAL_STATE = {
  * rather than relying on this widget to clip or truncate it.
  */
 export class Button extends Widget {
+  /**
+   * Both default to null, and without the annotation the compiler infers the type
+   * FROM the defaults, so `action` becomes `null` and every real action assigned to it
+   * is an error. The defaults describe an unconfigured button, not the only thing a
+   * button may hold.
+   *
+   * @param {{ id?: string|null, action?: any }} [options]
+   */
   constructor({ id = null, action = null } = {}) {
     super();
     this.id = id;
@@ -188,6 +213,7 @@ export class Button extends Widget {
     this.pressed = false;
   }
 
+  /** @override */
   _draw(ctx, rect, state) {
     const visual = resolveButtonVisualState({ disabled: state.disabled, pressed: state.pressed ?? this.pressed, hovered: state.hovered ?? this.hovered });
     ctx.save();
@@ -233,6 +259,7 @@ export class Button extends Widget {
 
 /** A horizontal progress bar (used for hp readouts, cooldowns, XP-style meters). */
 export class ProgressBar extends Widget {
+  /** @override */
   _draw(ctx, rect, state) {
     const ratio = Math.min(1, Math.max(0, state.ratio ?? 0));
     ctx.save();
@@ -263,6 +290,7 @@ export class ProgressBar extends Widget {
  * because an empty bevelled box is worse than an initial.
  */
 export class IconSlot extends Widget {
+  /** @override */
   _draw(ctx, rect, state) {
     ctx.save();
     traceRoundedRect(ctx, rect, 6);
@@ -323,6 +351,7 @@ export class IconSlot extends Widget {
  * it never draws outside `state.bounds` when supplied.
  */
 export class Tooltip extends Widget {
+  /** @override */
   _draw(ctx, rect, state) {
     const text = state.text ?? '';
     if (!text) return;

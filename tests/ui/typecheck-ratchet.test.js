@@ -31,10 +31,14 @@ const config = JSON.parse(readFileSync(ROOT + 'tsconfig.render.json', 'utf8'));
  * memory of what was true.
  */
 const RATCHETED_IN = [
+  'src/render/art/noise.js',
+  'src/render/hud/derive.js',
   'src/render/interpolation.js',
+  'src/render/object-pool.js',
   'src/render/sim-interface.js',
   'src/render/sim-source.js',
   'src/render/view-model.js',
+  'src/ui/affordability.js',
   'src/ui/targeting.js',
 ];
 
