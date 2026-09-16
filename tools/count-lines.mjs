@@ -90,8 +90,12 @@ for (const path of files) {
   }
 
   const generated = GENERATED_PATTERNS.some((pattern) => pattern.test(path));
-  const category = CATEGORIES.find((c) => c.test(path));
+  // The last category matches everything, so this always finds one. Stated rather
+  // than assumed, because a silent undefined here would attribute a whole area to
+  // nowhere and the totals would still look plausible.
+  const category = CATEGORIES.find((c) => c.test(path)) ?? CATEGORIES[CATEGORIES.length - 1];
   const row = rows.get(category.name);
+  if (!row) throw new Error('no row for category ' + category.name);
   row.files += 1;
   row.total += lines;
   row.nonBlank += nonBlank;
@@ -132,7 +136,7 @@ lines.push('| Area | Files | Lines | Non-blank | Generated |');
 lines.push('| --- | ---: | ---: | ---: | ---: |');
 for (const category of CATEGORIES) {
   const row = rows.get(category.name);
-  if (row.files === 0) continue;
+  if (!row || row.files === 0) continue;
   lines.push(
     '| ' + category.name + ' | ' + row.files + ' | ' + row.total + ' | ' + row.nonBlank +
       ' | ' + row.generated + ' |',

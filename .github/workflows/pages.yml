@@ -1,0 +1,64 @@
+name: Publish the documentation site
+
+# The site lives in site/ rather than in a folder the forge serves directly, so it is
+# published by this workflow. Like the release workflow, it runs no tests and no lint:
+# it publishes what is committed.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Check out the exact commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refuse to publish a site whose article bundle is stale
+        run: |
+          # The in-app documentation browser and the site read the same bundle. A stale
+          # one means the site shows an article that no longer matches the file on disk,
+          # which is worse than showing nothing.
+          node tools/check-docs-bundle.mjs
+
+      - name: Refuse to publish a site that is missing a required surface
+        run: |
+          # A hand-written list of every feature the site must carry. A check that only
+          # scans for patterns passes cleanly on a site that has none of them.
+          node tools/check-site-contract.mjs
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy
+        id: deploy
+        uses: actions/deploy-pages@v4

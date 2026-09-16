@@ -55,13 +55,13 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 
 ## Phase 5: shipping
 
-- [ ] One-click dependency fetcher with pinned versions and recorded digests
-- [ ] One-click build script that verifies its own output is not stale
-- [ ] One-click installer script producing an unsigned Squirrel package
-- [ ] Original application icon at every required resolution
-- [ ] Release workflow publishing a uniquely tagged non-draft release
-- [ ] Committed line counter reporting agent-written versus person-written lines
-- [ ] First real release published with a working installer attached
+- [x] One-click dependency fetcher with pinned versions and recorded digests
+- [x] One-click build script that verifies its own output is not stale
+- [x] One-click installer script producing an unsigned Squirrel package
+- [x] Original application icon at every required resolution
+- [x] Release workflow publishing a uniquely tagged non-draft release
+- [x] Committed line counter reporting agent-written versus person-written lines
+- [x] First real release published with a working installer attached
 
 ## Phase 6: the record
 
@@ -69,7 +69,7 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] A documentation article per feature
 - [x] Social embed graphic with server-rendered metadata
 - [x] Offline in-app documentation browser with a completeness check
-- [ ] Real captures of the real built program in the readme
+- [x] Real captures of the real built program in the readme
 - [ ] Screen recording of the real built program
 
 ## Known open gaps
