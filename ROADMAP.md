@@ -112,10 +112,17 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 
 ## Known open gaps
 
-- [ ] Thirteen of the forty-three files in `src/render` and `src/ui` are still outside
-  the TypeScript check: `app.js`, the Material Design component wrappers, and a handful
-  of smaller interface modules. Thirty are in, including the whole art directory, the
-  whole interface layer and the renderer.
+- [ ] One of the forty-one files in `src/render` and `src/ui` is still outside
+  the TypeScript check: `app.js`, which is the bootstrap and the largest single file in
+  the interface. Forty are in, including the whole art directory, the whole interface
+  layer, the renderer and every Material Design component.
+
+  Two files left the list by being deleted rather than fixed. `stub-sim.js` was the
+  simulation stand-in this lane was built against before the real one existed, and its
+  own note said it was not meant to survive contact with `src/sim`; `procedural-draw.js`
+  was superseded by the art directory. Nothing imported either, and the interface
+  documentation still described both as current, including the claim that the real
+  simulation modules "do not exist yet".
 
   It is a ratchet, not an open hole. `tsconfig.render.json` lists the files that pass,
   runs as part of `npm run typecheck`, and `tests/ui/typecheck-ratchet.test.js` refuses

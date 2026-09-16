@@ -6,14 +6,13 @@ Owns `src/render/**`, `src/ui/**`, `index.html`, `styles.css`, `tests/ui/**`.
 
 ```
 src/render/sim-interface.js  documented contract (typedefs + SIM_TICK_HZ) this lane expects from src/sim
-src/render/stub-sim.js       local dev/test stand-in implementing that exact contract
-src/render/sim-source.js     the one-line seam: re-exports stub-sim.js today, swap to real src/sim later
+src/render/sim-source.js     the seam: adapts the real src/sim to the shape above
 
 src/render/interpolation.js  lerp / lerpAngle / computeAlpha / SnapshotBuffer  (pure, tested)
 src/render/camera.js         pan / zoom / clamp-to-map / world<->screen        (pure, tested)
 src/render/object-pool.js    fixed-capacity pool used by projectiles/particles (pure, tested)
 src/render/view-model.js     two snapshots + alpha -> render-ready ViewModel   (pure, tested)
-src/render/procedural-draw.js  procedural tower/enemy sprites, cached to an offscreen canvas
+src/render/art/*             procedural terrain, path, tower and enemy sprites, cached
 src/render/particles.js      pooled hit particles + floating damage numbers
 src/render/renderer.js       CanvasRenderer: draws a ViewModel each frame
 src/render/loop.js           requestAnimationFrame loop, decoupled from the 30 Hz sim tick
@@ -34,9 +33,11 @@ it, not by a unit test — you cannot meaningfully assert on canvas pixels with
 
 ## The sim contract (proposal for the simulation lane)
 
-`src/sim/core/match.js` and `src/sim/state/snapshot.js` do not exist yet. This
-lane built against a local stub (`stub-sim.js`) that implements the exact shape
-documented in `sim-interface.js`:
+`src/sim/core/match.js` and `src/sim/state/snapshot.js` are the real simulation,
+and `sim-source.js` adapts them to the shape documented in `sim-interface.js`.
+This lane was originally built against a local stub implementing the same shape;
+the stub has been removed now that the thing it stood in for exists. The contract
+it was written against is this:
 
 - `createMatch({ seed, mapId, difficultyId, gameData }) -> state`
 - `submitCommand(state, command)` — enqueues only, never mutates synchronously
@@ -142,10 +143,12 @@ wired up.
 
 ## What is stubbed, and why
 
-- **The entire simulation** (`stub-sim.js`): one tower, one enemy, one lane, no
-  balance claims. It exists so this lane has something real to render and the
-  UI has something real to click. It is not sourced game data and is not meant
-  to survive contact with the real `src/sim`.
+- **Nothing, any more.** The simulation stub that used to stand in here was one
+  tower, one enemy and one lane, and its own note said it was not meant to
+  survive contact with the real `src/sim`. It did not: the real simulation is
+  wired in and the stub has been removed, along with a superseded sprite module
+  that the art directory replaced. Both are in the Git history if a reason to
+  want them back ever appears.
 - **Game data** (`getStubGameData`): a two-entry `GameData`-shaped `Map` set,
   standing in for `src/data`'s loader and validator, which do not exist yet
   either.
