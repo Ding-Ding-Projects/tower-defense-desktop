@@ -51,7 +51,6 @@
       ],
       "icon": "build/icon.ico",
       "forceCodeSigning": false,
-      "signExecutable": false,
       "signAndEditExecutable": false
     },
     "squirrelWindows": {
@@ -59,5 +58,9 @@
       "artifactName": "TowerDefenceDesktop-Setup-${version}.${ext}",
       "msi": false
     }
-  }
+  },
+  "author": {
+    "name": "Ding Ding Projects"
+  },
+  "license": "MIT"
 }

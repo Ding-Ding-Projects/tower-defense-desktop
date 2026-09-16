@@ -1,0 +1,29 @@
+{
+  "//": "The single record every build script reads. Adding a pinned thing means adding it here, not to a script.",
+  "node": {
+    "minimumMajor": 20,
+    "pinnedVersion": "22.20.0",
+    "sha256": "unrecorded",
+    "//": "The digest is recorded the first time this exact archive is fetched and verified. Until then the fetcher reports the digest it observed rather than silently accepting anything."
+  },
+  "desktopRuntime": {
+    "package": "electron",
+    "version": "33.4.11"
+  },
+  "packaging": {
+    "builder": "25.1.8",
+    "squirrelTarget": "26.15.3",
+    "signed": false,
+    "//": "Permanently unsigned. The installer will show an unknown publisher warning, and the release notes say so."
+  },
+  "artifacts": {
+    "setup": "release/TowerDefenceDesktop-Setup-${version}.exe",
+    "releasesFile": "release/RELEASES",
+    "nupkg": "release/*.nupkg"
+  },
+  "commands": {
+    "fetch": "download-dependencies.bat",
+    "build": "build.bat",
+    "installer": "build-installer.bat"
+  }
+}
