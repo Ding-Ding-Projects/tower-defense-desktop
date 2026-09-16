@@ -6,7 +6,7 @@
  * This module is runtime/canvas-facing and is not covered by node --test — see
  * the top of tests/ui for why (canvas pixels are not something a unit test can
  * meaningfully assert on) and see docs/features/interface.md for how it is
- * verified instead (HuiShots against the built app).
+ * verified instead (screenshots of the built app).
  */
 
 import { worldToScreen } from './camera.js';

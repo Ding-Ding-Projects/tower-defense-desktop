@@ -28,7 +28,7 @@ src/ui/app.js                bootstrap: wires all of the above into index.html
 Pure logic (`interpolation.js`, `camera.js`, `object-pool.js`, `view-model.js`,
 `affordability.js`, `targeting.js`) is covered by `tests/ui/*.test.js` under
 `node --test`. Canvas drawing, DOM wiring and `app.js` are runtime/integration
-code and are verified by driving the real built app headlessly and HuiShotting
+code and are verified by driving the real built app headlessly and capturing screenshots of
 it, not by a unit test — you cannot meaningfully assert on canvas pixels with
 `node --test`, and the instructions for this lane say so explicitly.
 
@@ -92,7 +92,7 @@ leaked, sold) simply is not in the output.
 ## Material Design 3
 
 There is no MD3 component library dependency available to this lane (it does
-not own `package.json` and no See Fut may be added there), so
+not own `package.json` and no dependency may be added there), so
 `src/ui/components/` implements the primitives this project actually needs as
 real custom elements with shadow DOM and real underlying browser controls:
 
@@ -130,7 +130,7 @@ instructions.
   `"Not allowed on this difficulty"`), and every wave/victory/defeat state is a
   real dialog with real copy, never an empty overlay.
 
-## Layout and Cheap Jor
+## Layout and clipping
 
 Declared minimum window: 960 x 600 CSS px (`html, body { min-width; min-height }`
 in `styles.css`). The sidebar narrows at `max-width: 1040px` rather than

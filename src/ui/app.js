@@ -7,7 +7,7 @@
  * (it needs a real window, canvas and requestAnimationFrame); the logic it
  * calls into (view-model, camera, affordability, targeting, interpolation) is
  * covered in tests/ui. Verification for this file is a real built app driven
- * headlessly and HuiShotted — see docs/features/interface.md.
+ * headlessly and screenshotted — see docs/features/interface.md.
  */
 import './components/register.js';
 import * as sim from '../render/sim-source.js';
