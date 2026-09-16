@@ -42,7 +42,8 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] First tranche of enemies including bosses, each cited (10, including 3 bosses)
 - [x] Two maps with real lanes and placement zones
 - [x] Every difficulty as its own row
-- [x] Wave tables per map and difficulty
+- [x] Wave tables per map and difficulty, generated from a curve the economy can fund
+- [x] The game is completable end to end on every difficulty, proven by a real playthrough
 - [x] Six open statistical questions resolved or recorded as unresolved
 - [x] Data validator with referential integrity and geometry checks
 

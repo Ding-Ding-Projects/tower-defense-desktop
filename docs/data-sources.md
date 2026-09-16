@@ -136,6 +136,45 @@ as sourced data regardless; what is not claimed is that the simulation reproduce
 number nobody has managed to derive. The check asserts the exclusion still has its
 reason, so it cannot quietly become a place to put anything inconvenient.
 
+## The wave schedule, and why it was rebuilt
+
+The shipped game could not be finished. A headless playthrough with an ordinary
+strategy lost on wave 8 or 9 on every map, every difficulty and every tower, and
+the cause was arithmetic rather than tactics: the ten-wave arc paid out about
+12,000 cash, the best tower in the roster converts cash into damage at roughly 6
+damage per second per 1,000 spent, and wave 10 alone carried 56,864 health. That
+is a finale needing about twenty times the damage the whole game had funded.
+
+Nothing had caught it because nothing had ever played the game. Every check ran
+against the synthetic fixture and the suite was green throughout.
+
+**Enemy health and kill rewards are wiki figures and were not touched.** What was
+rebuilt is what is genuinely this project's own: which enemies turn up, how many,
+and what a wave pays on completion. `tools/generate-waves.mjs` builds a geometric
+difficulty curve, sets the completion bonus to fund it, and computes where each
+boss fits rather than declaring it; `tools/playthrough-probe.mjs` then plays the
+result, and `tests/e2e/completable.test.js` makes that a gate.
+
+Three things were tried and rejected along the way, recorded so they are not tried
+again:
+
+| Attempt | Why it failed |
+| --- | --- |
+| Derive the wave load from cash earned so far | The economy compounds, so the budget compounds. With the heaviest non-boss enemy at 350 health the only way to express it was hundreds of enemies per wave and bonuses in the millions |
+| Pin bosses to fixed wave numbers | Molten Boss sat on wave 20 where the curve reaches about 800 against its cost of 20,741, so it was silently dropped from every table and the arc quietly had no bosses at all |
+| One curve for every difficulty | The ladder came out inverted. A harder tier met the same load with fewer, tougher enemies while starting with more cash, and finished with more lives than easy |
+
+**Two bosses do not fit and are recorded rather than forced.** Fallen Swordmaster
+at 150,000 health and Fallen King at 250,000 need a wave heavier than a 40-wave
+arc reaches on this economy; they are sized for a far longer game than this roster
+of kill rewards can fund. Molten Boss does fit, and the generator places it where
+the curve can carry it. Forcing either of the others in would recreate the exact
+cliff this replaced.
+
+The arc now runs 40 waves and every difficulty is completable. Hardcore, which
+multiplies enemy health by six, bans Scout and cuts the base to twenty lives,
+finishes with 9 of those 20 left.
+
 ## The rest of the roster, and why each one is still absent
 
 Every remaining tower was fetched and its page read. They are not all the same kind of
