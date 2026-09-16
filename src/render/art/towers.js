@@ -1,0 +1,354 @@
+/**
+ * Real tower structure instead of a flat square: a shadowed base, a plinth,
+ * a rotating turret head, a barrel (or barrels, or an antenna array, or a
+ * beacon ring) that points at the target, and visible upgrade differences as
+ * level rises.
+ *
+ * The silhouette is derived entirely from the level's own real data fields —
+ * aura, aoeRadius, chainCount, pierceCount, incomePerWave, burstCount,
+ * hitsAir, detectsHidden — never from the tower's id or displayName. A brand
+ * new tower added to src/data/towers tomorrow with, say, an aoeRadius gets
+ * the mortar silhouette automatically, with no matching change needed here.
+ *
+ * `drawTower` is the pure function the renderer calls every frame (rotation
+ * changes continuously as a turret tracks its target, so it cannot be baked
+ * into a cache key as-is). `getTowerSprite` is the cached wrapper: it
+ * quantizes rotation into a fixed number of buckets and caches one bitmap per
+ * (tower id, level, size, rotation bucket), so a screen full of towers all
+ * facing roughly the same way still costs one draw per bucket, not one per
+ * tower per frame. Rotation convention: 0 radians points along +x (screen
+ * right), increasing clockwise — the same convention as Math.atan2(dy, dx),
+ * so the renderer can pass `Math.atan2(target.y - tower.y, target.x - tower.x)`
+ * directly.
+ */
+
+import { TOWER, TOWER_ROLE, LIGHT_ANGLE_RADIANS, shade, withAlpha } from './palette.js';
+import { getCachedCanvas, quantizeAngle } from './cache.js';
+
+/** Base world footprint of a placed tower, in map units. See docs/features on the renderer side for how this becomes on-screen pixels via camera zoom. */
+export const TOWER_WORLD_SIZE = 3;
+
+const ROTATION_CACHE_BUCKETS = 24;
+
+/**
+ * @param {import('../../data/schema/types.js').TowerLevel} levelDef
+ * @returns {'support'|'aoe'|'chain'|'pierce'|'economy'|'single'}
+ */
+export function towerRole(levelDef) {
+  if (levelDef.aura) return 'support';
+  if (levelDef.aoeRadius) return 'aoe';
+  if (levelDef.chainCount) return 'chain';
+  if (levelDef.pierceCount) return 'pierce';
+  if (levelDef.incomePerWave) return 'economy';
+  return 'single';
+}
+
+function roleColor(role) {
+  return TOWER_ROLE[role] ?? TOWER_ROLE.single;
+}
+
+/**
+ * @param {import('../../data/schema/types.js').TowerDef} def
+ * @param {import('../../data/schema/types.js').TowerLevel} levelDef
+ * @param {number} size
+ * @returns {string}
+ */
+export function towerSpriteSignature(def, levelDef, size) {
+  return `tower:${def.id}:${levelDef.level}:${size}`;
+}
+
+/**
+ * The pure draw function. Draws a complete tower — base, plinth, armor,
+ * turret and barrel(s) rotated to `rotationRadians` — into a `size` x `size`
+ * square of `ctx` starting at (0, 0).
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} size
+ * @param {import('../../data/schema/types.js').TowerDef} def
+ * @param {import('../../data/schema/types.js').TowerLevel} levelDef
+ * @param {number} rotationRadians
+ */
+export function drawTower(ctx, size, def, levelDef, rotationRadians) {
+  ctx.clearRect(0, 0, size, size);
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const role = towerRole(levelDef);
+  const accent = roleColor(role);
+  const level = levelDef.level ?? 0;
+
+  const footprintScale = clamp((def.footprintRadius ?? 1.5) / 1.5, 0.75, 1.6);
+  const levelScale = 1 + level * 0.09;
+  const r = size * 0.3 * footprintScale * levelScale;
+
+  drawShadow(ctx, cx, cy, r);
+  drawPlinth(ctx, cx, cy, r, level);
+  drawArmorRing(ctx, cx, cy, r, level, accent);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotationRadians);
+  drawSilhouette(ctx, role, r, size, levelDef, accent);
+  ctx.restore();
+
+  drawTurretHub(ctx, cx, cy, r, accent);
+
+  if (levelDef.hitsAir) drawAntiAirSpike(ctx, cx, cy, r);
+  if (levelDef.detectsHidden) drawSensorLens(ctx, cx, cy, r);
+
+  drawLevelPips(ctx, cx, cy, r, level);
+}
+
+function drawShadow(ctx, cx, cy, r) {
+  ctx.fillStyle = TOWER.shadow;
+  ctx.beginPath();
+  ctx.ellipse(cx + r * 0.12, cy + r * 0.22, r * 1.05, r * 0.55, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/** An octagonal plinth, two-tone so it reads as a solid slab rather than a flat disc. */
+function drawPlinth(ctx, cx, cy, r, level) {
+  const plinthR = r * 1.05;
+  drawRegularPolygon(ctx, cx, cy, plinthR, 8, Math.PI / 8);
+  ctx.fillStyle = TOWER.plinthDark;
+  ctx.fill();
+
+  const insetR = plinthR * 0.82;
+  drawRegularPolygon(ctx, cx, cy, insetR, 8, Math.PI / 8);
+  ctx.fillStyle = TOWER.plinth;
+  ctx.fill();
+
+  ctx.strokeStyle = shade(TOWER.plinth, level > 0 ? 0.15 : 0.05);
+  ctx.lineWidth = Math.max(1, r * 0.03);
+  ctx.stroke();
+}
+
+/** Armor rivets around the plinth rim: more of them at higher level, so an upgraded tower reads as more heavily plated without a second art pass. */
+function drawArmorRing(ctx, cx, cy, r, level, accent) {
+  if (level <= 0) return;
+  const rivetCount = 6 + level * 2;
+  const ringR = r * 0.95;
+  ctx.fillStyle = TOWER.armorRivet;
+  for (let i = 0; i < rivetCount; i += 1) {
+    const angle = (i / rivetCount) * Math.PI * 2;
+    const x = cx + Math.cos(angle) * ringR;
+    const y = cy + Math.sin(angle) * ringR;
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(0.6, r * 0.045), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if (level >= 2) {
+    ctx.strokeStyle = withAlpha(accent, 0.55);
+    ctx.lineWidth = Math.max(1, r * 0.05);
+    ctx.beginPath();
+    ctx.arc(cx, cy, ringR * 1.03, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
+
+/** Drawn already rotated (caller has translated to the tower centre and rotated by rotationRadians): everything here points along local +x. */
+function drawSilhouette(ctx, role, r, size, levelDef, accent) {
+  const barrels = Math.max(1, levelDef.burstCount ?? 1);
+  switch (role) {
+    case 'support':
+      drawBeacon(ctx, r, accent);
+      break;
+    case 'aoe':
+      drawMortar(ctx, r, accent);
+      break;
+    case 'chain':
+      drawChainArray(ctx, r, levelDef.chainCount ?? 3, accent);
+      break;
+    case 'pierce':
+      drawRifle(ctx, r, accent);
+      break;
+    case 'economy':
+      drawCoinSlot(ctx, r, accent);
+      break;
+    default:
+      drawBarrels(ctx, r, barrels, accent);
+      break;
+  }
+}
+
+function drawBarrels(ctx, r, count, accent) {
+  const barrelLen = r * 1.1;
+  const barrelW = Math.max(1.2, r * 0.16);
+  for (let i = 0; i < count; i += 1) {
+    const offset = (i - (count - 1) / 2) * barrelW * 1.4;
+    ctx.fillStyle = TOWER.barrel;
+    ctx.fillRect(0, offset - barrelW / 2, barrelLen, barrelW);
+    ctx.fillStyle = TOWER.barrelHighlight;
+    ctx.fillRect(0, offset - barrelW / 2, barrelLen, barrelW * 0.3);
+    ctx.fillStyle = accent;
+    ctx.fillRect(barrelLen - barrelW * 0.6, offset - barrelW / 2, barrelW * 0.6, barrelW);
+  }
+}
+
+function drawRifle(ctx, r, accent) {
+  const len = r * 1.6;
+  const w = Math.max(1, r * 0.1);
+  ctx.fillStyle = TOWER.barrel;
+  ctx.fillRect(0, -w / 2, len, w);
+  ctx.fillStyle = TOWER.barrelHighlight;
+  ctx.fillRect(0, -w / 2, len, w * 0.25);
+  ctx.fillStyle = accent;
+  ctx.fillRect(len * 0.55, -w * 0.9, w * 0.5, w * 1.8);
+}
+
+function drawMortar(ctx, r, accent) {
+  const len = r * 0.75;
+  const w = Math.max(2, r * 0.42);
+  ctx.fillStyle = TOWER.barrel;
+  ctx.beginPath();
+  ctx.moveTo(0, -w / 2);
+  ctx.lineTo(len, -w * 0.62);
+  ctx.lineTo(len, w * 0.62);
+  ctx.lineTo(0, w / 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(len, 0, w * 0.4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawChainArray(ctx, r, chainCount, accent) {
+  const rods = Math.max(2, Math.min(5, chainCount));
+  const spread = Math.PI / 3;
+  for (let i = 0; i < rods; i += 1) {
+    const angle = rods === 1 ? 0 : -spread / 2 + (spread * i) / (rods - 1);
+    const len = r * (0.85 + (i % 2) * 0.15);
+    const tipX = Math.cos(angle) * len;
+    const tipY = Math.sin(angle) * len;
+    ctx.strokeStyle = TOWER.turretMetal;
+    ctx.lineWidth = Math.max(1, r * 0.06);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(tipX, tipY);
+    ctx.stroke();
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.arc(tipX, tipY, r * 0.09, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawBeacon(ctx, r, accent) {
+  ctx.strokeStyle = withAlpha(accent, 0.7);
+  ctx.setLineDash([r * 0.15, r * 0.12]);
+  ctx.lineWidth = Math.max(1, r * 0.06);
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.85, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  drawRegularPolygon(ctx, 0, 0, r * 0.4, 6, 0);
+  ctx.fillStyle = accent;
+  ctx.fill();
+}
+
+function drawCoinSlot(ctx, r, accent) {
+  ctx.fillStyle = TOWER.turretMetal;
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = Math.max(1, r * 0.07);
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.16, -r * 0.24);
+  ctx.lineTo(-r * 0.16, r * 0.24);
+  ctx.moveTo(r * 0.16, -r * 0.24);
+  ctx.lineTo(r * 0.16, r * 0.24);
+  ctx.moveTo(-r * 0.24, 0);
+  ctx.lineTo(r * 0.24, 0);
+  ctx.stroke();
+}
+
+/** The turret head: a metal hub with a rim-light arc facing the palette's light direction. Drawn unrotated, on top of the (rotated) barrel, so the hub itself never spins even though its payload does. */
+function drawTurretHub(ctx, cx, cy, r, accent) {
+  const hubR = r * 0.52;
+  ctx.fillStyle = TOWER.turretMetal;
+  ctx.beginPath();
+  ctx.arc(cx, cy, hubR, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(cx, cy, hubR * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = TOWER.rimLight;
+  ctx.lineWidth = Math.max(1, hubR * 0.14);
+  ctx.beginPath();
+  ctx.arc(cx, cy, hubR * 0.86, LIGHT_ANGLE_RADIANS - 0.9, LIGHT_ANGLE_RADIANS + 0.9);
+  ctx.stroke();
+}
+
+function drawAntiAirSpike(ctx, cx, cy, r) {
+  ctx.fillStyle = TOWER.antiAirSpike;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - r * 1.15);
+  ctx.lineTo(cx - r * 0.08, cy - r * 0.55);
+  ctx.lineTo(cx + r * 0.08, cy - r * 0.55);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawSensorLens(ctx, cx, cy, r) {
+  const x = cx + r * 0.6;
+  const y = cy - r * 0.6;
+  ctx.fillStyle = shade(TOWER.plinth, -0.1);
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.16, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = TOWER.sensorLens;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.09, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawLevelPips(ctx, cx, cy, r, level) {
+  if (level <= 0) return;
+  const y = cy + r * 1.3;
+  const spacing = r * 0.22;
+  const startX = cx - ((level - 1) * spacing) / 2;
+  ctx.fillStyle = TOWER.rimLight;
+  for (let i = 0; i < level; i += 1) {
+    ctx.beginPath();
+    ctx.arc(startX + i * spacing, y, r * 0.07, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawRegularPolygon(ctx, cx, cy, radius, sides, rotation) {
+  ctx.beginPath();
+  for (let i = 0; i < sides; i += 1) {
+    const angle = rotation + (i / sides) * Math.PI * 2;
+    const x = cx + Math.cos(angle) * radius;
+    const y = cy + Math.sin(angle) * radius;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+/**
+ * Cached entry point. Quantizes rotation into ROTATION_CACHE_BUCKETS steps so
+ * every tower of a given (id, level, size) facing roughly the same direction
+ * shares one cached bitmap, rather than redrawing full vector art per tower
+ * per frame.
+ * @param {import('../../data/schema/types.js').TowerDef} def
+ * @param {import('../../data/schema/types.js').TowerLevel} levelDef
+ * @param {number} size
+ * @param {number} rotationRadians
+ * @returns {OffscreenCanvas|HTMLCanvasElement}
+ */
+export function getTowerSprite(def, levelDef, size, rotationRadians) {
+  const { index, angle } = quantizeAngle(rotationRadians, ROTATION_CACHE_BUCKETS);
+  const signature = `${towerSpriteSignature(def, levelDef, size)}:r${index}`;
+  return getCachedCanvas(signature, size, size, (ctx) => drawTower(ctx, size, def, levelDef, angle));
+}
