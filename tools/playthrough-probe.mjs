@@ -84,12 +84,15 @@ export function play(mapId, difficultyId, towerId, options = {}) {
   const match = createMatch({ gameData, seed: 11, mapId, difficultyId });
   const mapDef = gameData.maps.get(mapId);
   const def = gameData.towers.get(towerId);
+  if (!def) throw new Error('no such tower: ' + towerId);
 
   // A difficulty may ban a tower outright: hardcore forbids Scout. Without this the
   // probe built nothing at all, lost on wave 5, and reported it as a difficulty result,
   // which reads exactly like a brutally hard tier rather than like a probe that never
   // played. A result nobody can distinguish from a broken run is not a result.
-  const banned = gameData.difficulties.get(difficultyId).disallowedTowers ?? [];
+  const difficulty = gameData.difficulties.get(difficultyId);
+  if (!difficulty) throw new Error('no such difficulty: ' + difficultyId);
+  const banned = difficulty.disallowedTowers ?? [];
   if (banned.includes(towerId)) {
     return { phase: 'unplayable', reason: towerId + ' is not allowed on ' + difficultyId };
   }
@@ -103,7 +106,12 @@ export function play(mapId, difficultyId, towerId, options = {}) {
     // ones, and a probe that only ever adds towers never exercises the upgrade path
     // the whole economy is built around.
     let spent = false;
-    /** What was asked for this second, so the next tick can confirm it happened. */
+    /**
+     * What was asked for this second, so the next tick can confirm it happened.
+     * @type {{ kind: 'upgrade', seq: number, fromLevel: number }
+     *       | { kind: 'place', towerCount: number }
+     *       | null}
+     */
     let intended = null;
     if (upgradeFirst) {
       const upgradable = match.state.towers
@@ -145,13 +153,23 @@ export function play(mapId, difficultyId, towerId, options = {}) {
     // A command submitted on the last second of a match is refused, because the
     // simulation stops accepting them once the match is won or lost. That is correct
     // behaviour, not a lost command, so it is the one case these assertions allow.
-    const matchOver = match.state.phase === 'won' || match.state.phase === 'lost';
+    //
+    // Re-read rather than reusing the check at the top of the loop: the compiler
+    // narrows `phase` there and cannot see that runTicks mutates it, so the narrowed
+    // type says this comparison can never be true when in fact it is exactly how every
+    // match ends.
+    /** @type {string} */
+    const phaseNow = match.state.phase;
+    const matchOver = phaseNow === 'won' || phaseNow === 'lost';
     if (matchOver) {
       intended = null;
     } else if (intended && intended.kind === 'upgrade') {
-      const after = match.state.towers.find((t) => t.seq === intended.seq);
-      if (!after || after.level <= intended.fromLevel) {
-        throw new Error('upgrade of tower ' + intended.seq + ' did not take effect');
+      // Copied into a const before the closure. `intended` is a `let`, so the compiler
+      // drops its narrowing the moment it is captured by the arrow function below.
+      const asked = intended;
+      const after = match.state.towers.find((t) => t.seq === asked.seq);
+      if (!after || after.level <= asked.fromLevel) {
+        throw new Error('upgrade of tower ' + asked.seq + ' did not take effect');
       }
       upgrades += 1;
     } else if (intended && intended.kind === 'place') {

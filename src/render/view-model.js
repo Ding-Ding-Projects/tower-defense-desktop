@@ -97,10 +97,20 @@ export function buildViewModel(prevSnapshot, nextSnapshot, alpha) {
   return snapshotToViewModel(prevSnapshot, nextSnapshot, clamp01(alpha));
 }
 
+/**
+ * @param {number} value
+ * @returns {number}
+ */
 function clamp01(value) {
   return Math.min(1, Math.max(0, value));
 }
 
+/**
+ * @param {import('./sim-interface.js').Snapshot} prev
+ * @param {import('./sim-interface.js').Snapshot} next
+ * @param {number} alpha
+ * @returns {ViewModel}
+ */
 function snapshotToViewModel(prev, next, alpha) {
   return {
     tick: next.tick,
@@ -116,11 +126,37 @@ function snapshotToViewModel(prev, next, alpha) {
   };
 }
 
+/**
+ * Pair each entity in the newer snapshot with its own earlier self, by id, and hand
+ * both to the mapper. An entity that has only just appeared has no earlier self and
+ * the mapper gets undefined, which is why every mapper below takes a nullable `prev`.
+ *
+ * @template {{ id: string }} TIn
+ * @template TOut
+ * @param {TIn[]|undefined} prevList
+ * @param {TIn[]|undefined} nextList
+ * @param {number} alpha
+ * @param {(prev: TIn|undefined, next: TIn, alpha: number) => TOut} mapFn
+ * @returns {TOut[]}
+ */
 function interpolateList(prevList, nextList, alpha, mapFn) {
   const prevById = new Map((prevList ?? []).map((entity) => [entity.id, entity]));
   return (nextList ?? []).map((next) => mapFn(prevById.get(next.id), next, alpha));
 }
 
+/**
+ * The ONE place a fixed-point position becomes a float.
+ *
+ * `x` and `y` arrive branded as Fixed from the snapshot, and fromFixed is the only
+ * thing that unwraps the brand. That is deliberate: converting a second time used to
+ * draw every entity a thousandth of the way from the map origin, silently, and the
+ * brand makes a second conversion a compile error rather than an empty screen.
+ *
+ * @param {{ x: import('../sim/core/fixed.js').Fixed, y: import('../sim/core/fixed.js').Fixed }|undefined} prev
+ * @param {{ x: import('../sim/core/fixed.js').Fixed, y: import('../sim/core/fixed.js').Fixed }} next
+ * @param {number} alpha
+ * @returns {{ x: number, y: number }}
+ */
 function interpolatePosition(prev, next, alpha) {
   const nx = fromFixed(next.x);
   const ny = fromFixed(next.y);
@@ -130,6 +166,11 @@ function interpolatePosition(prev, next, alpha) {
   return { x: lerp(px, nx, alpha), y: lerp(py, ny, alpha) };
 }
 
+/**
+ * @param {import('./sim-interface.js').SnapshotTower|undefined} prev
+ * @param {import('./sim-interface.js').SnapshotTower} next
+ * @returns {ViewTower}
+ */
 function interpolateTower(prev, next) {
   // Towers do not move once placed; no lerp needed for position, but the shape
   // stays parallel to enemy/projectile so the renderer treats all three uniformly.
@@ -145,6 +186,12 @@ function interpolateTower(prev, next) {
   };
 }
 
+/**
+ * @param {import('./sim-interface.js').SnapshotEnemy|undefined} prev
+ * @param {import('./sim-interface.js').SnapshotEnemy} next
+ * @param {number} alpha
+ * @returns {ViewEnemy}
+ */
 function interpolateEnemy(prev, next, alpha) {
   const { x, y } = interpolatePosition(prev, next, alpha);
   const hpCurrent = prev ? lerp(prev.hpCurrent, next.hpCurrent, alpha) : next.hpCurrent;
@@ -160,6 +207,12 @@ function interpolateEnemy(prev, next, alpha) {
   };
 }
 
+/**
+ * @param {import('./sim-interface.js').SnapshotProjectile|undefined} prev
+ * @param {import('./sim-interface.js').SnapshotProjectile} next
+ * @param {number} alpha
+ * @returns {ViewProjectile}
+ */
 function interpolateProjectile(prev, next, alpha) {
   const { x, y } = interpolatePosition(prev, next, alpha);
   return {

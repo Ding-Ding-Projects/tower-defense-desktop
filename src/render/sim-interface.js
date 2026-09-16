@@ -34,8 +34,8 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  * @typedef {object} SnapshotTower
  * @property {string} id                 stable identity across ticks, for interpolation
  * @property {string} defId              key into GameData.towers
- * @property {number} x                  fixed-point
- * @property {number} y                  fixed-point
+ * @property {import('../sim/core/fixed.js').Fixed} x
+ * @property {import('../sim/core/fixed.js').Fixed} y
  * @property {number} level              index into TowerDef.levels
  * @property {TargetingMode} targetingMode
  * @property {number} abilityCooldownRemainingSeconds  0 when ready or no ability
@@ -52,8 +52,8 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  * @typedef {object} SnapshotEnemy
  * @property {string} id
  * @property {string} defId        key into GameData.enemies
- * @property {number} x            fixed-point
- * @property {number} y            fixed-point
+ * @property {import('../sim/core/fixed.js').Fixed} x
+ * @property {import('../sim/core/fixed.js').Fixed} y
  * @property {number} hpCurrent
  * @property {number} hpMax
  * @property {number} shieldCurrent
@@ -63,8 +63,8 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
 /**
  * @typedef {object} SnapshotProjectile
  * @property {string} id
- * @property {number} x            fixed-point
- * @property {number} y            fixed-point
+ * @property {import('../sim/core/fixed.js').Fixed} x
+ * @property {import('../sim/core/fixed.js').Fixed} y
  * @property {string} fromTowerDefId  drives which procedural sprite to draw
  * @property {string|null} targetEnemyId
  */
@@ -76,8 +76,8 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  * the sim's own cash/lives/hp fields are always the source of truth.
  * @typedef {object} SnapshotEvent
  * @property {'damageDealt'|'kill'|'leak'|'abilityCast'|'towerPlaced'|'towerSold'} type
- * @property {number} x  fixed-point
- * @property {number} y  fixed-point
+ * @property {import('../sim/core/fixed.js').Fixed} x
+ * @property {import('../sim/core/fixed.js').Fixed} y
  * @property {number} [amount]      damageDealt: the number to float; leak: lives lost
  * @property {string} [enemyDefId]  kill, leak
  * @property {string} [towerDefId]  abilityCast, towerPlaced, towerSold
@@ -104,14 +104,21 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  * Every mutation the UI is allowed to request. submitCommand only enqueues; it
  * never applies a command synchronously, so every mutation still happens at a
  * tick boundary and stays replayable.
- * @typedef {
- *   { type: 'placeTower', defId: string, x: number, y: number } |
- *   { type: 'sellTower', towerId: string } |
- *   { type: 'upgradeTower', towerId: string } |
- *   { type: 'setTargetingMode', towerId: string, mode: TargetingMode } |
- *   { type: 'castAbility', towerId: string } |
- *   { type: 'skipIntermission' }
- * } Command
+ *
+ * Written as one named member per line rather than as a single multi-line union.
+ * A `@typedef` whose type expression spans lines does not parse: the compiler stops
+ * at the first line break with "'}' expected" and then cannot find `Command`
+ * anywhere, so every signature mentioning it silently loses its type. Placement
+ * coordinates here are MAP UNITS, because this is what a click turns into, before
+ * anything has been scaled.
+ *
+ * @typedef {{ type: 'placeTower', defId: string, x: number, y: number }} PlaceTowerCommand
+ * @typedef {{ type: 'sellTower', towerId: string }} SellTowerCommand
+ * @typedef {{ type: 'upgradeTower', towerId: string }} UpgradeTowerCommand
+ * @typedef {{ type: 'setTargetingMode', towerId: string, mode: TargetingMode }} SetTargetingCommand
+ * @typedef {{ type: 'castAbility', towerId: string }} CastAbilityCommand
+ * @typedef {{ type: 'skipIntermission' }} SkipIntermissionCommand
+ * @typedef {PlaceTowerCommand|SellTowerCommand|UpgradeTowerCommand|SetTargetingCommand|CastAbilityCommand|SkipIntermissionCommand} Command
  */
 
 /**

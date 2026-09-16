@@ -80,12 +80,24 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 
 ## Known open gaps
 
-- [ ]  and  are outside the TypeScript check. They were written on a
-  branch while the check covered only the simulation and its data, and they do not
-  pass it: JSDoc generics on a constructor, a canvas context used without a null
-  check, and a pool whose element type does not flow through. They are covered by 51
-  behaviour checks, which is not the same thing. Bringing them in is real work and is
-  recorded here rather than hidden by loosening the check until it goes quiet.
+- [ ] Most of `src/render` and `src/ui` are still outside the TypeScript check. They
+  were written while it covered the simulation and its data only, and bringing the
+  whole of both directories in at once reports 800 errors: about 520 are missing
+  annotations rather than defects, and roughly 280 are real (values used without a null
+  check, properties read off the wrong shape, types that do not flow through). They are
+  covered by behaviour checks, which is not the same thing.
+
+  It is now a ratchet rather than an open hole. `tsconfig.render.json` carries an
+  explicit list of the files that DO pass, runs as part of `npm run typecheck`, and
+  `tests/ui/typecheck-ratchet.test.js` refuses to let a file be quietly dropped from
+  that list to make a red check green. Five files are in so far:
+  `interpolation.js`, `sim-interface.js`, `sim-source.js`, `view-model.js` and
+  `targeting.js`. The remaining 38 go in one at a time.
+
+  Bringing the first of them in paid for itself immediately. `sim-interface.js` carried
+  a `@typedef` whose type expression spanned several lines, which does not parse: the
+  compiler stopped at the first line break and then could not find `Command` anywhere,
+  so every signature mentioning it had silently lost its type.
 
 ## Deliberately not doing
 

@@ -13,17 +13,34 @@ export const FIXED_SHIFT = 10;
 export const FIXED_ONE = 1 << FIXED_SHIFT; // 1024
 
 /**
+ * A number that has ALREADY been scaled into 1/1024 map-unit steps.
+ *
+ * It is a plain number at run time; the brand exists only so the compiler can tell a
+ * scaled value from an unscaled one. That distinction is worth having because losing
+ * it produced the single worst defect this project has had: the snapshot converted to
+ * map units and the view model converted the result again, so every tower, enemy and
+ * projectile was drawn a thousandth of the way from the map origin. Nothing threw.
+ * No check went red. The screen was simply empty except for the terrain, and it took a
+ * debugger attached to the running program to find out why.
+ *
+ * With the brand, converting twice is `fromFixed(number)` where a `Fixed` is required,
+ * which the compiler refuses.
+ *
+ * @typedef {number & { readonly __fixedPoint: unique symbol }} Fixed
+ */
+
+/**
  * Map-unit float to fixed-point integer.
  * @param {number} value
- * @returns {number}
+ * @returns {Fixed}
  */
 export function toFixed(value) {
-  return Math.round(value * FIXED_ONE);
+  return /** @type {Fixed} */ (Math.round(value * FIXED_ONE));
 }
 
 /**
  * Fixed-point integer back to map-unit float. Rendering only, never simulation.
- * @param {number} value
+ * @param {Fixed} value
  * @returns {number}
  */
 export function fromFixed(value) {
