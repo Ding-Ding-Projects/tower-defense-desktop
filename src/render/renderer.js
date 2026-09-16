@@ -1,43 +1,60 @@
 /**
- * The canvas renderer. Draws the lane, placement zones, towers, enemies,
- * projectiles, range circles, health bars, status icons, floating damage
- * numbers and the leak flash from a ViewModel (see view-model.js) each frame.
+ * The canvas renderer.
  *
- * This module is runtime/canvas-facing and is not covered by node --test — see
- * the top of tests/ui for why (canvas pixels are not something a unit test can
- * meaningfully assert on) and see docs/features/interface.md for how it is
- * verified instead (screenshots of the built app).
+ * Draws the terrain, the worn track, the placement zones, the towers, the enemies,
+ * the projectiles and their effects, then hands the frame to the in-canvas interface
+ * layer which draws the shop, the heads-up display and the panels on top.
+ *
+ * All the drawing itself lives in ./art. This file's job is the geometry: where each
+ * thing is on screen, how big it is, which way it faces, and how far through its walk
+ * cycle it has got. Keeping those apart is what lets the art be checked without a
+ * canvas and the placement be checked without a picture.
+ *
+ * This module is runtime and canvas facing, so it is not covered by node --test. It is
+ * verified by driving the real built program headlessly and capturing the window.
  */
 
 import { worldToScreen } from './camera.js';
 import { fromFixed } from '../sim/core/fixed.js';
-import { getCachedSprite, drawTowerSprite, drawEnemySprite, towerSpriteSignature, enemySpriteSignature } from './procedural-draw.js';
-
-/**
- * Sprites are cached at this pixel resolution and then scaled to their world size.
- * It is a texture resolution, NOT a size on screen.
- */
-const SPRITE_PX = 96;
+import {
+  getTerrainSprite,
+  drawPath,
+  getTowerSprite,
+  getEnemySprite,
+  drawMuzzleFlash,
+  drawImpactSpark,
+  drawExplosion,
+  drawLeakFlash,
+  TOWER_WORLD_SIZE,
+  ENEMY_WORLD_SIZE,
+  PROJECTILE_WORLD_SIZE,
+} from './art/index.js';
 
 /**
  * Sizes are in MAP UNITS, multiplied by the camera zoom at draw time.
  *
- * The camera zoom is pixels per map unit and sits around seven on a normal window,
- * so a constant that quietly assumed a zoom of one drew a 650 pixel tower and a 150
- * pixel health bar. Everything on this screen is measured in the same units the
- * simulation and the tower ranges are quoted in, which is the only way a range circle
- * and the tower it belongs to can agree.
+ * The camera zoom is pixels per map unit and sits around seven on a normal window, so
+ * a constant that quietly assumed a zoom of one drew a 650 pixel tower and a 150 pixel
+ * health bar. Everything visible is measured in the units the simulation uses and
+ * tower ranges are published in, which is the only way a range circle and the tower it
+ * belongs to can agree about where it ends.
+ *
+ * The art module publishes its own world sizes; these scale them for this map's
+ * proportions, where two hundred units span a couple of thousand pixels.
  */
 const WORLD = Object.freeze({
-  tower: 4.6,
-  enemy: 3.4,
-  projectile: 0.45,
+  tower: TOWER_WORLD_SIZE * 1.6,
+  enemy: ENEMY_WORLD_SIZE * 2.1,
+  projectile: PROJECTILE_WORLD_SIZE,
   particle: 0.35,
-  laneWidth: 9,
-  healthBarWidth: 3.2,
+  laneWidth: 4.5,
+  healthBarWidth: 2.6,
   healthBarHeight: 0.45,
-  healthBarGap: 0.6,
+  healthBarGap: 0.5,
 });
+
+/** Sprite texture resolution. NOT a size on screen. */
+const SPRITE_PX = 128;
 
 export class CanvasRenderer {
   /**
@@ -54,6 +71,24 @@ export class CanvasRenderer {
     this.placingTowerDefId = null;
     this.reducedMotion = false;
     this._leakFlashUntil = 0;
+
+    /**
+     * Per-enemy walk phase, last position and facing.
+     *
+     * The phase advances by the distance the enemy actually moved, not by elapsed
+     * time, so a fast enemy takes quicker steps and a lumbering one takes slow ones
+     * without either being told its own speed. Facing comes from the same delta, so
+     * everything turns to look where it is going.
+     * @type {Map<number, { phase: number, x: number, y: number, facing: number }>}
+     */
+    this._gait = new Map();
+
+    /** Transient effects: a position, a kind and a start time. */
+    this._effects = [];
+
+    /** The in-canvas interface, drawn last so it sits above the battlefield. */
+    this.interfaceLayer = null;
+    this.interfaceState = null;
   }
 
   resize(cssWidth, cssHeight, devicePixelRatio = window.devicePixelRatio || 1) {
@@ -75,61 +110,70 @@ export class CanvasRenderer {
     const ctx = this.ctx;
     const w = this.cssWidth;
     const h = this.cssHeight;
+    const now = performance.now();
 
     ctx.save();
     ctx.scale(this.dpr, this.dpr);
-    ctx.fillStyle = '#0f1115';
-    ctx.fillRect(0, 0, w, h);
 
+    this._drawGround(camera, w, h);
+    this._drawTrack(camera, w, h);
     this._drawZones(camera, w, h);
-    this._drawLane(camera, w, h);
 
-    for (const event of viewModel.events) {
-      this._handleEvent(event, particles);
-    }
+    for (const event of viewModel.events) this._handleEvent(event, particles, now);
 
-    for (const tower of viewModel.towers) {
-      this._drawTower(tower, camera, w, h);
-    }
-    for (const enemy of viewModel.enemies) {
-      this._drawEnemy(enemy, camera, w, h);
-    }
-    for (const proj of viewModel.projectiles) {
-      this._drawProjectile(proj, camera, w, h);
-    }
+    for (const tower of viewModel.towers) this._drawTower(tower, viewModel, camera, w, h);
+    for (const enemy of viewModel.enemies) this._drawEnemy(enemy, camera, w, h);
+    for (const proj of viewModel.projectiles) this._drawProjectile(proj, camera, w, h);
 
+    this._drawEffects(camera, w, h, now);
     particles.forEachParticle((p) => this._drawParticle(p, camera, w, h));
     particles.forEachDamageNumber((d) => this._drawDamageNumber(d, camera, w, h));
 
-    if (performance.now() < this._leakFlashUntil) {
-      ctx.fillStyle = 'rgba(179, 38, 30, 0.25)';
-      ctx.fillRect(0, 0, w, h);
+    this._forgetDepartedEnemies(viewModel);
+
+    if (this.interfaceLayer && this.interfaceState) {
+      this.interfaceLayer.draw(ctx, { x: 0, y: 0, width: w, height: h }, this.interfaceState);
+    }
+
+    if (now < this._leakFlashUntil) {
+      drawLeakFlash(ctx, w, h, 1 - (this._leakFlashUntil - now) / 260);
     }
 
     ctx.restore();
   }
 
-  _handleEvent(event, particles) {
-    if (this.reducedMotion) return;
-    // Converted through the shared helper, not a hardcoded 1024. A second copy of
-    // that constant is a second place to be wrong when the precision changes.
-    const { x, y } = { x: fromFixed(event.x), y: fromFixed(event.y) };
-    if (event.type === 'damageDealt') {
-      particles.emitDamageNumber(x, y, event.amount, 'damage');
-      particles.emitBurst(x, y, '#f2b8b5', 4);
-    } else if (event.type === 'kill') {
-      particles.emitBurst(x, y, '#ffd166', 10);
-    } else if (event.type === 'leak') {
-      this._leakFlashUntil = performance.now() + 260;
+  /** The ground, generated once per map and then blitted. */
+  _drawGround(camera, w, h) {
+    const ctx = this.ctx;
+    ctx.fillStyle = '#0b0d10';
+    ctx.fillRect(0, 0, w, h);
+    const topLeft = worldToScreen(camera, w, h, 0, 0);
+    const bottomRight = worldToScreen(camera, w, h, this.mapDef.width, this.mapDef.height);
+    const sprite = getTerrainSprite(this.mapDef.id, this.mapDef.width, this.mapDef.height);
+    ctx.drawImage(
+      sprite,
+      topLeft.x,
+      topLeft.y,
+      bottomRight.x - topLeft.x,
+      bottomRight.y - topLeft.y,
+    );
+  }
+
+  _drawTrack(camera, w, h) {
+    for (const lane of this.mapDef.lanes) {
+      const points = lane.waypoints.map((wp) => worldToScreen(camera, w, h, wp.x, wp.y));
+      drawPath(this.ctx, points, WORLD.laneWidth * camera.zoom, this.mapDef.id, {});
     }
   }
 
   _drawZones(camera, w, h) {
     if (!this.placingTowerDefId) return;
     const ctx = this.ctx;
-    ctx.fillStyle = 'rgba(103, 80, 164, 0.18)';
-    ctx.strokeStyle = 'rgba(103, 80, 164, 0.6)';
-    ctx.lineWidth = 2;
+    ctx.save();
+    ctx.fillStyle = 'rgba(122, 214, 138, 0.16)';
+    ctx.strokeStyle = 'rgba(122, 214, 138, 0.7)';
+    ctx.lineWidth = Math.max(1, 0.2 * camera.zoom);
+    ctx.setLineDash([0.9 * camera.zoom, 0.7 * camera.zoom]);
     for (const zone of this.mapDef.placementZones) {
       ctx.beginPath();
       zone.polygon.forEach(([x, y], i) => {
@@ -141,54 +185,71 @@ export class CanvasRenderer {
       ctx.fill();
       ctx.stroke();
     }
+    ctx.restore();
   }
 
-  _drawLane(camera, w, h) {
-    const ctx = this.ctx;
-    ctx.strokeStyle = '#3a3f4b';
-    ctx.lineWidth = WORLD.laneWidth * camera.zoom;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    for (const lane of this.mapDef.lanes) {
-      ctx.beginPath();
-      lane.waypoints.forEach((wp, i) => {
-        const p = worldToScreen(camera, w, h, wp.x, wp.y);
-        if (i === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
-      });
-      ctx.stroke();
-    }
-  }
-
-  _drawTower(tower, camera, w, h) {
+  /**
+   * A tower points at whatever it would actually be shooting: the nearest enemy inside
+   * its range. Without this every turret faces the same way and the battlefield reads
+   * as a diagram of towers rather than a fight.
+   */
+  _drawTower(tower, viewModel, camera, w, h) {
     const def = this.gameData.towers.get(tower.defId);
     if (!def) return;
     const levelDef = def.levels[tower.level];
+    if (!levelDef) return;
+
     const p = worldToScreen(camera, w, h, tower.x, tower.y);
     const size = WORLD.tower * camera.zoom;
-    const sprite = getCachedSprite(towerSpriteSignature(def, tower.level), SPRITE_PX, (ctx) => drawTowerSprite(ctx, SPRITE_PX, def, levelDef));
+
+    let facing = 0;
+    let nearest = Infinity;
+    for (const enemy of viewModel.enemies) {
+      const dx = enemy.x - tower.x;
+      const dy = enemy.y - tower.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance <= levelDef.range && distance < nearest) {
+        nearest = distance;
+        facing = Math.atan2(dy, dx);
+      }
+    }
 
     if (tower.id === this.selectedTowerId) {
       const ctx = this.ctx;
+      ctx.save();
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(208, 188, 255, 0.85)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(208, 188, 255, 0.75)';
+      ctx.fillStyle = 'rgba(208, 188, 255, 0.07)';
+      ctx.lineWidth = Math.max(1, 0.18 * camera.zoom);
       ctx.arc(p.x, p.y, levelDef.range * camera.zoom, 0, Math.PI * 2);
+      ctx.fill();
       ctx.stroke();
+      ctx.restore();
     }
 
+    const sprite = getTowerSprite(def, levelDef, SPRITE_PX, facing);
     this.ctx.drawImage(sprite, p.x - size / 2, p.y - size / 2, size, size);
   }
 
   _drawEnemy(enemy, camera, w, h) {
     const def = this.gameData.enemies.get(enemy.defId);
     if (!def) return;
+
+    const gait = this._advanceGait(enemy);
     const p = worldToScreen(camera, w, h, enemy.x, enemy.y);
     const size = WORLD.enemy * camera.zoom;
-    const sprite = getCachedSprite(enemySpriteSignature(def), SPRITE_PX, (ctx) => drawEnemySprite(ctx, SPRITE_PX, def));
+    const hpRatio = Math.max(0, Math.min(1, enemy.hpCurrent / Math.max(1, enemy.hpMax)));
+
+    const sprite = getEnemySprite(def, SPRITE_PX, gait.phase, gait.facing, hpRatio);
     this.ctx.drawImage(sprite, p.x - size / 2, p.y - size / 2, size, size);
 
-    this._drawHealthBar(p.x, p.y - size / 2 - WORLD.healthBarGap * camera.zoom, WORLD.healthBarWidth * camera.zoom, enemy.hpCurrent / Math.max(1, enemy.hpMax), camera.zoom);
+    this._drawHealthBar(
+      p.x,
+      p.y - size / 2 - WORLD.healthBarGap * camera.zoom,
+      WORLD.healthBarWidth * camera.zoom,
+      hpRatio,
+      camera.zoom,
+    );
 
     let iconX = p.x - size / 2;
     for (const status of enemy.statuses) {
@@ -197,58 +258,157 @@ export class CanvasRenderer {
     }
   }
 
+  /**
+   * Advance the walk cycle by the distance actually covered, and face the direction of
+   * travel. Driving the gait from elapsed time instead would make a lumbering boss and
+   * a sprinting runner step at exactly the same rate, which reads as a sliding sprite
+   * rather than a walking thing.
+   */
+  _advanceGait(enemy) {
+    const previous = this._gait.get(enemy.id);
+    if (!previous) {
+      const fresh = { phase: 0, x: enemy.x, y: enemy.y, facing: 0 };
+      this._gait.set(enemy.id, fresh);
+      return fresh;
+    }
+    const dx = enemy.x - previous.x;
+    const dy = enemy.y - previous.y;
+    const moved = Math.hypot(dx, dy);
+    if (moved > 0.0001) {
+      previous.facing = Math.atan2(dy, dx);
+      // One full stride per map unit and a half, so the step length is believable at
+      // the scale everything else is drawn at.
+      previous.phase = (previous.phase + moved / 1.5) % 1;
+    }
+    previous.x = enemy.x;
+    previous.y = enemy.y;
+    return previous;
+  }
+
+  /** Forget gait state for anything dead or leaked, so the map cannot grow forever. */
+  _forgetDepartedEnemies(viewModel) {
+    if (this._gait.size <= viewModel.enemies.length) return;
+    const alive = new Set(viewModel.enemies.map((e) => e.id));
+    for (const id of this._gait.keys()) {
+      if (!alive.has(id)) this._gait.delete(id);
+    }
+  }
+
+  _handleEvent(event, particles, now) {
+    const x = fromFixed(event.x);
+    const y = fromFixed(event.y);
+    if (event.type === 'leak') {
+      this._leakFlashUntil = now + 260;
+      return;
+    }
+    if (this.reducedMotion) return;
+    if (event.type === 'damageDealt') {
+      particles.emitDamageNumber(x, y, event.amount, 'damage');
+      this._effects.push({ kind: 'spark', x, y, start: now, life: 220 });
+    } else if (event.type === 'kill') {
+      this._effects.push({ kind: 'explosion', x, y, start: now, life: 420, radius: 1.6 });
+    } else if (event.type === 'towerFired') {
+      this._effects.push({ kind: 'muzzle', x, y, angle: event.angle ?? 0, start: now, life: 120 });
+    }
+  }
+
+  _drawEffects(camera, w, h, now) {
+    const ctx = this.ctx;
+    const surviving = [];
+    for (const effect of this._effects) {
+      const t = (now - effect.start) / effect.life;
+      if (t >= 1) continue;
+      const p = worldToScreen(camera, w, h, effect.x, effect.y);
+      const size = camera.zoom;
+      if (effect.kind === 'spark') drawImpactSpark(ctx, p.x, p.y, t, size);
+      else if (effect.kind === 'explosion') {
+        drawExplosion(ctx, p.x, p.y, (effect.radius ?? 1.5) * camera.zoom, t, size);
+      } else if (effect.kind === 'muzzle') drawMuzzleFlash(ctx, p.x, p.y, effect.angle, t, size);
+      surviving.push(effect);
+    }
+    this._effects = surviving;
+  }
+
   _drawHealthBar(cx, y, width, ratio, zoom) {
     const ctx = this.ctx;
-    // Sized in map units like everything else. A pixel floor here quietly undoes
-    // the world sizing at low zoom and puts a bar wider than its own enemy.
+    // Sized in map units like everything else. A pixel floor here quietly undoes the
+    // world sizing at low zoom and puts a bar wider than its own enemy.
     const barWidth = width;
     const barHeight = Math.max(2, WORLD.healthBarHeight * zoom);
     const x = cx - barWidth / 2;
-    ctx.fillStyle = '#2b2d33';
-    ctx.fillRect(x, y, barWidth, barHeight);
     const clamped = Math.min(1, Math.max(0, ratio));
-    ctx.fillStyle = clamped > 0.5 ? '#4caf50' : clamped > 0.2 ? '#ffb300' : '#e53935';
+    ctx.save();
+    ctx.fillStyle = 'rgba(8, 10, 13, 0.75)';
+    ctx.fillRect(x - 1, y - 1, barWidth + 2, barHeight + 2);
+    ctx.fillStyle = '#23262d';
+    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fillStyle = clamped > 0.5 ? '#5fd37a' : clamped > 0.2 ? '#ffb300' : '#e5484d';
     ctx.fillRect(x, y, barWidth * clamped, barHeight);
+    ctx.restore();
   }
 
   _drawStatusIcon(x, y, status, zoom) {
     const ctx = this.ctx;
+    const colours = {
+      stun: '#ffd166',
+      slow: '#7ec8e3',
+      freeze: '#9fe3ff',
+      burn: '#ff8a4c',
+      poison: '#8ad06a',
+      exposed: '#d6a2ff',
+      haste: '#ff6b9d',
+    };
+    ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, Math.max(2, 0.3 * zoom), 0, Math.PI * 2);
-    ctx.fillStyle = '#79747e';
+    ctx.fillStyle = colours[status.id] ?? '#9aa0a6';
     ctx.fill();
+    ctx.restore();
   }
 
   _drawProjectile(proj, camera, w, h) {
     const p = worldToScreen(camera, w, h, proj.x, proj.y);
     const ctx = this.ctx;
+    const r = Math.max(1.5, WORLD.projectile * camera.zoom);
+    ctx.save();
     ctx.beginPath();
-    ctx.arc(p.x, p.y, WORLD.projectile * camera.zoom, 0, Math.PI * 2);
-    ctx.fillStyle = '#f7d548';
+    ctx.arc(p.x, p.y, r * 2.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(247, 213, 72, 0.25)';
     ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffe89a';
+    ctx.fill();
+    ctx.restore();
   }
 
   _drawParticle(p, camera, w, h) {
     const screen = worldToScreen(camera, w, h, p.x, p.y);
     const alpha = Math.max(0, 1 - p.age / p.life);
     const ctx = this.ctx;
+    ctx.save();
     ctx.globalAlpha = alpha;
     ctx.beginPath();
-    ctx.arc(screen.x, screen.y, WORLD.particle * camera.zoom, 0, Math.PI * 2);
+    ctx.arc(screen.x, screen.y, Math.max(1, WORLD.particle * camera.zoom), 0, Math.PI * 2);
     ctx.fillStyle = p.color;
     ctx.fill();
-    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
   _drawDamageNumber(d, camera, w, h) {
     const screen = worldToScreen(camera, w, h, d.x, d.y);
     const alpha = Math.max(0, 1 - d.age / d.life);
+    const rise = (d.age / d.life) * 1.4 * camera.zoom;
     const ctx = this.ctx;
+    ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '600 13px "Roboto", system-ui, sans-serif';
+    ctx.font = `600 ${Math.max(10, 0.9 * camera.zoom)}px system-ui, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(`-${Math.round(d.amount)}`, screen.x, screen.y);
-    ctx.globalAlpha = 1;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.strokeText(String(d.amount), screen.x, screen.y - rise);
+    ctx.fillStyle = '#ffd9d9';
+    ctx.fillText(String(d.amount), screen.x, screen.y - rise);
+    ctx.restore();
   }
 }

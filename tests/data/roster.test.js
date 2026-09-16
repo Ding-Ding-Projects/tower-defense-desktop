@@ -129,7 +129,7 @@ test('every map has somewhere the cheapest tower can actually shoot the lane fro
 
 test('a real match on real data actually kills things', () => {
   const match = createMatch({ gameData: data, seed: 2026, mapId: 'crossroads', difficultyId: 'casual' });
-  for (const [towerId, x, y] of [['scout', 20, 70], ['scout', 30, 70], ['scout', 60, 68]]) {
+  for (const [towerId, x, y] of [['scout', 8, 36], ['scout', 15, 36], ['scout', 30, 34]]) {
     submitCommand(match, 'PlaceTower', { towerId, x, y });
   }
   runTicks(match, 5);
@@ -157,7 +157,7 @@ test('a real match on real data is still deterministic', () => {
 test('a difficulty that bans a tower really refuses it', () => {
   const match = createMatch({ gameData: data, seed: 1, mapId: 'crossroads', difficultyId: 'hardcore' });
   match.state.cash = 99999;
-  const verdict = canPlace(match.state, data, 'scout', 20, 70);
+  const verdict = canPlace(match.state, data, 'scout', 8, 36);
   assert.equal(verdict.ok, false);
   assert.match(verdict.reason, /not allowed on this difficulty/);
 });

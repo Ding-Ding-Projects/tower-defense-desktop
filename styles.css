@@ -106,21 +106,20 @@ html, body {
 }
 
 /* ---- game layout ---- */
+/* The canvas takes the whole window. The shop, the heads-up display and every
+   panel are drawn inside it now, so reserving a sidebar column here would leave a
+   black band down the side of the game. */
 .game-layout {
   position: relative;
   flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr var(--sidebar-width);
-  grid-template-rows: 1fr;
+  display: block;
 }
 
 .game-canvas {
-  grid-column: 1;
-  grid-row: 1;
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
   outline-offset: -3px;
 }
 .game-canvas:focus-visible {

@@ -29,7 +29,7 @@ const data = loadGameData();
 
 function playingMatch(ticks = TICK_RATE * 14) {
   const match = createMatch({ gameData: data, seed: 5, mapId: 'crossroads', difficultyId: 'easy' });
-  submitCommand(match, 'PlaceTower', { towerId: 'scout', x: 20, y: 70 });
+  submitCommand(match, 'PlaceTower', { towerId: 'scout', x: 8, y: 36 });
   runTicks(match, ticks);
   return match;
 }
@@ -109,7 +109,7 @@ test('a real snapshot through the real view model lands on the map, not in its c
 
 test('a tower placed at a known spot appears there, and not somewhere else', () => {
   const match = createMatch({ gameData: data, seed: 9, mapId: 'crossroads', difficultyId: 'easy' });
-  submitCommand(match, 'PlaceTower', { towerId: 'scout', x: 20, y: 70 });
+  submitCommand(match, 'PlaceTower', { towerId: 'scout', x: 8, y: 36 });
   runTicks(match, 4);
 
   const a = snapshot(match.state);
@@ -119,8 +119,8 @@ test('a tower placed at a known spot appears there, and not somewhere else', () 
 
   assert.equal(view.towers.length, 1);
   const tower = view.towers[0];
-  assert.ok(Math.abs(tower.x - 20) < 0.5, 'placed at x=20, drew at x=' + tower.x);
-  assert.ok(Math.abs(tower.y - 70) < 0.5, 'placed at y=70, drew at y=' + tower.y);
+  assert.ok(Math.abs(tower.x - 8) < 0.5, 'placed at x=8, drew at x=' + tower.x);
+  assert.ok(Math.abs(tower.y - 36) < 0.5, 'placed at y=36, drew at y=' + tower.y);
 });
 
 test('enemies move between snapshots, so the interface has something to interpolate', () => {

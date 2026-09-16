@@ -2,35 +2,35 @@
   "id": "riverbend",
   "displayName": "Riverbend",
   "baseLives": 100,
-  "width": 220,
-  "height": 120,
+  "width": 110,
+  "height": 60,
   "lanes": [
     {
       "id": "main",
       "waypoints": [
         {
           "x": 0,
-          "y": 30
+          "y": 15
         },
         {
-          "x": 70,
-          "y": 30
+          "x": 35,
+          "y": 15
         },
         {
-          "x": 70,
-          "y": 90
+          "x": 35,
+          "y": 45
         },
         {
-          "x": 150,
-          "y": 90
+          "x": 75,
+          "y": 45
         },
         {
-          "x": 150,
-          "y": 35
+          "x": 75,
+          "y": 17.5
         },
         {
-          "x": 220,
-          "y": 35
+          "x": 110,
+          "y": 17.5
         }
       ]
     }
@@ -41,20 +41,20 @@
       "terrain": "ground",
       "polygon": [
         [
-          4,
-          16
+          2,
+          8
         ],
         [
-          64,
-          16
+          32,
+          8
         ],
         [
-          64,
-          24
+          32,
+          12
         ],
         [
-          4,
-          24
+          2,
+          12
         ]
       ]
     },
@@ -63,20 +63,20 @@
       "terrain": "ground",
       "polygon": [
         [
-          4,
-          36
+          2,
+          18
         ],
         [
-          62,
-          36
+          31,
+          18
         ],
         [
-          62,
-          46
+          31,
+          23
         ],
         [
-          4,
-          46
+          2,
+          23
         ]
       ]
     },
@@ -85,20 +85,20 @@
       "terrain": "ground",
       "polygon": [
         [
-          56,
-          52
+          28,
+          26
         ],
         [
-          64,
-          52
+          32,
+          26
         ],
         [
-          64,
-          82
+          32,
+          41
         ],
         [
-          56,
-          82
+          28,
+          41
         ]
       ]
     },
@@ -107,20 +107,20 @@
       "terrain": "ground",
       "polygon": [
         [
-          78,
-          48
+          39,
+          24
         ],
         [
-          142,
-          48
+          71,
+          24
         ],
         [
-          142,
-          60
+          71,
+          30
         ],
         [
-          78,
-          60
+          39,
+          30
         ]
       ]
     },
@@ -129,20 +129,20 @@
       "terrain": "water",
       "polygon": [
         [
-          78,
-          96
+          39,
+          48
         ],
         [
-          142,
-          96
+          71,
+          48
         ],
         [
-          142,
-          112
+          71,
+          56
         ],
         [
-          78,
-          112
+          39,
+          56
         ]
       ]
     },
@@ -151,20 +151,20 @@
       "terrain": "ground",
       "polygon": [
         [
-          156,
-          50
+          78,
+          25
         ],
         [
-          166,
-          50
+          83,
+          25
         ],
         [
-          166,
-          84
+          83,
+          42
         ],
         [
-          156,
-          84
+          78,
+          42
         ]
       ]
     },
@@ -173,20 +173,20 @@
       "terrain": "ground",
       "polygon": [
         [
-          172,
-          42
+          86,
+          21
         ],
         [
-          214,
-          42
+          107,
+          21
         ],
         [
-          214,
-          54
+          107,
+          27
         ],
         [
-          172,
-          54
+          86,
+          27
         ]
       ]
     },
@@ -195,26 +195,26 @@
       "terrain": "cliff",
       "polygon": [
         [
-          172,
-          16
+          86,
+          8
         ],
         [
-          214,
-          16
+          107,
+          8
         ],
         [
-          214,
-          28
+          107,
+          14
         ],
         [
-          172,
-          28
+          86,
+          14
         ]
       ]
     }
   ],
   "source": {
     "origin": "engine-default",
-    "reason": "an original layout authored for this project, not a reproduction of any map from the source game. Zones hug the lane because tower ranges are in the same units as the map, and a zone placed further away than the cheapest tower can shoot is a zone nothing can be usefully built in"
+    "reason": "an original layout authored for this project, not a reproduction of any map from the source game. Zones hug the lane because tower ranges are in the same units as the map, and a zone placed further away than the cheapest tower can shoot is a zone nothing can be usefully built in. Coordinates are in the same units tower ranges are published in, so the map is sized so a cheap tower covers a meaningful share of it rather than six percent of its width"
   }
 }

@@ -17,10 +17,7 @@ import { RenderLoop } from '../render/loop.js';
 import { createCamera, clampCamera, panCamera, zoomCamera, screenToWorld } from '../render/camera.js';
 import { fromFixed } from '../sim/core/fixed.js';
 import { createTitleBar } from './titlebar.js';
-import { Hud } from './hud.js';
-import { ShopPanel } from './shop.js';
-import { SelectedTowerPanel } from './selected-tower-panel.js';
-import { GameStateOverlays } from './game-states.js';
+import { InterfaceLayer } from '../render/hud/interface-layer.js';
 import { PauseAndSettings } from './pause-settings.js';
 import { ALL_TARGETING_MODES, cycleTargetingMode } from './targeting.js';
 
@@ -56,24 +53,16 @@ export function bootstrap(doc = document) {
   canvas.setAttribute('role', 'application');
   canvas.setAttribute('aria-label', 'Tower defence battlefield. Use the shop and tower panel to play; arrow keys pan the camera, +/- zoom.');
 
-  const sidebar = doc.createElement('aside');
-  sidebar.className = 'sidebar';
-  const shop = new ShopPanel(doc);
-  const towerPanel = new SelectedTowerPanel(doc);
-  sidebar.append(shop.el, towerPanel.el);
-
-  const hud = new Hud(doc);
-
-  const pauseButton = doc.createElement('md3-icon-button');
-  pauseButton.setAttribute('icon', 'pause');
-  pauseButton.setAttribute('aria-label', 'Pause');
-  pauseButton.className = 'pause-button';
-
-  main.append(canvas, sidebar, hud.el, pauseButton);
+  // The shop, the heads-up display, the tower panel and the wave overlays used to be
+  // HTML alongside the canvas, which made the whole thing read as a web page with a
+  // sidebar rather than as a game. They are now drawn inside the canvas, in the game's
+  // own style, by the interface layer below. The canvas gets the whole window.
+  main.append(canvas);
   root.appendChild(main);
 
-  const overlays = new GameStateOverlays(doc);
-  overlays.mount(root);
+  const interfaceLayer = new InterfaceLayer({ doc });
+  interfaceLayer.mountAccessibilityMirror(root);
+
   const pauseSettings = new PauseAndSettings(doc);
   pauseSettings.mount(root);
 
@@ -83,6 +72,7 @@ export function bootstrap(doc = document) {
   const renderer = new CanvasRenderer(canvas, gameData, mapDef);
   const loop = new RenderLoop(renderer);
   renderer.reducedMotion = reducedMotionQuery?.matches ?? false;
+  renderer.interfaceLayer = interfaceLayer;
 
   let fittedOnce = false;
   let camera = createCamera({ x: mapDef.width / 2, y: mapDef.height / 2, zoom: 1 });
@@ -122,22 +112,96 @@ export function bootstrap(doc = document) {
   }
   window.addEventListener('resize', resize);
 
+
+  /**
+   * Every action the interface can produce, from a pointer or from the hidden
+   * accessibility mirror. Both routes land here so a keyboard user and a mouse user
+   * cannot drift apart.
+   * @param {{ kind: string } & Record<string, any>} action
+   */
+  function handleInterfaceAction(action) {
+    switch (action.kind) {
+      case 'buyTower':
+        placingTowerDefId = action.towerId;
+        renderer.placingTowerDefId = placingTowerDefId;
+        selectedTowerId = null;
+        renderer.selectedTowerId = null;
+        break;
+      case 'upgradeTower':
+        if (selectedTowerId !== null) sim.submitCommand(matchState, { kind: 'upgradeTower', towerId: selectedTowerId });
+        break;
+      case 'sellTower':
+        if (selectedTowerId !== null) {
+          sim.submitCommand(matchState, { kind: 'sellTower', towerId: selectedTowerId });
+          selectedTowerId = null;
+          renderer.selectedTowerId = null;
+        }
+        break;
+      case 'useAbility':
+        if (selectedTowerId !== null) sim.submitCommand(matchState, { kind: 'castAbility', towerId: selectedTowerId });
+        break;
+      case 'cycleTargeting': {
+        if (selectedTowerId === null) break;
+        const snap = sim.snapshot(matchState);
+        const tower = snap.towers.find((t) => t.id === selectedTowerId);
+        if (!tower) break;
+        const def = gameData.towers.get(tower.defId);
+        const next = cycleTargetingMode(tower.targetingMode, def.targetingModes ?? ALL_TARGETING_MODES, 1);
+        sim.submitCommand(matchState, { kind: 'setTargetingMode', towerId: selectedTowerId, mode: next });
+        break;
+      }
+      case 'skipIntermission':
+        sim.submitCommand(matchState, { kind: 'skipIntermission' });
+        break;
+      case 'togglePause':
+        paused = !paused;
+        if (paused) pauseSettings.openPause();
+        break;
+      case 'dismissOverlay':
+        interfaceLayer.dismissOverlay?.();
+        break;
+      case 'overlayBlocked':
+        // A click inside a modal overlay that missed its button. Swallowed on
+        // purpose so it never falls through to the battlefield underneath.
+        break;
+      default:
+        break;
+    }
+  }
+
+  root.addEventListener('interface-action', (e) => handleInterfaceAction(e.detail));
   // --- input: pan, zoom, select/place ---
   let isDragging = false;
   let dragLast = null;
 
+  /** Canvas-local coordinates, the same space the interface layer lays itself out in. */
+  function localPoint(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
   canvas.addEventListener('pointerdown', (e) => {
     canvas.focus();
+    const local = localPoint(e);
+    // The interface is drawn inside the canvas, so a click has to be offered to it
+    // before the battlefield. Dragging the map from underneath a panel would be a
+    // surprising way to lose a placement.
+    if (interfaceLayer.hitTest(local.x, local.y)) return;
     isDragging = true;
     dragLast = { x: e.clientX, y: e.clientY };
   });
   canvas.addEventListener('pointerup', (e) => {
     const moved = dragLast && Math.hypot(e.clientX - dragLast.x, e.clientY - dragLast.y) > 4;
     isDragging = false;
+    const local = localPoint(e);
+    const action = interfaceLayer.hitTest(local.x, local.y);
+    if (action) { handleInterfaceAction(action); return; }
     if (!moved) handleCanvasClick(e);
   });
   canvas.addEventListener('pointerleave', () => { isDragging = false; });
   canvas.addEventListener('pointermove', (e) => {
+    const local = localPoint(e);
+    interfaceLayer.setHover(local.x, local.y);
     if (!isDragging || !dragLast) return;
     const dx = (e.clientX - dragLast.x) / camera.zoom;
     const dy = (e.clientY - dragLast.y) / camera.zoom;
@@ -177,7 +241,7 @@ export function bootstrap(doc = document) {
     const hit = snap.towers.find((t) => Math.hypot(fromFixed(t.x) - world.x, fromFixed(t.y) - world.y) < 1.2);
     selectedTowerId = hit ? hit.id : null;
     renderer.selectedTowerId = selectedTowerId;
-    if (!hit) towerPanel.clear();
+
   }
 
   canvas.addEventListener('keydown', (e) => {
@@ -190,48 +254,17 @@ export function bootstrap(doc = document) {
     else if (e.key === '-') camera = clampAfterPan(zoomCamera(camera, 1 / 1.1, MIN_ZOOM, MAX_ZOOM));
     else if (e.key === 'Escape') {
       if (placingTowerDefId) { placingTowerDefId = null; renderer.placingTowerDefId = null; }
-      else { selectedTowerId = null; renderer.selectedTowerId = null; towerPanel.clear(); }
+      else { selectedTowerId = null; renderer.selectedTowerId = null;  }
     } else return;
     loop.setCamera(camera);
   });
 
-  // --- shop / tower panel wiring ---
-  root.addEventListener('tower-shop-select', (e) => {
-    placingTowerDefId = e.detail.defId;
-    renderer.placingTowerDefId = placingTowerDefId;
-    selectedTowerId = null;
-    renderer.selectedTowerId = null;
-    towerPanel.clear();
-  });
-  root.addEventListener('tower-panel-upgrade', () => {
-    if (selectedTowerId) sim.submitCommand(matchState, { type: 'upgradeTower', towerId: selectedTowerId });
-  });
-  root.addEventListener('tower-panel-sell', () => {
-    if (selectedTowerId) {
-      sim.submitCommand(matchState, { type: 'sellTower', towerId: selectedTowerId });
-      selectedTowerId = null;
-      renderer.selectedTowerId = null;
-      towerPanel.clear();
-    }
-  });
-  root.addEventListener('tower-panel-cast-ability', () => {
-    if (selectedTowerId) sim.submitCommand(matchState, { type: 'castAbility', towerId: selectedTowerId });
-  });
-  root.addEventListener('tower-panel-cycle-targeting', () => {
-    if (!selectedTowerId) return;
-    const snap = sim.snapshot(matchState);
-    const tower = snap.towers.find((t) => t.id === selectedTowerId);
-    if (!tower) return;
-    const def = gameData.towers.get(tower.defId);
-    const nextMode = cycleTargetingMode(tower.targetingMode, def.targetingModes ?? ALL_TARGETING_MODES, 1);
-    sim.submitCommand(matchState, { type: 'setTargetingMode', towerId: selectedTowerId, mode: nextMode });
-  });
-  root.addEventListener('hud-skip-intermission', () => {
-    sim.submitCommand(matchState, { type: 'skipIntermission' });
-  });
+  // The shop, tower panel and heads-up display no longer post DOM events: every one
+  // of their actions now arrives through handleInterfaceAction above, from either a
+  // pointer or the hidden accessibility mirror.
 
   // --- pause / settings ---
-  pauseButton.addEventListener('click', () => { paused = true; pauseSettings.openPause(); });
+  // Pause is a control inside the canvas now; it arrives as a togglePause action.
   root.addEventListener('pause-resume', () => { paused = false; });
   root.addEventListener('settings-reduced-motion-change', (e) => {
     renderer.reducedMotion = e.detail.reducedMotion;
@@ -243,7 +276,7 @@ export function bootstrap(doc = document) {
     matchState = sim.createMatch({ seed: Date.now() >>> 0, mapId: mapDef.id, difficultyId: difficultyDef.id });
     selectedTowerId = null;
     renderer.selectedTowerId = null;
-    towerPanel.clear();
+    
     lastPhase = null;
   });
 
@@ -255,10 +288,10 @@ export function bootstrap(doc = document) {
     loop.pushSnapshot(snap);
 
     if (snap.phase !== lastPhase) {
-      if (snap.phase === 'active' && lastPhase === 'intermission') overlays.showWaveStart(snap.waveIndex, totalWaves);
-      else if (snap.phase === 'intermission' && lastPhase === 'active') overlays.showWaveClear(snap.waveIndex, 0);
-      else if (snap.phase === 'victory') overlays.showVictory(totalWaves);
-      else if (snap.phase === 'defeat') overlays.showDefeat(snap.waveIndex);
+      // Wave, victory and defeat states are drawn by the interface layer inside the
+      // canvas now, from the phase in the snapshot it is handed every tick. There is
+      // nothing to push at an HTML dialog.
+      interfaceLayer.onPhaseChange?.(snap.phase, snap.waveIndex, totalWaves);
       lastPhase = snap.phase;
     }
 
@@ -266,18 +299,26 @@ export function bootstrap(doc = document) {
     for (const t of snap.towers) {
       placementPoolCounts.set(t.defId, (placementPoolCounts.get(t.defId) ?? 0) + 1);
     }
-    shop.update(gameData.towers, snap.cash, placementPoolCounts, [], placingTowerDefId);
-    hud.update({ cash: snap.cash, lives: snap.lives, waveIndex: snap.waveIndex, phase: snap.phase, intermissionSecondsRemaining: snap.intermissionSecondsRemaining }, totalWaves);
+    // One object, handed to the layer, drawn inside the canvas next frame.
+    renderer.interfaceState = {
+      snapshot: snap,
+      gameData,
+      totalWaves,
+      selectedTowerId,
+      placingTowerDefId,
+      disallowedTowerIds: difficultyDef.disallowedTowers ?? [],
+      paused,
+      uiScale: 1,
+    };
 
     if (selectedTowerId) {
       const tower = snap.towers.find((t) => t.id === selectedTowerId);
       if (tower) {
         const def = gameData.towers.get(tower.defId);
-        towerPanel.update(def, { ...tower }, snap.cash);
       } else {
         selectedTowerId = null;
         renderer.selectedTowerId = null;
-        towerPanel.clear();
+        
       }
     }
   }, SIM_TICK_INTERVAL_MS);

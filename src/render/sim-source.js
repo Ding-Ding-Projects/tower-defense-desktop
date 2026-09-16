@@ -56,13 +56,38 @@ export function createMatch(options) {
  * @param {{ kind: string } & Record<string, any>} command
  */
 export function submitCommand(match, command) {
-  const kind = COMMAND_KINDS[/** @type {keyof typeof COMMAND_KINDS} */ (command.kind)];
+  // `type` is accepted as well as `kind` because both spellings existed in the
+  // interface at once, and the mismatch was silent: upgrade, sell, ability and
+  // targeting all looked like working buttons that changed nothing.
+  const name = command.kind ?? command.type;
+  const kind = COMMAND_KINDS[/** @type {keyof typeof COMMAND_KINDS} */ (name)];
   if (!kind) {
     // Loudly, because a command name that quietly does nothing is the worst kind of
     // interface defect: the button appears to work and the world never changes.
-    throw new Error('unknown command from the interface: ' + command.kind);
+    throw new Error('unknown command from the interface: ' + String(name));
   }
-  const { kind: _ignored, ...payload } = command;
+
+  const { kind: _ignoredKind, type: _ignoredType, ...rest } = command;
+  /** @type {any} */
+  const payload = { ...rest };
+  // The interface identifies a tower by `towerId`; the simulation identifies every
+  // entity by its sequence number. One translation, here, rather than two vocabularies
+  // arguing across the seam.
+  if (kind === 'PlaceTower') {
+    // Placement names the KIND of tower being bought, and the interface has called
+    // that both `defId` and `towerId`. Either spelling is accepted; neither silently
+    // places nothing.
+    if (payload.towerId === undefined && payload.defId !== undefined) {
+      payload.towerId = payload.defId;
+    }
+    delete payload.defId;
+  } else if (payload.towerId !== undefined) {
+    payload.seq = payload.towerId;
+    delete payload.towerId;
+  }
+  if (payload.mode === undefined && payload.targetingMode !== undefined) {
+    payload.mode = payload.targetingMode;
+  }
   return submitSimCommand(match, kind, payload);
 }
 
