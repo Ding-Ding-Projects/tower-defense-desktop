@@ -1,0 +1,224 @@
+/*
+ * Structural layout: header, dockable tab strip, content region, footer.
+ * Responsive from 320px upward with no sideways scroll on the document body.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--md-bg);
+  color: var(--md-on-surface);
+  font: var(--type-body);
+  transition: background-color var(--motion-medium) var(--motion-easing),
+    color var(--motion-medium) var(--motion-easing);
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  padding: calc(var(--space-unit) * 1.5) calc(var(--space-unit) * 2);
+  border-radius: 0 0 var(--shape-sm) 0;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space-unit) * 1.5);
+  padding: calc(var(--space-unit) * 1.5) calc(var(--space-unit) * 2);
+  background: var(--md-surface);
+  border-bottom: 1px solid var(--md-outline);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-unit);
+  font: var(--type-title);
+  margin-right: auto;
+  min-width: 0;
+}
+
+.app-header__brand img {
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+
+.app-header__brand-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-header__controls {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-unit) * 0.75);
+  flex-wrap: wrap;
+}
+
+/* Tab strip: dockable (top by default, can be docked to the side on wide viewports),
+   with reordering, pinning, grouping and overflow into a "More tabs" menu. */
+.tab-region {
+  background: var(--md-surface);
+  border-bottom: 1px solid var(--md-outline);
+  position: sticky;
+  top: var(--header-height, 0);
+  z-index: 15;
+}
+
+.tab-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  overflow: hidden;
+  padding: 0 calc(var(--space-unit) * 1.5);
+  min-height: var(--row-height);
+}
+
+.tab-strip[data-dock="start"] {
+  flex-direction: column;
+}
+
+.app-shell[data-tab-dock="start"] {
+  flex-direction: row;
+}
+.app-shell[data-tab-dock="start"] .tab-region {
+  border-bottom: none;
+  border-right: 1px solid var(--md-outline);
+  min-width: 220px;
+  max-width: 280px;
+}
+.app-shell[data-tab-dock="start"] .app-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.tab-group {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+.tab-group[data-grouped="true"] {
+  padding: 2px;
+  margin: 4px 2px;
+  border: 1px dashed var(--md-outline);
+  border-radius: var(--shape-sm);
+}
+.tab-group__label {
+  font: var(--type-label);
+  color: var(--md-on-surface-variant);
+  align-self: center;
+  padding: 0 calc(var(--space-unit) * 0.75);
+  white-space: nowrap;
+}
+
+.app-main {
+  flex: 1;
+  padding: calc(var(--space-unit) * 2);
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tab-panel {
+  display: none;
+  flex-direction: column;
+  gap: calc(var(--space-unit) * 2);
+}
+.tab-panel[data-active="true"] {
+  display: flex;
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-unit);
+}
+
+.app-footer {
+  padding: calc(var(--space-unit) * 2);
+  text-align: center;
+  font: var(--type-body-small);
+  color: var(--md-on-surface-variant);
+  border-top: 1px solid var(--md-outline);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: calc(var(--space-unit) * 1.5);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-unit) * 1.25);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-unit);
+  flex-wrap: wrap;
+}
+
+.notification-region {
+  position: fixed;
+  right: calc(var(--space-unit) * 1.5);
+  bottom: calc(var(--space-unit) * 1.5);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-unit);
+  z-index: 50;
+  width: min(360px, calc(100vw - 24px));
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: var(--space-unit) calc(var(--space-unit) * 1.5);
+  }
+  .app-main {
+    padding: calc(var(--space-unit) * 1.5);
+  }
+  .app-shell[data-tab-dock="start"] {
+    flex-direction: column;
+  }
+  .app-shell[data-tab-dock="start"] .tab-region {
+    max-width: none;
+    border-right: none;
+    border-bottom: 1px solid var(--md-outline);
+  }
+  .notification-region {
+    left: calc(var(--space-unit) * 1.5);
+    right: calc(var(--space-unit) * 1.5);
+    width: auto;
+  }
+}

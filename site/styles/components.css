@@ -1,0 +1,489 @@
+/* Material Design 3 component anatomy: buttons, tabs, cards, chips, text fields,
+   sliders, switches, snackbars. Hand-rolled (no bundler, no CDN) but built from real
+   M3 parts: a container, a state layer for hover/focus/press, and labelled content,
+   rather than a flat coloured <div> standing in for a control. */
+
+.md-surface {
+  background: var(--md-surface);
+  border: 1px solid var(--md-outline);
+  border-radius: var(--shape-lg);
+  box-shadow: var(--elev-1);
+}
+
+.md-card {
+  background: var(--md-surface-variant);
+  border-radius: var(--shape-lg);
+  padding: calc(var(--space-unit) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-unit);
+}
+.md-card h3 {
+  margin: 0;
+  font: var(--type-title);
+}
+.md-card p {
+  margin: 0;
+  color: var(--md-on-surface-variant);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--shape-full);
+  font: var(--type-label);
+  width: fit-content;
+}
+.status-chip[data-status="shipped"] {
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+}
+.status-chip[data-status="in-progress"] {
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+.status-chip[data-status="planned"] {
+  background: var(--md-surface);
+  color: var(--md-on-surface-variant);
+  border: 1px solid var(--md-outline);
+}
+
+/* Buttons: filled, tonal, outlined and icon, each with a state-layer pseudo-element
+   so hover/focus/press read as a real M3 ripple-adjacent overlay, not a colour swap. */
+.md-btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--target-min);
+  min-width: var(--target-min);
+  padding: 0 20px;
+  border-radius: var(--shape-full);
+  border: none;
+  font: var(--type-label);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  background: var(--md-surface-variant);
+  color: var(--md-on-surface);
+  transition: box-shadow var(--motion-fast) var(--motion-easing);
+}
+.md-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity var(--motion-fast) var(--motion-easing);
+}
+.md-btn:hover::after {
+  opacity: 0.08;
+}
+.md-btn:focus-visible::after {
+  opacity: 0.12;
+}
+.md-btn:active::after {
+  opacity: 0.16;
+}
+.md-btn:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+.md-btn[data-variant="filled"] {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+}
+.md-btn[data-variant="outlined"] {
+  background: transparent;
+  border: 1px solid var(--md-outline);
+}
+.md-btn[data-variant="icon"] {
+  padding: 0;
+  width: var(--target-min);
+  background: transparent;
+}
+.md-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.md-btn[disabled]::after {
+  display: none;
+}
+
+/* Tabs */
+.tab {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--target-min);
+  padding: 0 16px;
+  border: none;
+  background: transparent;
+  color: var(--md-on-surface-variant);
+  font: var(--type-label);
+  font-size: 0.85rem;
+  border-radius: var(--shape-sm) var(--shape-sm) 0 0;
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.app-shell[data-tab-dock="start"] .tab {
+  border-radius: var(--shape-sm);
+  justify-content: flex-start;
+}
+.tab::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0;
+  z-index: -1;
+  border-radius: inherit;
+}
+.tab:hover::after {
+  opacity: 0.08;
+}
+.tab:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: -2px;
+}
+.tab[aria-selected="true"] {
+  color: var(--md-primary);
+  border-bottom: 3px solid var(--md-primary);
+}
+.app-shell[data-tab-dock="start"] .tab[aria-selected="true"] {
+  border-bottom: none;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+}
+.tab[data-pinned="true"] .tab__pin-icon {
+  opacity: 1;
+}
+.tab__pin-icon {
+  opacity: 0.35;
+  font-size: 0.75em;
+}
+.tab[draggable="true"] {
+  cursor: grab;
+}
+.tab[data-drag-over="true"] {
+  outline: 2px dashed var(--md-primary);
+  outline-offset: -2px;
+}
+
+.tab-overflow-menu {
+  position: absolute;
+  right: 8px;
+  top: calc(var(--row-height) + 4px);
+  background: var(--md-surface);
+  border: 1px solid var(--md-outline);
+  border-radius: var(--shape-md);
+  box-shadow: var(--elev-2);
+  min-width: 220px;
+  padding: 4px;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+}
+.tab-overflow-menu[data-open="true"] {
+  display: flex;
+}
+.tab-overflow-menu button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--shape-sm);
+  color: var(--md-on-surface);
+  font: var(--type-body-small);
+  text-align: left;
+  cursor: pointer;
+}
+.tab-overflow-menu button:hover,
+.tab-overflow-menu button:focus-visible {
+  background: var(--md-surface-variant);
+}
+
+/* Text fields */
+.md-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.md-field label {
+  font: var(--type-label);
+  color: var(--md-on-surface-variant);
+}
+.md-field input[type="text"],
+.md-field input[type="search"] {
+  min-height: var(--target-min);
+  border-radius: var(--shape-sm);
+  border: 1px solid var(--md-outline);
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  padding: 0 12px;
+  font: var(--type-body);
+}
+.md-field input:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 1px;
+}
+.md-field .support-text {
+  font: var(--type-body-small);
+  color: var(--md-on-surface-variant);
+}
+.md-field .support-text[data-error="true"] {
+  color: var(--md-error);
+}
+
+/* Search + regex builder: an input plus a toggle plus a popover anchored beside it,
+   never a whole separate page. */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.search-bar .md-field {
+  flex: 1;
+  min-width: 160px;
+}
+.regex-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(320px, 90vw);
+  background: var(--md-surface);
+  border: 1px solid var(--md-outline);
+  border-radius: var(--shape-md);
+  box-shadow: var(--elev-2);
+  padding: calc(var(--space-unit) * 1.5);
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 25;
+}
+.regex-popover[data-open="true"] {
+  display: flex;
+}
+.regex-popover mark {
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-radius: 3px;
+}
+
+/* Switch */
+.md-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 52px;
+  height: 32px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--md-outline);
+  background: var(--md-surface-variant);
+  cursor: pointer;
+  padding: 0;
+  flex: none;
+}
+.md-switch[aria-checked="true"] {
+  background: var(--md-primary);
+  border-color: var(--md-primary);
+}
+.md-switch__thumb {
+  position: absolute;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--md-on-surface-variant);
+  transition: transform var(--motion-fast) var(--motion-easing), background var(--motion-fast);
+}
+.md-switch[aria-checked="true"] .md-switch__thumb {
+  transform: translateX(20px);
+  background: var(--md-on-primary);
+}
+.md-switch:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+/* Slider (used for density-independent accent hue/sat/light and for nothing else,
+   kept generic so future settings can reuse it) */
+.md-slider {
+  width: 100%;
+  height: var(--target-min);
+  accent-color: var(--md-primary);
+}
+
+/* Radio / segmented choice, used for theme and density */
+.choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.choice-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--md-outline);
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  cursor: pointer;
+  font: var(--type-body-small);
+}
+.choice-chip[aria-pressed="true"] {
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  border-color: transparent;
+}
+.choice-chip:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+/* Notifications (M3 snackbar pattern): corner-anchored, non-blocking, auto-dismissed,
+   with an accessible live region. Modals are reserved for real decisions elsewhere. */
+.snackbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--md-on-surface);
+  color: var(--md-bg);
+  border-radius: var(--shape-sm);
+  padding: 10px 12px 10px 16px;
+  box-shadow: var(--elev-3);
+  animation: snackbar-in var(--motion-medium) var(--motion-easing);
+}
+.snackbar[data-kind="error"] {
+  background: var(--md-error);
+  color: var(--md-on-error);
+}
+.snackbar__message {
+  flex: 1;
+  font: var(--type-body-small);
+}
+.snackbar__close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+}
+.snackbar__close:hover {
+  background: hsl(0 0% 100% / 0.15);
+}
+@keyframes snackbar-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Documentation browser */
+.docs-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: calc(var(--space-unit) * 2);
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .docs-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.docs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.docs-list button {
+  width: 100%;
+  text-align: left;
+  min-height: var(--target-min);
+  padding: 6px 10px;
+  border-radius: var(--shape-sm);
+  border: none;
+  background: transparent;
+  color: var(--md-on-surface);
+  font: var(--type-body-small);
+  cursor: pointer;
+}
+.docs-list button[aria-current="true"] {
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+.docs-article {
+  min-width: 0;
+}
+.docs-article h1,
+.docs-article h2,
+.docs-article h3 {
+  font-family: var(--font-body);
+}
+.docs-article pre {
+  background: var(--md-surface-variant);
+  padding: calc(var(--space-unit) * 1.5);
+  border-radius: var(--shape-sm);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+.docs-article code {
+  font-family: var(--font-mono);
+  background: var(--md-surface-variant);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.lang-line--secondary {
+  display: block;
+  font: var(--type-body-small);
+  color: var(--md-on-surface-variant);
+  font-family: var(--font-cjk), var(--font-latin);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.install-honest-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(var(--space-unit) * 1.5);
+  border-radius: var(--shape-md);
+  border: 1px dashed var(--md-outline);
+  color: var(--md-on-surface-variant);
+  font: var(--type-body-small);
+}
