@@ -56,8 +56,16 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] Every tower visually distinct, including towers sharing all mechanical stats
 - [x] Every state real: wave start, clear, victory, defeat, pause, settings
 - [x] Frameless window with a custom title bar, verified in the running program
-- [ ] The window can be resized to an exact size for capture via `--window-size=WxH`,
-      but the capture matrix itself is still taken by hand rather than by a script
+- [x] The capture matrix is written down and reproducible. `--window-size=WxH` puts the
+      window at an exact size, refusing anything below the supported minimum, and
+      `tools/capture-matrix.mjs` holds the list of sizes and launches each in turn. It
+      deliberately does not take the pictures: captures go through the project's own
+      off-screen route, and a script quietly grabbing frames another way would be
+      producing evidence from a route nobody agreed to trust. What it removes is the
+      part that was actually unreliable, which was that the sizes used to be whatever
+      the desktop happened to be that day. The layout itself is verified without any of
+      it by `tests/hud/viewport-fit.test.js`; these captures are evidence of what it
+      looks like, not proof that it fits
 - [x] Verified at 100, 125, 150 and 200 percent interface scale with no clipping, by
       `tests/hud/viewport-fit.test.js`, which draws the real interface layer with a
       tower selected (the tightest the layout gets) and bounds every drawing
