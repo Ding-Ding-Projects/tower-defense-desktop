@@ -19,8 +19,9 @@ real cost, damage, rate of fire and range, read from each tower's upgrade table 
 `tools/fetch-wiki-stats.mjs` and converted by `tools/generate-data-rows.mjs`.
 
 **Ten enemies.** Normal, Speedy, Slow, Quick, Slime, Molten, Ghost, Molten Boss,
-Fallen King and Fallen Swordmaster. Health, speed and cash reward read from each
-enemy's infobox by `tools/fetch-wiki-enemies.mjs`.
+Fallen King and Fallen Swordmaster. Health, speed, cash reward, concealment and flight
+read from each enemy's infobox by `tools/fetch-wiki-enemies.mjs`. Leak damage and boss
+abilities remain engine values and say so on every row.
 
 Re-run either script to refresh. They write to `tools/wiki-cache/`, which is committed
 so the conversion can be audited without a network.
@@ -304,6 +305,35 @@ The remaining mechanics with no shipped user are recorded as such by
 `tests/data/mechanic-coverage.test.js`, which is what found these: a mechanic nothing
 uses is a mechanic nothing exercises, and this project has now watched that go wrong
 twice.
+
+### Every enemy trait read false, which looked like a roster with no traits
+
+Concealment and flight were engine defaults across the whole enemy roster, and the rows
+said so in their own notes, which made it read as a limitation of the scrape rather than
+a defect in it.
+
+It was a defect in it. The infobox carries `hidden`, `fly`, `ghost` and `lead`, and the
+scraper reads all four. Ghost's Hidden field has a template stylesheet inline in front of
+its value, so stripping tags returned several hundred characters of CSS selectors, the
+truthiness test found no leading "yes", and the field came back false. Every trait on
+every enemy read false. That is indistinguishable from a roster that genuinely has none,
+and because the generator took its values from a hand-written list instead, the two
+readings were never compared and nothing ever noticed.
+
+The reader now strips embedded style and script elements before cleaning, the generator
+takes concealment and flight from the page, and the hand-written list is kept as a second
+reading that has to agree: where somebody wrote a trait down, a disagreement with the
+page refuses the row rather than picking a winner. Ghost is the only enemy with a
+hand-set trait and is the exact one whose reading was broken, so the two agreeing is what
+proves the reader is reading rather than merely returning something.
+
+**Nothing in the roster flies, and that is now a reading rather than a default.** All ten
+pages say Fly: No. It is the reason no tower's anti-air flag has ever mattered in a real
+match, and it is an accurate description of these ten enemies rather than a gap.
+
+While fixing this, the enemy cache turned out to overwrite rather than merge -- the exact
+defect the tower cache had and had fixed -- so scraping one enemy silently discarded
+every enemy scraped before it. It ate nine freshly-read records before anyone noticed.
 
 ### Abilities come from the page's prose, and are transcribed rather than scraped
 

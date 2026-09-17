@@ -58,11 +58,33 @@ for (const scraped of cache.results) {
     skipped.push(scraped.id + ' (no hand-set traits, so its concealment and leak damage are unknown)');
     continue;
   }
+  // The hand-set values are kept as a second reading rather than deleted. Where somebody
+  // wrote one down, it has to agree with the page; if the two disagree, one of them is
+  // stale and a row built from them would mix a trait from one reading with a number
+  // from the other. Ghost is the only enemy with a hand-set trait, and it is the exact
+  // one whose page reading was broken, so the two agreeing is the proof that the reader
+  // is fixed rather than merely returning something.
+  const disagreements = ['hidden', 'flying']
+    .filter((trait) => traits[trait] !== undefined)
+    .filter((trait) => traits[trait] !== (scraped[trait] === true))
+    .map((trait) => 'hand-set ' + trait + '=' + traits[trait] + ', the page says ' + scraped[trait]);
+  if (disagreements.length > 0) {
+    // Collected and checked outside the loop on purpose. Written as a loop with a
+    // `continue` inside it, this reported the disagreement and then wrote the row
+    // anyway, because the continue belonged to the inner loop: a guard that prints a
+    // complaint and lets the thing through is worse than no guard, since the complaint
+    // reads as if something was stopped.
+    skipped.push(
+      scraped.id + ' (' + disagreements.join('; ') + '; one of the two readings is stale)',
+    );
+    continue;
+  }
+
   const source = {
     wikiUrl: scraped.url,
     retrievedAt: scraped.retrievedAt ?? cache.retrievedAt,
     notes:
-      'health, speed and reward read from the infobox. Concealment, flight, leak damage ' +
+      'health, speed, reward, concealment and flight read from the infobox. Leak damage ' +
       'and abilities are engine values, not sourced: see docs/data-sources.md.',
   };
   const row = {
@@ -74,8 +96,13 @@ for (const scraped of cache.results) {
     speed: scraped.speed,
     leakDamage: traits.leak,
     killReward: scraped.cash ?? 0,
-    hidden: traits.hidden === true,
-    flying: traits.flying === true,
+    // Read from the page rather than hand-set. Both of these were engine defaults for
+    // the whole roster, which meant every enemy was not hidden and not flying because
+    // nobody had said otherwise, not because the source had. The scrape reads both
+    // fields, and its answers were being thrown away: Ghost's page says Yes and the
+    // reader returned a wall of CSS, so every trait on every enemy came back false.
+    hidden: scraped.hidden === true,
+    flying: scraped.flying === true,
     boss: traits.boss === true,
     immunities: traits.immunities ?? [],
     abilities: traits.abilities ?? [],

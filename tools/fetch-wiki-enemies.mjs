@@ -12,7 +12,7 @@
  * it rather than copied.
  */
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fetchPage } from './fetch-wiki-stats.mjs';
@@ -52,7 +52,18 @@ export function infoboxField(html, field) {
   const window = html.slice(anchor, anchor + 20000);
   const value = window.match(/class="pi-data-value[^"]*"[^>]*>([\s\S]*?)<\/div>/);
   if (!value) return null;
-  const text = clean(value[1]);
+  // Inline style and script elements come out first, and stripping tags turns a
+  // stylesheet into several hundred characters of CSS that reads as the field's value.
+  // Ghost's Hidden field is exactly this: the page says Yes and carries a template
+  // stylesheet in front of it, so the field read as a wall of selectors, `truthy` saw
+  // no leading "yes", and the enemy came back as not hidden. Every trait on every
+  // enemy in the roster read false, which looked like a roster with no traits rather
+  // than a reader that never matched anything -- and because the generator took these
+  // from a hand-written list instead, nothing ever compared the two.
+  const withoutEmbeds = value[1]
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ');
+  const text = clean(withoutEmbeds);
   return text.length > 0 ? text : null;
 }
 
@@ -139,6 +150,25 @@ function main() {
 
   const outDir = join(ROOT, 'tools', 'wiki-cache');
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, 'enemies.json'), JSON.stringify({ retrievedAt, results }, null, 2) + '\n');
-  console.log('\nwrote ' + results.length + ' enemy row(s) to tools/wiki-cache/enemies.json');
+  // Merged into what is already there, not written over it. Scraping one more enemy
+  // used to throw away every enemy scraped before it, and the loss was silent: the file
+  // simply came back smaller and the generator dutifully produced a smaller roster. The
+  // tower cache had this exact defect and had it fixed; this one was missed, and then
+  // quietly ate nine freshly-read records the first time a single enemy was re-fetched.
+  // Each record keeps the date it was read, so a merged file can still say which parts
+  // of it are old.
+  const outPath = join(outDir, 'enemies.json');
+  /** @type {Map<string, any>} */
+  const merged = new Map();
+  if (existsSync(outPath)) {
+    const previous = JSON.parse(readFileSync(outPath, 'utf8'));
+    for (const record of previous.results ?? []) merged.set(record.id, record);
+  }
+  for (const record of results) merged.set(record.id, record);
+  const all = [...merged.values()].sort((a, b) => a.id.localeCompare(b.id));
+
+  writeFileSync(outPath, JSON.stringify({ retrievedAt, results: all }, null, 2) + '\n');
+  console.log(
+    '\nwrote ' + results.length + ' enemy row(s); the cache now holds ' + all.length,
+  );
 }

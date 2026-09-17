@@ -23,7 +23,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Fallen_Swordmaster",
-    "retrievedAt": "2026-09-16",
-    "notes": "health, speed and reward read from the infobox. Concealment, flight, leak damage and abilities are engine values, not sourced: see docs/data-sources.md."
+    "retrievedAt": "2026-09-17",
+    "notes": "health, speed, reward, concealment and flight read from the infobox. Leak damage and abilities are engine values, not sourced: see docs/data-sources.md."
   }
 }
