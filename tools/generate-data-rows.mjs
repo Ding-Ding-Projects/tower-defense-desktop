@@ -126,6 +126,7 @@ function toLevel(row, overlay, attributes, source) {
     level.critEveryNthHit = row.critEveryNthHit;
   }
   if (row.aoeRadius) level.aoeRadius = row.aoeRadius;
+  if (row.splashDamage) level.splashDamage = row.splashDamage;
   if (row.spinUpSeconds) level.spinUpSeconds = row.spinUpSeconds;
   if (row.burstCount && row.burstCount > 1) {
     level.burstCount = row.burstCount;
@@ -160,6 +161,10 @@ function toLevel(row, overlay, attributes, source) {
   if (overlay.applies) {
     level.appliesStatuses = overlay.applies;
     level.statusDurationSeconds = overlay.statusSeconds ?? 1;
+    // The burn figure comes off the page, not the overlay. It is per level: Freezer
+    // chills for 3 at one level and 5 at the next, and the status definition has no
+    // opinion about either.
+    if (row.statusDamagePerTick) level.statusDamagePerTick = row.statusDamagePerTick;
   }
   if (overlay.chain) {
     level.chainCount = overlay.chain;

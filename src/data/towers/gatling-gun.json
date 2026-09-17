@@ -27,7 +27,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 50,
@@ -43,7 +43,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 50,
@@ -59,7 +59,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 100,
@@ -75,7 +75,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 200,
@@ -91,7 +91,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 200,
@@ -107,7 +107,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 400,
@@ -123,7 +123,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 600,
@@ -132,7 +132,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Gatling_Gun",
-    "retrievedAt": "2026-09-16",
-    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
+    "retrievedAt": "2026-09-17",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-17, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

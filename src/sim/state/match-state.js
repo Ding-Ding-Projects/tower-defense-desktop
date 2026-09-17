@@ -17,6 +17,8 @@ import { secondsToTicks } from '../core/constants.js';
  * @property {string} id
  * @property {number} ticksLeft
  * @property {number} stacks
+ * @property {number} [damagePerTick]  set when the tower that applied it carries its own
+ *   figure, which is how one status can burn for different amounts from different towers
  */
 
 /**
@@ -64,6 +66,8 @@ import { secondsToTicks } from '../core/constants.js';
  * @property {number} speedFixed      fixed-point map units per tick
  * @property {number} damage
  * @property {number} aoeRadiusFixed
+ * @property {number|null} splashDamage  what the blast deals to anything that was not
+ *   the direct target; null means the whole area takes the full damage
  * @property {number} pierceLeft
  * @property {string[]} appliesStatuses
  * @property {number} statusTicks

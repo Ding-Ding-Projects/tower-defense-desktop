@@ -1,8 +1,70 @@
 {
-  "retrievedAt": "2026-09-16",
+  "retrievedAt": "2026-09-17",
   "results": [
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
+      "id": "ace-pilot",
+      "displayName": "Ace Pilot",
+      "url": "https://tds.fandom.com/wiki/Ace_Pilot",
+      "levels": [
+        {
+          "level": 0,
+          "cost": 500,
+          "damage": 2,
+          "shotIntervalSeconds": 0.22,
+          "range": 9,
+          "pageDps": 9.09
+        },
+        {
+          "level": 1,
+          "cost": 225,
+          "damage": 3,
+          "shotIntervalSeconds": 0.22,
+          "range": 9,
+          "pageDps": 13.64
+        },
+        {
+          "level": 2,
+          "cost": 625,
+          "damage": 4,
+          "shotIntervalSeconds": 0.22,
+          "range": 9,
+          "aoeRadius": 3,
+          "pageDps": 20.68
+        },
+        {
+          "level": 3,
+          "cost": 1500,
+          "damage": 5,
+          "shotIntervalSeconds": 0.15,
+          "range": 10,
+          "aoeRadius": 3,
+          "pageDps": 40.83
+        },
+        {
+          "level": 4,
+          "cost": 3000,
+          "damage": 8,
+          "shotIntervalSeconds": 0.15,
+          "range": 10,
+          "aoeRadius": 3,
+          "pageDps": 68.33
+        },
+        {
+          "level": 5,
+          "cost": 7000,
+          "damage": 14,
+          "shotIntervalSeconds": 0.12,
+          "range": 10,
+          "aoeRadius": 4,
+          "pageDps": 146.67
+        }
+      ]
+    },
+    {
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "cowboy",
       "displayName": "Cowboy",
       "url": "https://tds.fandom.com/wiki/Cowboy",
@@ -64,7 +126,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "demoman",
       "displayName": "Demoman",
       "url": "https://tds.fandom.com/wiki/Demoman",
@@ -117,7 +180,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "electroshocker",
       "displayName": "Electroshocker",
       "url": "https://tds.fandom.com/wiki/Electroshocker",
@@ -173,7 +237,7 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
       "kind": "income",
       "id": "farm",
       "displayName": "Farm",
@@ -212,7 +276,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "freezer",
       "displayName": "Freezer",
       "url": "https://tds.fandom.com/wiki/Freezer",
@@ -250,6 +315,9 @@
           "damage": 4,
           "shotIntervalSeconds": 0.15,
           "range": 14,
+          "statusDamagePerTick": 3,
+          "statusTickSeconds": 1,
+          "pageDps": 19,
           "burstCount": 6,
           "reloadSeconds": 0.6
         },
@@ -259,13 +327,17 @@
           "damage": 9,
           "shotIntervalSeconds": 0.15,
           "range": 16,
+          "statusDamagePerTick": 5,
+          "statusTickSeconds": 1,
+          "pageDps": 45,
           "burstCount": 8,
           "reloadSeconds": 0.6
         }
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "gatling-gun",
       "displayName": "Gatling Gun",
       "url": "https://tds.fandom.com/wiki/Gatling_Gun",
@@ -343,7 +415,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "hunter",
       "displayName": "Hunter",
       "url": "https://tds.fandom.com/wiki/Hunter",
@@ -391,7 +464,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "militant",
       "displayName": "Militant",
       "url": "https://tds.fandom.com/wiki/Militant",
@@ -439,7 +513,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "minigunner",
       "displayName": "Minigunner",
       "url": "https://tds.fandom.com/wiki/Minigunner",
@@ -487,7 +562,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "mortar",
       "displayName": "Mortar",
       "url": "https://tds.fandom.com/wiki/Mortar",
@@ -549,7 +625,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "paintballer",
       "displayName": "Paintballer",
       "url": "https://tds.fandom.com/wiki/Paintballer",
@@ -611,7 +688,7 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "kind": "attack",
       "id": "ranger",
       "displayName": "Ranger",
       "url": "https://tds.fandom.com/wiki/Ranger",
@@ -654,12 +731,16 @@
           "damage": 875,
           "shotIntervalSeconds": 8,
           "range": 70,
-          "aoeRadius": 5
+          "aoeRadius": 5,
+          "splashDamage": 375,
+          "pageDps": 156.25
         }
-      ]
+      ],
+      "retrievedAt": "2026-09-17"
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "rocketeer",
       "displayName": "Rocketeer",
       "url": "https://tds.fandom.com/wiki/Rocketeer",
@@ -713,7 +794,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "scout",
       "displayName": "Scout",
       "url": "https://tds.fandom.com/wiki/Scout",
@@ -761,7 +843,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "shotgunner",
       "displayName": "Shotgunner",
       "url": "https://tds.fandom.com/wiki/Shotgunner",
@@ -814,7 +897,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "sniper",
       "displayName": "Sniper",
       "url": "https://tds.fandom.com/wiki/Sniper",
@@ -862,7 +946,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "soldier",
       "displayName": "Soldier",
       "url": "https://tds.fandom.com/wiki/Soldier",
@@ -920,7 +1005,8 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-16",
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "turret",
       "displayName": "Turret",
       "url": "https://tds.fandom.com/wiki/Turret",
@@ -976,6 +1062,7 @@
       ]
     },
     {
+      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "warden",
       "displayName": "Warden",
@@ -1026,8 +1113,7 @@
           "critDamage": 120,
           "pageDps": 186.67
         }
-      ],
-      "retrievedAt": "2026-09-16"
+      ]
     }
   ]
 }

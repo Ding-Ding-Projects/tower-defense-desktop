@@ -141,7 +141,12 @@ export function tableToRows(tableHtml) {
  * @returns {number | null}
  */
 function money(value) {
-  const cleaned = String(value).replace(/[$,\s]/g, '');
+  // Footnote markers are stripped from cells as well as headers. The page writes a
+  // referenced figure as "20.68 [ 3 ]", which is not a number, so the cell was rejected
+  // and whatever depended on it silently went missing -- for Ace Pilot that was every
+  // published damage-per-second value on the page, and with it the only independent
+  // check on the transcription.
+  const cleaned = String(value).replace(/\[\s*\d+\s*\]/g, '').replace(/[$,\s]/g, '');
   if (!/^-?\d+(\.\d+)?$/.test(cleaned)) return null;
   return Number(cleaned);
 }
@@ -198,7 +203,11 @@ export function extractLevels(html) {
     };
     const iLevel = col('level');
     const iCost = col('cost');
-    const iDamage = firstCol('damage', 'splash damage', 'normal damage');
+    // "Normal Damage" before "Splash Damage", because a page carrying both is a tower
+    // whose ordinary attack is the normal one and whose splash is a secondary. Taking
+    // the splash column first read Ace Pilot's bomb as its whole output AND dropped its
+    // first two levels, where the bomb does not exist yet and the cell says N/A.
+    const iDamage = firstCol('damage', 'normal damage', 'splash damage');
     const iFire = firstCol('firerate', 'swingrate');
     const iRange = col('range');
     if (iLevel < 0 || iCost < 0 || iDamage < 0 || iFire < 0 || iRange < 0) continue;
@@ -235,6 +244,19 @@ export function extractLevels(html) {
     // 15 times 1.5 is 22.5, and it is the 23 that reproduces the published rate.
     const iCrit = col('critical damage');
 
+    // A burn, chill or similar damage-over-time the tower applies. The published
+    // damage-per-second folds it in, which is how Freezer reads 19 where its direct
+    // damage alone is 16: the missing 3 is exactly its chill.
+    const iDot = firstCol('chill damage', 'burn damage');
+
+    // A splash figure SEPARATE from the direct damage, which only appears on a page that
+    // lists both. Where the splash column IS the damage column -- Demoman, Mortar -- the
+    // alias list above already picked it up as `damage` and there is nothing distinct.
+    const iSplash = iDamage >= 0 && header[iDamage] !== 'splash damage'
+      ? col('splash damage')
+      : -1;
+    const iTick = col('tick');
+
     const levels = [];
     for (const row of rows.slice(1)) {
       const level = money(row[iLevel]);
@@ -250,6 +272,20 @@ export function extractLevels(html) {
       if (iAoe >= 0) {
         const aoe = money(row[iAoe]);
         if (aoe !== null && aoe > 0) entry.aoeRadius = aoe;
+      }
+      if (iSplash >= 0) {
+        const splash = money(row[iSplash]);
+        if (splash !== null && splash > 0) entry.splashDamage = splash;
+      }
+      if (iDot >= 0) {
+        const dot = money(row[iDot]);
+        // The tick column is the gap between burn ticks in seconds; the figure the
+        // simulation wants is per tick, which is what the column already gives.
+        if (dot !== null && dot > 0) {
+          entry.statusDamagePerTick = dot;
+          const tick = iTick >= 0 ? money(row[iTick]) : null;
+          if (tick !== null && tick > 0) entry.statusTickSeconds = tick;
+        }
       }
       if (iCrit >= 0) {
         const crit = money(row[iCrit]);

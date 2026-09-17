@@ -12,15 +12,20 @@
  * @param {import('../../data/schema/types.js').EnemyDef} def
  * @param {import('../../data/schema/types.js').StatusDef} status
  * @param {number} ticks
+ * @param {number} [damagePerTick]  the applier's own burn figure, if it carries one
  * @returns {boolean} whether it was applied
  */
-export function applyStatus(enemy, def, status, ticks) {
+export function applyStatus(enemy, def, status, ticks, damagePerTick) {
   if (def.immunities.includes(status.id)) return false;
   const existing = enemy.statuses.find((s) => s.id === status.id);
   if (!existing) {
-    enemy.statuses.push({ id: status.id, ticksLeft: ticks, stacks: 1 });
+    enemy.statuses.push({ id: status.id, ticksLeft: ticks, stacks: 1, damagePerTick });
     return true;
   }
+  // A refreshed status takes the new applier's figure. Two towers applying the same
+  // status for different amounts is the normal case, not an edge one: Freezer's chill
+  // burns for 3 at one level and 5 at the next, and the status itself has no opinion.
+  if (damagePerTick !== undefined) existing.damagePerTick = damagePerTick;
   switch (status.stackingRule) {
     case 'refresh':
       existing.ticksLeft = Math.max(existing.ticksLeft, ticks);
@@ -115,7 +120,11 @@ export function damageOverTime(enemy, statuses) {
   for (const active of enemy.statuses) {
     const def = statuses.get(active.id);
     if (!def) continue;
-    if (def.damagePerTick) total += def.damagePerTick * active.stacks;
+    // The applier's own figure wins when it has one, and the status definition is the
+    // fallback. Without this a tower's burn is whatever the status says, identically at
+    // every level, which is not what any of the sourced numbers describe.
+    const perTick = active.damagePerTick ?? def.damagePerTick;
+    if (perTick) total += perTick * active.stacks;
     if (def.percentMaxHpPerTick) {
       total += Math.trunc(enemy.maxHp * def.percentMaxHpPerTick) * active.stacks;
     }

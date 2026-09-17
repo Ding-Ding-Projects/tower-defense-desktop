@@ -65,11 +65,15 @@
  * @property {number} [reloadSeconds]   pause after a burst
  * @property {number} [projectileSpeed] map units per second; omitted means hitscan
  * @property {number} [aoeRadius]
+ * @property {number} [splashDamage]      what everything OTHER than the direct target
+ *   takes inside aoeRadius; without it the whole area takes `damage`
  * @property {number} [pierceCount]     how many enemies one shot passes through
  * @property {number} [chainCount]
  * @property {number} [chainRadius]
  * @property {string[]} [appliesStatuses]
  * @property {number} [statusDurationSeconds]
+ * @property {number} [statusDamagePerTick]  what THIS tower's applied status burns for,
+ *   overriding the status definition's own figure
  * @property {{ tag: string, damageMultiplier: number }} [bonusVsTag]
  * @property {number} [incomePerWave]   economy towers
  * @property {AuraDef} [aura]

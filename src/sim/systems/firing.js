@@ -113,6 +113,7 @@ function shoot(state, gameData, tower, level, stats, target) {
     speedFixed: toFixed(level.projectileSpeed * TICK_SECONDS),
     damage,
     aoeRadiusFixed: level.aoeRadius ? toFixed(level.aoeRadius) : 0,
+    splashDamage: level.splashDamage ?? null,
     pierceLeft: level.pierceCount ?? 1,
     appliesStatuses: level.appliesStatuses ?? [],
     statusTicks: level.statusDurationSeconds ? secondsToTicks(level.statusDurationSeconds) : 0,
@@ -212,7 +213,13 @@ export function resolveHit(state, gameData, sourceSeq, target, damage, level) {
   for (const enemy of struck) {
     const def = gameData.enemies.get(enemy.defId);
     if (!def) continue;
-    const result = applyDamage(enemy, def, damage, gameData, level.bonusVsTag ?? null);
+    // Same rule as the projectile path: the thing aimed at takes the full figure and
+    // everything else caught in the blast takes the splash one, when the tower carries a
+    // separate splash figure at all.
+    const amount = enemy.seq === target.seq || level.splashDamage == null
+      ? damage
+      : level.splashDamage;
+    const result = applyDamage(enemy, def, amount, gameData, level.bonusVsTag ?? null);
     if (result.dealt > 0) {
       recordEvent(state, {
         type: 'damageDealt', x: enemy.xFixed, y: enemy.yFixed, amount: result.dealt,
@@ -229,7 +236,7 @@ export function resolveHit(state, gameData, sourceSeq, target, damage, level) {
       const status = gameData.statuses.get(statusId);
       if (!status) continue;
       const ticks = level.statusDurationSeconds ? secondsToTicks(level.statusDurationSeconds) : 1;
-      applyStatus(enemy, def, status, ticks);
+      applyStatus(enemy, def, status, ticks, level.statusDamagePerTick);
     }
   }
 
@@ -307,10 +314,26 @@ function landAreaOnly(state, gameData, shot) {
   for (const enemy of caught) {
     const def = gameData.enemies.get(enemy.defId);
     if (!def) continue;
-    const result = applyDamage(enemy, def, shot.damage, gameData, shot.bonusVsTag);
+    // The thing that was aimed at takes the full figure; everything else caught in the
+    // blast takes the splash one, when the tower carries a separate splash figure at
+    // all. Ranger's top level deals 875 to what it hit and 375 around it, and 875 over
+    // its 8 second interval plus 375 over the same is exactly the 156.25 its page
+    // publishes. A tower with no splash figure applies its damage to the whole area, as
+    // every splash tower in the roster did before this.
+    const isDirectTarget = shot.targetSeq != null && enemy.seq === shot.targetSeq;
+    const amount = isDirectTarget || shot.splashDamage == null ? shot.damage : shot.splashDamage;
+    const result = applyDamage(enemy, def, amount, gameData, shot.bonusVsTag);
+    if (result.dealt > 0) {
+      recordEvent(state, {
+        type: 'damageDealt', x: enemy.xFixed, y: enemy.yFixed, amount: result.dealt,
+      });
+    }
     if (result.killed) {
       state.cash += result.reward;
       state.killCount += 1;
+      recordEvent(state, {
+        type: 'kill', x: enemy.xFixed, y: enemy.yFixed, enemyDefId: enemy.defId,
+      });
     }
   }
   state.enemies = state.enemies.filter((e) => e.hp > 0);

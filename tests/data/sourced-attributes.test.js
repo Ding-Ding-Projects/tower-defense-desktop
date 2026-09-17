@@ -153,13 +153,23 @@ test('every shipped level reproduces the damage per second its page states', () 
       if (!scraped || scraped.pageDps == null) continue;
 
       const shots = level.burstCount && level.burstCount > 1 ? level.burstCount : 1;
+      // A damage-over-time the tower applies counts toward the published figure. It is
+      // what makes Freezer read 19 where its direct damage alone is 16, and it was
+      // invisible until footnote markers stopped being read as part of the number.
+      const overTime = level.statusDamagePerTick
+        ? level.statusDamagePerTick / (scraped.statusTickSeconds ?? 1)
+        : 0;
       // Every shot is followed by its own interval, and the reload comes on top of the
       // last one. Counting only the gaps BETWEEN shots makes the cycle one gap short,
       // which is exactly the error this check found in the simulation itself.
       const cycleSeconds = shots > 1
         ? shots / level.fireRate + (level.reloadSeconds ?? 0)
         : 1 / level.fireRate;
-      const dps = (level.damage * shots) / cycleSeconds;
+      // A separate splash figure is counted once alongside the direct hit, which is how
+      // the source computes it: Ranger's top level deals 875 to what it hit and 375
+      // around it, and both over the same 8 second interval make its published 156.25.
+      const perShot = level.damage + (level.splashDamage ?? 0);
+      const dps = (perShot * shots) / cycleSeconds + overTime;
 
       // A tenth of a percent, to absorb the four decimal places the rate is rounded to
       // and nothing wider. Every class of error this has caught was off by a factor,

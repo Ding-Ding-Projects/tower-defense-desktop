@@ -27,7 +27,7 @@
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "appliesStatuses": [
@@ -45,7 +45,7 @@
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "appliesStatuses": [
@@ -63,7 +63,7 @@
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "appliesStatuses": [
@@ -81,7 +81,7 @@
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 6,
@@ -89,7 +89,8 @@
       "appliesStatuses": [
         "slow"
       ],
-      "statusDurationSeconds": 1.5
+      "statusDurationSeconds": 1.5,
+      "statusDamagePerTick": 3
     },
     {
       "level": 4,
@@ -101,7 +102,7 @@
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "burstCount": 8,
@@ -109,12 +110,13 @@
       "appliesStatuses": [
         "slow"
       ],
-      "statusDurationSeconds": 1.5
+      "statusDurationSeconds": 1.5,
+      "statusDamagePerTick": 5
     }
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Freezer",
-    "retrievedAt": "2026-09-16",
-    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
+    "retrievedAt": "2026-09-17",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-17, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }

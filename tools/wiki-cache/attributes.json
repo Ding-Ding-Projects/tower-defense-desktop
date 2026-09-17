@@ -1,6 +1,33 @@
 {
-  "retrievedAt": "2026-09-16",
+  "retrievedAt": "2026-09-17",
   "results": [
+    {
+      "id": "ace-pilot",
+      "displayName": "Ace Pilot",
+      "url": "https://tds.fandom.com/wiki/Ace_Pilot",
+      "hidden": {
+        "fromLevel": 4,
+        "never": false,
+        "raw": "Level 4+"
+      },
+      "flying": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "lead": {
+        "fromLevel": 2,
+        "never": false,
+        "raw": "Level 2+"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 500,
+      "baseSell": 166,
+      "refundRatio": 0.332,
+      "immunities": "Stun",
+      "retrievedAt": "2026-09-17"
+    },
     {
       "retrievedAt": "2026-09-16",
       "id": "cowboy",
@@ -488,6 +515,7 @@
       "immunities": "Partial Debuff"
     },
     {
+      "retrievedAt": "2026-09-16",
       "id": "warden",
       "displayName": "Warden",
       "url": "https://tds.fandom.com/wiki/Warden",
@@ -511,8 +539,7 @@
       "baseCost": 1850,
       "baseSell": 616,
       "refundRatio": 0.333,
-      "immunities": "Stun Immune",
-      "retrievedAt": "2026-09-16"
+      "immunities": "Stun Immune"
     }
   ]
 }

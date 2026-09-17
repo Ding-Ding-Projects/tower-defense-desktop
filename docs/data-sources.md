@@ -175,6 +175,30 @@ The arc now runs 40 waves and every difficulty is completable. Hardcore, which
 multiplies enemy health by six, bans Scout and cuts the base to twenty lives,
 finishes with 9 of those 20 left.
 
+## What stripping footnote markers revealed
+
+The published damage-per-second column is the only independent arithmetic the source
+offers, and a referenced figure is written "19 [ 2 ]", which is not a number. The cell
+was being thrown away, so those levels were silently uncovered. Reading them properly
+widened the cross-check from 83 levels to 97, and two of the newly visible rows
+disagreed at once.
+
+**Freezer** publishes 19 where its direct damage alone is 16. The missing 3 is its
+chill, which the engine could express only as a property of the status, identically at
+every level; Freezer chills for 3 at one level and 5 at the next. A tower level can now
+carry its own burn figure, and the status definition is the fallback.
+
+**Ranger** publishes 156.25 at its top level where 875 over an 8 second interval is
+109.375. The missing 46.875 is 375 over the same interval: it deals 875 to what it hit
+and 375 to everything else in the blast. The engine applied one figure to the whole
+area. A level can now carry a separate splash figure, and a tower without one still
+hits the whole area for its damage, which is what every splash tower in the roster did
+before.
+
+Both were watched failing before being trusted, and the second was written specifically
+to confirm the old behaviour still holds for the towers that never had a separate
+figure.
+
 ## The rest of the roster, and why each one is still absent
 
 Every remaining tower was fetched and its page read. They are not all the same kind of
@@ -221,6 +245,7 @@ checked, and waiting.
 
 | Tower | What it needs |
 | --- | --- |
+| Ace Pilot | A second weapon. It is a gun AND a bomb on its own cooldown: at level 5, 14 damage over 0.12 seconds plus a 45 bomb over 1.5 seconds is exactly the published 146.67. The engine gives a tower one weapon. |
 | Warden | **The engine can model it now; the source contradicts itself.** Its upgrade table lists $1,000 to place with 6 base damage, and its own infobox lists $1,850 with 12. A row built from two readings that disagree is a row nobody can trust, so it does not ship and the generator refuses it by name. |
 | Accelerator | A charge-up beam. Its table has no rate column at all, only charge-up, tick and overcharge. |
 | Pyromancer | Burn damage, burn time, tick rate and defence melt as one coherent status. The status registry can carry a burn, but not the defence melt. |

@@ -27,7 +27,7 @@
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
       },
       "burstCount": 8,
@@ -43,7 +43,7 @@
       "hitsAir": false,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
       },
       "burstCount": 8,
@@ -59,7 +59,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
       },
       "burstCount": 9,
@@ -75,7 +75,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
       },
       "burstCount": 9,
@@ -91,7 +91,7 @@
       "hitsAir": true,
       "source": {
         "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
-        "retrievedAt": "2026-09-16",
+        "retrievedAt": "2026-09-17",
         "notes": "upgrade table; the firerate column is the whole salvo cycle, so the projectile count is modelled as a burst fired one tick apart with the remainder of the cycle as the reload"
       },
       "burstCount": 12,
@@ -100,7 +100,7 @@
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Shotgunner",
-    "retrievedAt": "2026-09-16",
-    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-16, for detection, footprint and the selling cost the refund fraction is derived from"
+    "retrievedAt": "2026-09-17",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-17, for detection, footprint and the selling cost the refund fraction is derived from"
   }
 }
