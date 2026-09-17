@@ -328,8 +328,17 @@ hand-set trait and is the exact one whose reading was broken, so the two agreein
 proves the reader is reading rather than merely returning something.
 
 **Nothing in the roster flies, and that is now a reading rather than a default.** All ten
-pages say Fly: No. It is the reason no tower's anti-air flag has ever mattered in a real
-match, and it is an accurate description of these ten enemies rather than a gap.
+pages say Fly: No, and the source's own enemy index says why: the only two flying enemies
+it has are `Flying Ducky (Ducky Revenge)` and `Flying Ducky (D00M's Revenge)`, both from
+limited-time event modes rather than the base game.
+
+So every tower still carries an anti-air flag that cannot currently matter, and that flag
+is real sourced data rather than filler -- the roster genuinely disagrees about it, and
+the readings were corrected once already, when Turret turned out not to hit air and
+Sniper turned out to. It is inert because the enemies it would apply to are not in the
+base game, which is a different thing from being unimplemented. `tests/data/enemy-traits.test.js`
+records that state and turns red the moment a flying enemy ships, so the note has to be
+removed rather than quietly becoming false.
 
 While fixing this, the enemy cache turned out to overwrite rather than merge -- the exact
 defect the tower cache had and had fixed -- so scraping one enemy silently discarded

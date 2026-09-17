@@ -111,12 +111,36 @@ test('the reader really can tell a hidden enemy from an ordinary one', () => {
 
 test('nothing flies, and that is now a reading rather than a default', () => {
   // Worth stating plainly, because it is why no tower's hitsAir flag has ever mattered
-  // in a real match. It is not an omission: every one of these ten pages says Fly: No.
+  // in a real match. It is not an omission: every one of these ten pages says Fly: No,
+  // and the source's own enemy index says why -- the only flying enemies it has are two
+  // Flying Duckies from limited-time event modes, not the base game.
+  //
+  // This turns red the moment one ships, which is the point: the anti-air flag becomes
+  // live that day, and the note explaining why it is inert has to come out rather than
+  // quietly becoming false.
   for (const read of cache.results) {
     assert.equal(
       read.flying, false,
-      read.id + ' flies, so a tower that cannot hit air now has something to miss',
+      read.id + ' flies, so a tower that cannot hit air now has something to miss. ' +
+        'Remove the note in docs/data-sources.md saying the anti-air flag is inert.',
     );
   }
   assert.ok(cache.results.length >= 10, 'the cache holds ' + cache.results.length + ' enemies');
+});
+
+test('the anti-air flag is real sourced data, not filler', () => {
+  // An inert flag is one thing; a flag every tower shares is another, and they look the
+  // same from a match nothing flies in. The roster genuinely disagrees about this, and
+  // the readings have already been corrected once -- Turret turned out not to hit air
+  // and Sniper turned out to.
+  const dir = ROOT + 'src/data/towers/';
+  const flags = new Set();
+  for (const file of readdirSync(dir)) {
+    const def = JSON.parse(readFileSync(dir + file, 'utf8'));
+    for (const level of def.levels) flags.add(level.hitsAir === true);
+  }
+  assert.deepEqual(
+    [...flags].sort(), [false, true],
+    'every shipped tower level agrees about hitsAir, so the field is carrying no information',
+  );
 });
