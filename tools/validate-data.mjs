@@ -77,6 +77,17 @@ for (const raw of RAW.statuses) {
   }
 }
 
+/**
+ * The targeting modes the simulation implements.
+ *
+ * Hand-written here and deliberately not imported from anywhere. Six places name these
+ * modes -- this list, the switch in `systems/targeting.js`, the `TargetingMode` typedef,
+ * `ALL_TARGETING_MODES` and `LABELS` in the interface, and every tower row on disk --
+ * and `tests/data/targeting-modes.test.js` holds all six against each other. A list
+ * that read its expectations from one of the others could not notice that one drifting.
+ */
+const TARGETING_MODES = ['first', 'last', 'closest', 'strongest', 'weakest'];
+
 // --- towers -----------------------------------------------------------------
 for (const raw of RAW.towers) {
   /** @type {any} */ const tower = raw;
@@ -89,6 +100,14 @@ for (const raw of RAW.towers) {
     must(['ground', 'water', 'cliff'].includes(terrain), where + ': unknown terrain ' + terrain);
   }
   must(tower.targetingModes.length > 0, where + ': has no targeting modes');
+  for (const mode of tower.targetingModes) {
+    // The simulation throws on a mode it does not implement, which is the right
+    // behaviour and the wrong moment: the throw happens the first time a tower carrying
+    // that mode picks a target, so a typo in a data row is a crash several waves into a
+    // match in front of whoever is playing, rather than a file that failed to validate.
+    // The terrain list two lines up has been checked this way all along.
+    must(TARGETING_MODES.includes(mode), where + ': unknown targeting mode ' + mode);
+  }
   // A FRACTION between 0 and 1, never a number out of a hundred. The field used to
   // be called sellRefundPercent while holding 0.7, so the simulation read it as a
   // fraction and the interface read it as a percentage. Both were reasonable given
