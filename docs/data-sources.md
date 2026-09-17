@@ -274,12 +274,23 @@ checked, and waiting.
 | Accelerator | A charge-up beam. Its table has no rate column at all, only charge-up, tick and overcharge. |
 | Military Base | Friendly units. It spawns them; nothing in the simulation fights on the player's side. |
 | Medic | Healing and shield recharge for other towers. Auras can buff a stat; nothing repairs. |
+| Commander | **A weapon that only exists during an ability.** Levels 0 and 1 have no damage and no firerate at all: the tower is a pure firerate aura, which the engine already models. Its damage column applies only while Call to Arms is up, because the page says the ability "will be able to attack enemies with its own weapon for 10 seconds". Nothing in the firing system can switch a tower's weapon on for a duration, and its level 4 Support Caravan summons friendly units, which is the Military Base blocker again. |
+| Pursuit | **Branching upgrade paths, and a tower that moves.** From level 4 the page splits into a Top Path and a Bottom Path with different costs, damage and ranges, and the engine models one linear upgrade line. It also carries Speed and Patrol Range columns, so it drives around rather than holding a placement. Its infobox says the same thing independently: hidden detection at "Level 4B+", a level number with a branch letter on it. |
 
-### Page layout not yet understood
+### Page layout: understood now
 
-Commander and Pursuit have no table carrying a level column in the shape the others
-use. Ace Pilot could not be fetched at all. All three need a second look rather than a
-guess.
+Commander and Pursuit were recorded here for weeks as pages with no table carrying a
+level column. Both have one. Their tables simply open with a single spanning caption
+cell -- `<th colspan="11">Commander Stats</th>` -- so row zero was one cell wide, the
+column check found no Level column, and the table was skipped whole. To every step
+downstream that was indistinguishable from a page with no statistics on it at all,
+which is why it read as a missing source rather than a missing line of code.
+
+`findHeaderRow` now scans the first few rows for one carrying both Level and Cost.
+Both pages parse, and neither tower ships: what the readable tables then showed was
+that both are blocked on engine features, recorded in the table above. The scan is
+bounded to the first few rows on purpose, because a search of the whole table would
+let any row containing those two words become a header.
 
 ### The rule that governs all of it
 

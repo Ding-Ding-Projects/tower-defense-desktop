@@ -225,6 +225,21 @@ const written = [];
 const skipped = [];
 
 for (const scraped of cache.results) {
+  // A tower whose page splits into a Top Path and a Bottom Path has two different
+  // level 4s and two different level 5s, and the scraper reads whichever came first.
+  // That produces a row which is internally consistent, passes every cross-check, and
+  // silently describes one branch of a tower as though it were the whole tower. The
+  // engine has no way to represent a choice of upgrade path, so the honest outcome is
+  // no row at all rather than half of one wearing the tower's name.
+  if (scraped.branchingPathCaptions?.length > 0) {
+    skipped.push(
+      scraped.id + ' (its page declares branching upgrade paths -- ' +
+        scraped.branchingPathCaptions.join(', ') +
+        ' -- and the engine models one linear upgrade line)',
+    );
+    continue;
+  }
+
   const overlay = OVERLAY[scraped.id];
   if (!overlay) {
     skipped.push(scraped.id + ' (no hand-written overlay, so its terrain and pool are unknown)');
@@ -242,12 +257,25 @@ for (const scraped of cache.results) {
   // sign of it until a hidden wave walks straight past a tower that should have seen
   // it. The same reasoning covers the footprint: a guessed size silently changes what
   // can be placed where.
+  //
+  // "Never read" covers two different failures and both have to be caught. A field
+  // absent from the page is the obvious one. The quiet one is a field that is present
+  // and was not understood: Pursuit lists its hidden detection as "Level 4B+", the
+  // level parser finds no plain number in "4B", and `detectionAtLevel` reads that
+  // missing number as a tower which never detects hidden at all. That is the Ranger
+  // defect exactly -- a detector shipped blind, with the page saying otherwise and
+  // nothing red anywhere.
+  const unreadable = (detection) =>
+    detection.raw != null && !detection.never && detection.fromLevel == null;
+
   const unread = [];
-  if (attributes.hidden.raw == null) unread.push('hidden detection');
-  if (attributes.flying.raw == null) unread.push('flying detection');
-  if (attributes.footprint == null) unread.push('placement footprint');
+  if (attributes.hidden.raw == null) unread.push('hidden detection is not on the fetched page');
+  else if (unreadable(attributes.hidden)) unread.push('hidden detection reads "' + attributes.hidden.raw + '", which is not a level');
+  if (attributes.flying.raw == null) unread.push('flying detection is not on the fetched page');
+  else if (unreadable(attributes.flying)) unread.push('flying detection reads "' + attributes.flying.raw + '", which is not a level');
+  if (attributes.footprint == null) unread.push('placement footprint is not on the fetched page');
   if (unread.length > 0) {
-    skipped.push(scraped.id + ' (' + unread.join(', ') + ' not on the fetched page; a guess here is invisible)');
+    skipped.push(scraped.id + ' (' + unread.join('; ') + '; a guess here is invisible)');
     continue;
   }
 

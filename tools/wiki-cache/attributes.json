@@ -326,6 +326,34 @@
       "immunities": "None"
     },
     {
+      "id": "pursuit",
+      "displayName": "Pursuit",
+      "url": "https://tds.fandom.com/wiki/Pursuit",
+      "hidden": {
+        "fromLevel": null,
+        "never": false,
+        "raw": "Level 4B+"
+      },
+      "flying": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "lead": {
+        "fromLevel": 3,
+        "never": false,
+        "raw": "Level 3+"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 5000,
+      "baseSell": 1666,
+      "refundRatio": 0.3332,
+      "immunities": "Stun",
+      "retrievedAt": "2026-09-17"
+    },
+    {
+      "retrievedAt": "2026-09-17",
       "id": "pyromancer",
       "displayName": "Pyromancer",
       "url": "https://tds.fandom.com/wiki/Pyromancer",
@@ -349,8 +377,7 @@
       "baseCost": 900,
       "baseSell": 300,
       "refundRatio": 0.3333,
-      "immunities": "None",
-      "retrievedAt": "2026-09-17"
+      "immunities": "None"
     },
     {
       "retrievedAt": "2026-09-16",

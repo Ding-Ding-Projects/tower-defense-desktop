@@ -178,12 +178,81 @@ function normaliseHeader(cell) {
     .toLowerCase();
 }
 
-export function extractLevels(html) {
+/**
+ * Which row actually carries the column names.
+ *
+ * Looked for rather than assumed, and bounded to the first few rows so a data row that
+ * happens to contain the word cannot be mistaken for a header.
+ *
+ * @param {string[][]} rows
+ * @returns {number} the row index, or -1
+ */
+function findHeaderRow(rows) {
+  const limit = Math.min(rows.length, 4);
+  for (let i = 0; i < limit; i += 1) {
+    const cells = rows[i].map(normaliseHeader);
+    if (cells.includes('level') && cells.includes('cost')) return i;
+  }
+  return -1;
+}
+
+/**
+ * The captions of any statistics tables describing a branching upgrade path.
+ *
+ * `extractLevels` stops at the first table that yields anything, which is right for a
+ * page with one subject and quietly wrong for a page without. Pursuit carries six
+ * statistics tables: a neutral block for levels 0 to 3, then a Top Path and a Bottom
+ * Path block that each claim their own levels 4 and 5, and then that whole set again.
+ * Read first-table-wins, that tower comes back as an ordinary four-level tower, and
+ * nothing anywhere says the other two thirds of it were dropped.
+ *
+ * Counting the tables does not separate that from the ordinary case, because plenty of
+ * unambiguous pages carry two: most towers print their own table and then their Golden
+ * variant's, and the generator's infobox cost cross-check already refuses a row that
+ * read the wrong one. Comparing the tables' numbers does not separate it either, for
+ * the same reason -- a Golden variant disagrees with its base tower at every level, by
+ * design.
+ *
+ * What does separate it is that the source says so itself. A tower with branching
+ * upgrades captions its tables "Top Path Stats" and "Bottom Path Stats", and across
+ * every page read so far exactly one tower does: Pursuit. So this reports the source's
+ * own words rather than inferring the structure from the numbers, and the generator
+ * refuses a row whose page claims paths the engine has no way to represent.
+ *
+ * @param {string} html
+ * @returns {string[]}  the captions naming a path, in page order
+ */
+export function branchingPathCaptions(html) {
   const tables = html.match(/<table[\s\S]*?<\/table>/g) || [];
+  const captions = [];
   for (const table of tables) {
     const rows = tableToRows(table).filter((r) => r.length > 0);
     if (rows.length < 2) continue;
-    const header = rows[0].map(normaliseHeader);
+    const headerRow = findHeaderRow(rows);
+    // A caption is the spanning row ABOVE the header, so a table whose header is row
+    // zero has none and cannot be making a claim about paths either way.
+    if (headerRow < 1) continue;
+    const caption = rows[headerRow - 1].join(' ').trim();
+    if (/\bpath\b/i.test(caption)) captions.push(caption);
+  }
+  return captions;
+}
+
+export function extractLevels(html, options = {}) {
+  const tables = html.match(/<table[\s\S]*?<\/table>/g) || [];
+  /** @type {Array<Array<Record<string, number>>>} */
+  const everyTable = [];
+  for (const table of tables) {
+    const rows = tableToRows(table).filter((r) => r.length > 0);
+    if (rows.length < 2) continue;
+    // The header is not always the first row. Several pages open their statistics table
+    // with a single spanning cell -- "Commander Stats" -- so row zero is one cell, the
+    // column check found no Level column, and the whole table was skipped. The page then
+    // looked to every downstream step like a page with no statistics on it at all, which
+    // is exactly what was reported about those two for weeks.
+    const headerRow = findHeaderRow(rows);
+    if (headerRow < 0) continue;
+    const header = rows[headerRow].map(normaliseHeader);
     const col = (name) => header.findIndex((h) => h === name);
     // Several columns mean one thing under more than one name, and the difference is
     // purely editorial: a splash tower's damage column is headed "Splash Damage", a
@@ -263,7 +332,7 @@ export function extractLevels(html) {
     const iTick = col('tick');
 
     const levels = [];
-    for (const row of rows.slice(1)) {
+    for (const row of rows.slice(headerRow + 1)) {
       const level = money(row[iLevel]);
       const cost = money(row[iCost]);
       const damage = money(row[iDamage]);
@@ -325,15 +394,14 @@ export function extractLevels(html) {
       }
       levels.push(entry);
     }
-    if (levels.length > 0) return levels;
+    if (levels.length > 0) {
+      if (!options.allTables) return levels;
+      everyTable.push(levels);
+    }
   }
-  return [];
+  return options.allTables ? /** @type {any} */ (everyTable) : [];
 }
 
-/**
- * @param {string} name
- * @returns {{ id: string, displayName: string, url: string, levels: Array<Record<string, number>> }}
- */
 /**
  * Read a support tower's table: the ones that earn money rather than deal damage.
  *
@@ -351,14 +419,16 @@ export function extractIncomeLevels(html) {
   for (const table of tables) {
     const rows = tableToRows(table).filter((r) => r.length > 0);
     if (rows.length < 2) continue;
-    const header = rows[0].map(normaliseHeader);
+    const headerRow = findHeaderRow(rows);
+    if (headerRow < 0) continue;
+    const header = rows[headerRow].map(normaliseHeader);
     const iLevel = header.indexOf('level');
     const iCost = header.indexOf('cost');
     const iIncome = header.indexOf('income');
     if (iLevel < 0 || iCost < 0 || iIncome < 0) continue;
 
     const levels = [];
-    for (const row of rows.slice(1)) {
+    for (const row of rows.slice(headerRow + 1)) {
       const level = money(row[iLevel]);
       const cost = money(row[iCost]);
       const income = money(row[iIncome]);
@@ -372,7 +442,8 @@ export function extractIncomeLevels(html) {
 
 /**
  * @param {string} name
- * @returns {{ id: string, displayName: string, url: string, levels: Array<Record<string, number>>, kind: string }}
+ * @returns {{ id: string, displayName: string, url: string, kind: string,
+ *   levels: Array<Record<string, number>>, branchingPathCaptions: string[] }}
  */
 export function scrapeTower(name) {
   const url = 'https://tds.fandom.com/wiki/' + encodeURIComponent(name.replace(/ /g, '_'));
@@ -394,6 +465,7 @@ export function scrapeTower(name) {
     displayName: name,
     url,
     levels,
+    branchingPathCaptions: branchingPathCaptions(html),
   };
 }
 

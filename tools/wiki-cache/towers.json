@@ -77,6 +77,36 @@
     {
       "retrievedAt": "2026-09-17",
       "kind": "attack",
+      "id": "commander",
+      "displayName": "Commander",
+      "url": "https://tds.fandom.com/wiki/Commander",
+      "levels": [
+        {
+          "level": 2,
+          "cost": 2450,
+          "damage": 15,
+          "shotIntervalSeconds": 0.6,
+          "range": 13
+        },
+        {
+          "level": 3,
+          "cost": 4500,
+          "damage": 30,
+          "shotIntervalSeconds": 0.6,
+          "range": 15
+        },
+        {
+          "level": 4,
+          "cost": 14000,
+          "damage": 50,
+          "shotIntervalSeconds": 0.6,
+          "range": 17
+        }
+      ]
+    },
+    {
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "cowboy",
       "displayName": "Cowboy",
       "url": "https://tds.fandom.com/wiki/Cowboy",
@@ -701,6 +731,57 @@
     },
     {
       "kind": "attack",
+      "id": "pursuit",
+      "displayName": "Pursuit",
+      "url": "https://tds.fandom.com/wiki/Pursuit",
+      "levels": [
+        {
+          "level": 0,
+          "cost": 5000,
+          "damage": 7,
+          "shotIntervalSeconds": 0.225,
+          "range": 7,
+          "reloadSeconds": 3.5
+        },
+        {
+          "level": 1,
+          "cost": 1750,
+          "damage": 10,
+          "shotIntervalSeconds": 0.225,
+          "range": 7,
+          "reloadSeconds": 3.5
+        },
+        {
+          "level": 2,
+          "cost": 3000,
+          "damage": 10,
+          "shotIntervalSeconds": 0.175,
+          "range": 8,
+          "reloadSeconds": 3
+        },
+        {
+          "level": 3,
+          "cost": 4750,
+          "damage": 12,
+          "shotIntervalSeconds": 0.175,
+          "range": 8,
+          "aoeRadius": 4,
+          "splashDamage": 30,
+          "burstCount": 2,
+          "reloadSeconds": 3
+        }
+      ],
+      "branchingPathCaptions": [
+        "Top Path Stats",
+        "Bottom Path Stats",
+        "Top Path Stats",
+        "Bottom Path Stats"
+      ],
+      "retrievedAt": "2026-09-17"
+    },
+    {
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "pyromancer",
       "displayName": "Pyromancer",
       "url": "https://tds.fandom.com/wiki/Pyromancer",
@@ -765,8 +846,7 @@
           "statusTickSeconds": 1,
           "pageDps": 76.43
         }
-      ],
-      "retrievedAt": "2026-09-17"
+      ]
     },
     {
       "retrievedAt": "2026-09-17",
