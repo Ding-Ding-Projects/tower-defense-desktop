@@ -95,6 +95,8 @@
  * @property {number} [incomePerWave]   economy towers
  * @property {AuraDef} [aura]
  * @property {AbilityDef} [ability]
+ * @property {boolean} [firesOnlyDuringAbility]  a tower with no weapon of its own
+ *   except while its ability is running
  * @property {Source} source
  */
 
@@ -118,6 +120,7 @@
  * @property {number} magnitude
  * @property {number} [radius]
  * @property {number} [durationSeconds]
+ * @property {AuraDef} [aura]  a `buffPulse` applies this only while the ability runs
  */
 
 /**

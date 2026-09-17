@@ -167,6 +167,11 @@ export function serializeState(state) {
       t.burstLeft,
       t.reloadTicks,
       t.abilityCooldownTicks,
+      // Decides whether a tower whose weapon only exists during its ability is
+      // currently allowed to shoot at all, and which buffs its neighbours are
+      // fighting under. Two runs that disagree about it deal different damage
+      // everywhere at once.
+      t.abilityActiveTicks ?? 0,
       t.totalSpent,
       // Drives which swings crit, so two replays that disagree about it deal different
       // damage. Left out of the hash it would diverge in complete silence, and the

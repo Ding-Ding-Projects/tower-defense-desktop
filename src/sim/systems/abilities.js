@@ -72,8 +72,17 @@ export function runPendingAbilities(state, gameData) {
         state.lives += ability.magnitude;
         break;
       case 'buffPulse':
-        // Handled as an aura on the data row rather than as state, so nothing has to
-        // be remembered between ticks and a replay re-derives it.
+        // This branch used to be empty, with a comment claiming the buff was "handled
+        // as an aura on the data row". The aura on a data row is the tower's PASSIVE
+        // one, which is always on, so pressing the button spent a thirty second
+        // cooldown and changed nothing whatsoever. Nothing was red: no shipped tower
+        // had an ability, so the dead branch had never once been reached.
+        //
+        // The duration lives on the tower and the aura is read back out of the ability
+        // while it lasts, which keeps the property the aura system is built on: every
+        // effective stat is still a pure function of the current world, so a replay
+        // re-derives it and selling the source removes the buff with no bookkeeping.
+        tower.abilityActiveTicks = secondsToTicks(ability.durationSeconds ?? 0);
         break;
       default:
         throw new Error('unknown ability effect: ' + ability.effect);
@@ -88,6 +97,7 @@ export function runPendingAbilities(state, gameData) {
 export function coolAbilities(state) {
   for (const tower of state.towers) {
     if (tower.abilityCooldownTicks > 0) tower.abilityCooldownTicks -= 1;
+    if (tower.abilityActiveTicks > 0) tower.abilityActiveTicks -= 1;
   }
 }
 

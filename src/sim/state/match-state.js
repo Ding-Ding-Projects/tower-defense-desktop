@@ -54,6 +54,7 @@ import { secondsToTicks } from '../core/constants.js';
  * @property {number} reloadTicks
  * @property {number} secondaryCooldownTicks  the second weapon runs its own clock
  * @property {number} abilityCooldownTicks
+ * @property {number} abilityActiveTicks  ticks its ability is still running for
  * @property {number} totalSpent      what a sale refunds a percentage of
  */
 

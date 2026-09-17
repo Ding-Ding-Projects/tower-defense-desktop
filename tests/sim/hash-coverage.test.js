@@ -18,6 +18,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
+import { createMatch, submitCommand, runTicks } from '../../src/sim/core/match.js';
 import { createMatchState } from '../../src/sim/state/match-state.js';
 import { serializeState, hashState } from '../../src/sim/state/snapshot.js';
 import { makeGameData } from '../fixtures/game-data.js';
@@ -31,7 +32,8 @@ import { makeGameData } from '../fixtures/game-data.js';
 const TOWER_STATE_FIELDS = [
   'seq', 'defId', 'level', 'xFixed', 'yFixed', 'targeting',
   'cooldownTicks', 'spinUpTicks', 'burstLeft', 'reloadTicks',
-  'abilityCooldownTicks', 'totalSpent', 'hitsLanded', 'secondaryCooldownTicks',
+  'abilityCooldownTicks', 'abilityActiveTicks', 'totalSpent', 'hitsLanded',
+  'secondaryCooldownTicks',
 ];
 
 function stateWithTower() {
@@ -40,8 +42,8 @@ function stateWithTower() {
   state.towers.push(/** @type {any} */ ({
     seq: 1, defId: 'gunner', level: 0, xFixed: 100 * 1024, yFixed: 80 * 1024,
     targeting: 'first', cooldownTicks: 2, spinUpTicks: 1, burstLeft: 1,
-    reloadTicks: 3, abilityCooldownTicks: 4, totalSpent: 100, hitsLanded: 5,
-    secondaryCooldownTicks: 6,
+    reloadTicks: 3, abilityCooldownTicks: 4, abilityActiveTicks: 7,
+    totalSpent: 100, hitsLanded: 5, secondaryCooldownTicks: 6,
   }));
   return state;
 }
@@ -77,4 +79,31 @@ test('the serialised state actually mentions the tower', () => {
   // and the first check would fail for a reason nobody could read off it.
   const text = serializeState(stateWithTower());
   assert.match(text, /\|T\|/, 'no tower section in the serialised state');
+});
+
+test('a tower built by the real placement path carries exactly these fields', () => {
+  // The fixture above is a hand-written literal, so on its own it proves only that the
+  // literal and the list agree with each other. A field added to the game's actual
+  // placement path and forgotten in both would leave every check here green, which is
+  // the same blind spot the list was written to close, one level further out.
+  const match = createMatch({
+    gameData: makeGameData(), seed: 3, mapId: 'proving-ground', difficultyId: 'standard',
+  });
+  submitCommand(match, 'PlaceTower', { towerId: 'gunner', x: 60, y: 65 });
+  // Commands execute at a tick boundary a couple of ticks out, and `submitCommand`
+  // returns the queued command rather than a verdict, so the tower is looked for after
+  // the ticks that actually run it.
+  runTicks(match, 3);
+  const placed = /** @type {any} */ (match.state.towers[0]);
+  assert.ok(placed, 'the placement command placed nothing, so this proves nothing');
+
+  const missing = TOWER_STATE_FIELDS.filter((field) => placed[field] === undefined);
+  assert.deepEqual(missing, [], 'a real tower is missing hashed fields: ' + missing.join(', '));
+
+  const unhashed = Object.keys(placed).filter((field) => !TOWER_STATE_FIELDS.includes(field));
+  assert.deepEqual(
+    unhashed, [],
+    'a real tower carries state nothing hashes: ' + unhashed.join(', ') +
+      '. Either add it to the hash, or add it to the list with a note saying why it cannot diverge.',
+  );
 });

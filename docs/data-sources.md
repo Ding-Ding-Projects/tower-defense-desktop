@@ -274,7 +274,7 @@ checked, and waiting.
 | Accelerator | A charge-up beam. Its table has no rate column at all, only charge-up, tick and overcharge. |
 | Military Base | Friendly units. It spawns them; nothing in the simulation fights on the player's side. |
 | Medic | Healing and shield recharge for other towers. Auras can buff a stat; nothing repairs. |
-| Commander | **A weapon that only exists during an ability.** Levels 0 and 1 have no damage and no firerate at all: the tower is a pure firerate aura, which the engine already models. Its damage column applies only while Call to Arms is up, because the page says the ability "will be able to attack enemies with its own weapon for 10 seconds". Nothing in the firing system can switch a tower's weapon on for a duration, and its level 4 Support Caravan summons friendly units, which is the Military Base blocker again. |
+| Commander | **Two abilities on one level, one of which summons friendly units.** Most of this tower is modellable now: levels 0 and 1 have no damage and no firerate because it is purely a firerate aura, its damage column applies only while Call to Arms is up, and the engine gained both of those while investigating it (see below). What remains is that its level 4 carries Call to Arms *and* Support Caravan at the same time, and a level holds one ability. Making that a list would not help, because Support Caravan summons Gunner APCs and nothing in the simulation fights on the player's side, which is the Military Base blocker. Shipping the tower without it would be shipping a level 4 the source does not describe. |
 | Pursuit | **Branching upgrade paths, and a tower that moves.** From level 4 the page splits into a Top Path and a Bottom Path with different costs, damage and ranges, and the engine models one linear upgrade line. It also carries Speed and Patrol Range columns, so it drives around rather than holding a placement. Its infobox says the same thing independently: hidden detection at "Level 4B+", a level number with a branch letter on it. |
 
 ### Page layout: understood now
@@ -291,6 +291,31 @@ Both pages parse, and neither tower ships: what the readable tables then showed 
 that both are blocked on engine features, recorded in the table above. The scan is
 bounded to the first few rows on purpose, because a search of the whole table would
 let any row containing those two words become a header.
+
+### What reading Commander's page found in the engine
+
+Neither of these was a data problem, and neither was visible from the data.
+
+No shipped tower has an aura or an ability. Both systems exist, both are covered by
+checks against the synthetic fixture, and neither had ever run on a real match. Inside
+the ability system, the `buffPulse` branch was empty, with a comment explaining that
+the buff was "handled as an aura on the data row". A data row's aura is the tower's
+PASSIVE one, always on, so a `buffPulse` ability spent its cooldown and changed
+nothing at all. It had never been reached, because nothing on disk had an ability to
+reach it with.
+
+That branch now sets a duration on the tower, and the aura collector reads the
+ability's own aura back out for as long as it lasts -- separately from the passive
+one, so the stacking rules decide how they combine rather than one silently replacing
+the other. A tower level may also declare `firesOnlyDuringAbility`, which is what
+Commander's damage column actually means: the page says Call to Arms lets it "attack
+enemies with its own weapon for 10 seconds", so without the gate it would shoot
+continuously at ability damage, which is a straightforwardly better tower than the one
+the source describes.
+
+`tests/sim/support-tower.test.js` covers all of it, and `abilityActiveTicks` is in the
+determinism hash, because it decides both whether a tower may shoot and what its
+neighbours are fighting under.
 
 ### The rule that governs all of it
 

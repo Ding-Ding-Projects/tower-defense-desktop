@@ -34,6 +34,14 @@ export function fireTowers(state, gameData) {
     const level = def.levels[tower.level];
     if (!level) continue;
 
+    // Some towers have no weapon of their own except while an ability is running.
+    // Commander is the whole reason this exists: its levels 0 and 1 list no damage and
+    // no firerate at all because it is purely a firerate aura, and from level 2 its
+    // gun appears only for the ten seconds Call to Arms is up. Without the gate, a
+    // tower like that shoots continuously at its ability's damage, which is a very
+    // different tower from the one the source describes.
+    if (level.firesOnlyDuringAbility && tower.abilityActiveTicks <= 0) continue;
+
     // The second weapon runs BEFORE the reload check and on its own clock, because it
     // is a separate weapon: a tower reloading its gun has not stopped carrying bombs.
     // Running it after the reload guard would have tied the two together and quietly

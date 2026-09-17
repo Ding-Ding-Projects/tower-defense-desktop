@@ -40,12 +40,26 @@ export function aurasReaching(state, gameData, xFixed, yFixed, excludeSeq) {
     const def = gameData.towers.get(source.defId);
     if (!def) continue;
     const level = def.levels[source.level];
-    if (!level || !level.aura) continue;
-    const radiusFixed = toFixed(level.aura.radius);
-    if (distanceSquared(xFixed, yFixed, source.xFixed, source.yFixed) > radiusFixed * radiusFixed) {
-      continue;
+    if (!level) continue;
+
+    // A tower can be projecting two auras at once: the passive one its level carries,
+    // and a stronger temporary one while its ability is running. Commander is exactly
+    // that -- a standing firerate boost, and a larger one for the ten seconds Call to
+    // Arms lasts. They are collected separately rather than one replacing the other,
+    // so the stacking rules in `applyAuras` decide how they combine instead of this
+    // function quietly picking a winner.
+    const active = [];
+    if (level.aura) active.push(level.aura);
+    if (source.abilityActiveTicks > 0 && level.ability?.aura) active.push(level.ability.aura);
+    if (active.length === 0) continue;
+
+    for (const aura of active) {
+      const radiusFixed = toFixed(aura.radius);
+      if (distanceSquared(xFixed, yFixed, source.xFixed, source.yFixed) > radiusFixed * radiusFixed) {
+        continue;
+      }
+      found.push(aura);
     }
-    found.push(level.aura);
   }
   return found;
 }

@@ -103,6 +103,7 @@ function placeTower(state, gameData, payload) {
     secondaryCooldownTicks: 0,
     reloadTicks: 0,
     abilityCooldownTicks: 0,
+    abilityActiveTicks: 0,
     totalSpent: def.baseCost,
   });
   return { accepted: true };
