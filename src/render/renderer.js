@@ -25,6 +25,7 @@ import {
   drawImpactSpark,
   drawExplosion,
   drawLeakFlash,
+  STATUS_TINT,
   TOWER_WORLD_SIZE,
   ENEMY_WORLD_SIZE,
   PROJECTILE_WORLD_SIZE,
@@ -42,6 +43,15 @@ import {
  * The art module publishes its own world sizes; these scale them for this map's
  * proportions, where two hundred units span a couple of thousand pixels.
  */
+/**
+ * What an unrecognised status is drawn as.
+ *
+ * Grey rather than invisible: a status the palette has no colour for is still something
+ * the enemy is carrying, and a player who can see an unfamiliar mark will ask about it,
+ * where one who sees nothing will not.
+ */
+const UNKNOWN_STATUS_TINT = '#9aa0a6';
+
 export const WORLD = Object.freeze({
   tower: TOWER_WORLD_SIZE * 1.6,
   enemy: ENEMY_WORLD_SIZE * 2.1,
@@ -466,20 +476,21 @@ export class CanvasRenderer {
    * @param {number} zoom
    */
   _drawStatusIcon(x, y, status, zoom) {
+    // Colours come from the palette, which is the module that exists so colour lives in
+    // one place. This function carried its own copy of the whole table, and the two had
+    // drifted: haste was #ff6b9d here and #ffe08a there, so the palette's value for it
+    // described nothing that was ever drawn. STATUS_TINT was exported and read by
+    // nothing at all -- one definition, no consumers, in the entire tree.
+    //
+    // It was also rebuilt on every call: once per status, per enemy, per frame. A wave
+    // of forty-five enemies under a Freezer allocates that object thousands of times a
+    // second, in a renderer that pools its projectiles and particles precisely so it
+    // does not do this.
     const ctx = this.ctx;
-    const colours = {
-      stun: '#ffd166',
-      slow: '#7ec8e3',
-      freeze: '#9fe3ff',
-      burn: '#ff8a4c',
-      poison: '#8ad06a',
-      exposed: '#d6a2ff',
-      haste: '#ff6b9d',
-    };
     ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, Math.max(2, 0.3 * zoom), 0, Math.PI * 2);
-    ctx.fillStyle = /** @type {Record<string, string|undefined>} */ (colours)[status.id] ?? '#9aa0a6';
+    ctx.fillStyle = STATUS_TINT[/** @type {keyof typeof STATUS_TINT} */ (status.id)] ?? UNKNOWN_STATUS_TINT;
     ctx.fill();
     ctx.restore();
   }
