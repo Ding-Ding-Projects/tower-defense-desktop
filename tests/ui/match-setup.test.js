@@ -186,9 +186,8 @@ test('app.js reaches the setup screen instead of replaying the same match', () =
 
 test('the new module is in the typecheck ratchet', () => {
   const config = JSON.parse(readFileSync(ROOT + 'tsconfig.render.json', 'utf8'));
-  assert.ok(
-    (config.files ?? []).includes('src/ui/match-setup.js'),
-    'match-setup.js is not checked, and a new file has to be clean',
-  );
+  for (const file of ['src/ui/match-setup.js', 'src/ui/match-transition.js']) {
+    assert.ok((config.files ?? []).includes(file), file + ' is not checked, and a new file has to be clean');
+  }
   assert.ok(readdirSync(ROOT + 'src/ui/').includes('match-setup.js'));
 });

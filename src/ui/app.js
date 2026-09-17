@@ -20,6 +20,7 @@ import { createTitleBar } from './titlebar.js';
 import { InterfaceLayer } from '../render/hud/interface-layer.js';
 import { PauseAndSettings } from './pause-settings.js';
 import { MatchSetup } from './match-setup.js';
+import { presentNewMatch } from './match-transition.js';
 import { ALL_TARGETING_MODES, cycleTargetingMode } from './targeting.js';
 
 // Zoom is pixels per map unit. A map is a couple of hundred units across and a
@@ -132,20 +133,34 @@ export function bootstrap(doc = document) {
     renderer.selectedTowerId = null;
     placingTowerDefId = null;
     renderer.placingTowerDefId = null;
-    // Otherwise the first frame of the new match is described using the last frame of
-    // the old one, and a brand new game opens by announcing "Wave 0 cleared".
-    //
-    // Both of them, and the second is the one that actually did it. The interface layer
-    // remembers the previous phase, and the render loop keeps the last two snapshots to
-    // interpolate between -- so even with the layer reset, the loop still held the
-    // finished match's final frame and handed the layer `active` followed by
-    // `intermission` one more time.
-    interfaceLayer.resetForNewMatch();
-    loop.resetForNewMatch();
+    // Everything on the presentation side that remembers the previous match, forgotten
+    // together. Three things do, and the one that actually produced the stale "Wave 0
+    // cleared" card was the last to be found; match-transition.js says which.
+    presentNewMatch({
+      interfaceLayer, loop, renderer,
+      state: interfaceStateFor(sim.snapshot(matchState)),
+    });
     // Refit, because the two maps are not the same size and a camera framed for one
     // shows the other half off-screen.
     fittedOnce = false;
     resize();
+  }
+
+  /**
+   * One object, handed to the layer, drawn inside the canvas next frame.
+   * @param {import('../render/sim-interface.js').Snapshot} snap
+   */
+  function interfaceStateFor(snap) {
+    return {
+      snapshot: snap,
+      gameData,
+      totalWaves,
+      selectedTowerId,
+      placingTowerDefId,
+      disallowedTowerIds: difficultyDef.disallowedTowers ?? [],
+      paused,
+      uiScale: 1,
+    };
   }
 
   function resize() {
@@ -384,17 +399,7 @@ export function bootstrap(doc = document) {
     for (const t of snap.towers) {
       placementPoolCounts.set(t.defId, (placementPoolCounts.get(t.defId) ?? 0) + 1);
     }
-    // One object, handed to the layer, drawn inside the canvas next frame.
-    renderer.interfaceState = {
-      snapshot: snap,
-      gameData,
-      totalWaves,
-      selectedTowerId,
-      placingTowerDefId,
-      disallowedTowerIds: difficultyDef.disallowedTowers ?? [],
-      paused,
-      uiScale: 1,
-    };
+    renderer.interfaceState = interfaceStateFor(snap);
 
     if (selectedTowerId) {
       const tower = snap.towers.find((t) => t.id === selectedTowerId);

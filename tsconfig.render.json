@@ -44,6 +44,7 @@
     "src/ui/game-states.js",
     "src/ui/hud.js",
     "src/ui/match-setup.js",
+    "src/ui/match-transition.js",
     "src/ui/pause-settings.js",
     "src/ui/selected-tower-panel.js",
     "src/ui/shop.js",

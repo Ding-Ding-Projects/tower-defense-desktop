@@ -14,7 +14,12 @@ const METHODS = [
   'quadraticCurveTo', 'bezierCurveTo',
   'fill', 'stroke', 'clip',
   'save', 'restore', 'translate', 'rotate', 'scale',
-  'setLineDash', 'drawImage', 'measureText',
+  'setLineDash', 'drawImage',
+  // The interface layer draws through the same context as the battlefield, and these
+  // are what it needs beyond the art. Without them the renderer could only be driven
+  // with its interface layer detached, which is how every renderer check ran until a
+  // match transition had to be reproduced with the layer attached.
+  'arcTo', 'fillText', 'strokeText',
 ];
 
 const PROPERTIES = [
@@ -74,6 +79,15 @@ export function createFakeContext() {
       },
     });
   }
+
+  // Real-shaped, because HUD layout reads `.width` off it and lays text out by the
+  // answer; a recorded call returning undefined throws one line later. Seven pixels a
+  // character, matching the HUD-side fake, so both fakes lay the same text out the
+  // same way.
+  ctx.measureText = (text) => {
+    calls.push({ type: 'measureText', args: [sanitize(text)] });
+    return { width: String(text ?? '').length * 7 };
+  };
 
   ctx.createRadialGradient = (...args) => {
     calls.push({ type: 'createRadialGradient', args: args.map(sanitize) });
