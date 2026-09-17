@@ -35,7 +35,7 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 ## Phase 3: the roster
 
 - [x] Status effect rows, each cited
-- [x] First tranche of towers, each cited (17 of roughly 40)
+- [x] First tranche of towers, each cited (19 of roughly 40)
 - [x] Tower detection, footprint and sell refund read off the page instead of hand-written
 - [x] Every shipped level cross-checked against its page's own damage-per-second column
       (83 levels; Cowboy excluded by name, with its arithmetic recorded)

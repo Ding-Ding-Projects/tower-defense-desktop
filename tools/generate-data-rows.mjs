@@ -53,6 +53,7 @@ const OVERLAY = {
   mortar: { terrain: ['ground'], pool: 'default', max: null },
   rocketeer: { terrain: ['ground'], pool: 'default', max: null },
   warden: { terrain: ['ground'], pool: 'default', max: null },
+  'ace-pilot': { terrain: ['ground'], pool: 'default', max: null },
   // The shared economy cap, which is what the placementPool field exists for: farms
   // compete with each other for a limited number of slots rather than with the guns.
   farm: { terrain: ['ground'], pool: 'economy', max: 8 },
@@ -127,6 +128,13 @@ function toLevel(row, overlay, attributes, source) {
   }
   if (row.aoeRadius) level.aoeRadius = row.aoeRadius;
   if (row.splashDamage) level.splashDamage = row.splashDamage;
+  if (row.secondaryDamage && row.secondaryCooldownSeconds) {
+    level.secondary = {
+      damage: row.secondaryDamage,
+      cooldownSeconds: row.secondaryCooldownSeconds,
+      ...(row.secondaryAoeRadius ? { aoeRadius: row.secondaryAoeRadius } : {}),
+    };
+  }
   if (row.spinUpSeconds) level.spinUpSeconds = row.spinUpSeconds;
   if (row.burstCount && row.burstCount > 1) {
     level.burstCount = row.burstCount;

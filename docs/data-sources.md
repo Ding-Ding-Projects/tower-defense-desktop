@@ -199,6 +199,18 @@ Both were watched failing before being trusted, and the second was written speci
 to confirm the old behaviour still holds for the towers that never had a separate
 figure.
 
+**Ace Pilot needed a third.** It carries a gun AND a bomb on its own cooldown, and its
+published figure is the two added: at level 5, 14 damage every 0.12 seconds plus a 45
+bomb every 1.5 seconds is exactly 146.67. A tower level can now carry a second weapon
+that runs on its own clock, which is checked both ways and does not touch a tower that
+has none. What distinguishes a bomb from an ordinary blast in the data is simply that
+the page gives it a cooldown of its own; where the splash has no separate cooldown, as
+on Ranger, it is a blast around the shot and is read as one.
+
+Ace Pilot also caught the scraper preferring a splash column over a normal one, which
+read its bomb as its entire output and silently dropped the two levels where the bomb
+does not exist yet and the cell reads N/A.
+
 ## The rest of the roster, and why each one is still absent
 
 Every remaining tower was fetched and its page read. They are not all the same kind of
@@ -245,7 +257,6 @@ checked, and waiting.
 
 | Tower | What it needs |
 | --- | --- |
-| Ace Pilot | A second weapon. It is a gun AND a bomb on its own cooldown: at level 5, 14 damage over 0.12 seconds plus a 45 bomb over 1.5 seconds is exactly the published 146.67. The engine gives a tower one weapon. |
 | Warden | **The engine can model it now; the source contradicts itself.** Its upgrade table lists $1,000 to place with 6 base damage, and its own infobox lists $1,850 with 12. A row built from two readings that disagree is a row nobody can trust, so it does not ship and the generator refuses it by name. |
 | Accelerator | A charge-up beam. Its table has no rate column at all, only charge-up, tick and overcharge. |
 | Pyromancer | Burn damage, burn time, tick rate and defence melt as one coherent status. The status registry can carry a burn, but not the defence melt. |

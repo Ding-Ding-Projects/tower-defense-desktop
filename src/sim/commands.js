@@ -100,6 +100,7 @@ function placeTower(state, gameData, payload) {
     spinUpTicks: 0,
     burstLeft: 0,
     hitsLanded: 0,
+    secondaryCooldownTicks: 0,
     reloadTicks: 0,
     abilityCooldownTicks: 0,
     totalSpent: def.baseCost,

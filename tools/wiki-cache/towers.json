@@ -2,7 +2,6 @@
   "retrievedAt": "2026-09-17",
   "results": [
     {
-      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "ace-pilot",
       "displayName": "Ace Pilot",
@@ -31,6 +30,9 @@
           "shotIntervalSeconds": 0.22,
           "range": 9,
           "aoeRadius": 3,
+          "secondaryDamage": 10,
+          "secondaryCooldownSeconds": 4,
+          "secondaryAoeRadius": 3,
           "pageDps": 20.68
         },
         {
@@ -40,6 +42,9 @@
           "shotIntervalSeconds": 0.15,
           "range": 10,
           "aoeRadius": 3,
+          "secondaryDamage": 30,
+          "secondaryCooldownSeconds": 4,
+          "secondaryAoeRadius": 3,
           "pageDps": 40.83
         },
         {
@@ -49,6 +54,9 @@
           "shotIntervalSeconds": 0.15,
           "range": 10,
           "aoeRadius": 3,
+          "secondaryDamage": 30,
+          "secondaryCooldownSeconds": 2,
+          "secondaryAoeRadius": 3,
           "pageDps": 68.33
         },
         {
@@ -58,9 +66,13 @@
           "shotIntervalSeconds": 0.12,
           "range": 10,
           "aoeRadius": 4,
+          "secondaryDamage": 45,
+          "secondaryCooldownSeconds": 1.5,
+          "secondaryAoeRadius": 4,
           "pageDps": 146.67
         }
-      ]
+      ],
+      "retrievedAt": "2026-09-17"
     },
     {
       "retrievedAt": "2026-09-17",

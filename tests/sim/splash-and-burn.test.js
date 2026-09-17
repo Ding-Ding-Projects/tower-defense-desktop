@@ -92,3 +92,54 @@ test('a tower with no splash figure still hits the whole area for its damage', (
   assert.equal(hit.lead, 100);
   assert.equal(hit.trailing, 100, 'without a splash figure the blast deals full damage');
 });
+
+test('a second weapon fires on its own clock, not the tower\'s', () => {
+  // Ace Pilot carries a gun and a bomb, and its published damage per second is the two
+  // added together. Modelling it as one weapon means choosing which half to ship and
+  // being wrong by the other.
+  const gameData = makeGameData();
+  const def = gameData.towers.get('gunner');
+  const level = def.levels[0];
+  Object.assign(level, {
+    fireRate: 10, range: 1000, damage: 1, aoeRadius: 0,
+    secondary: { damage: 50, cooldownSeconds: 1 },
+  });
+
+  const state = createMatchState(gameData, { seed: 6, mapId: 'proving-ground', difficultyId: 'standard' });
+  state.towers.push(/** @type {any} */ ({
+    seq: 1, defId: 'gunner', level: 0, xFixed: 100 * 1024, yFixed: 80 * 1024,
+    targeting: 'first', cooldownTicks: 0, spinUpTicks: 0, burstLeft: 0,
+    reloadTicks: 0, abilityCooldownTicks: 0, totalSpent: 100, hitsLanded: 0,
+    secondaryCooldownTicks: 0,
+  }));
+  const enemy = placeEnemy(state, 'grunt', 100 * 1024, { hp: 1e9, maxHp: 1e9 });
+
+  // Three seconds: the gun should land about thirty 1s and the bomb about three 50s.
+  const before = enemy.hp;
+  for (let tick = 0; tick < 90; tick += 1) fireTowers(state, gameData);
+  const dealt = before - enemy.hp;
+
+  // Gun alone would be roughly 30. Bomb alone would be roughly 150. Both is the point.
+  assert.ok(dealt > 150, 'only ' + dealt + ' damage in three seconds; the bomb did not fire');
+  assert.ok(dealt < 220, dealt + ' damage in three seconds; the bomb fired more often than its cooldown');
+});
+
+test('a tower with no second weapon is untouched by any of it', () => {
+  const gameData = makeGameData();
+  const def = gameData.towers.get('gunner');
+  Object.assign(def.levels[0], { fireRate: 10, range: 1000, damage: 1, aoeRadius: 0, secondary: undefined });
+
+  const state = createMatchState(gameData, { seed: 6, mapId: 'proving-ground', difficultyId: 'standard' });
+  state.towers.push(/** @type {any} */ ({
+    seq: 1, defId: 'gunner', level: 0, xFixed: 100 * 1024, yFixed: 80 * 1024,
+    targeting: 'first', cooldownTicks: 0, spinUpTicks: 0, burstLeft: 0,
+    reloadTicks: 0, abilityCooldownTicks: 0, totalSpent: 100, hitsLanded: 0,
+    secondaryCooldownTicks: 0,
+  }));
+  const enemy = placeEnemy(state, 'grunt', 100 * 1024, { hp: 1e9, maxHp: 1e9 });
+
+  const before = enemy.hp;
+  for (let tick = 0; tick < 90; tick += 1) fireTowers(state, gameData);
+  const dealt = before - enemy.hp;
+  assert.ok(dealt > 25 && dealt < 35, 'expected about thirty shots of 1, got ' + dealt);
+});

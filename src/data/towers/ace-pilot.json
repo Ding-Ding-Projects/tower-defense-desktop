@@ -1,0 +1,134 @@
+{
+  "id": "ace-pilot",
+  "displayName": "Ace Pilot",
+  "baseCost": 500,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundFraction": 0.3333333333333333,
+  "footprintRadius": 1.5,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 2,
+      "fireRate": 4.5455,
+      "range": 9,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ace_Pilot",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 1,
+      "cost": 225,
+      "damage": 3,
+      "fireRate": 4.5455,
+      "range": 9,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ace_Pilot",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      }
+    },
+    {
+      "level": 2,
+      "cost": 625,
+      "damage": 4,
+      "fireRate": 4.5455,
+      "range": 9,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ace_Pilot",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 3,
+      "secondary": {
+        "damage": 10,
+        "cooldownSeconds": 4,
+        "aoeRadius": 3
+      }
+    },
+    {
+      "level": 3,
+      "cost": 1500,
+      "damage": 5,
+      "fireRate": 6.6667,
+      "range": 10,
+      "detectsHidden": false,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ace_Pilot",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 3,
+      "secondary": {
+        "damage": 30,
+        "cooldownSeconds": 4,
+        "aoeRadius": 3
+      }
+    },
+    {
+      "level": 4,
+      "cost": 3000,
+      "damage": 8,
+      "fireRate": 6.6667,
+      "range": 10,
+      "detectsHidden": true,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ace_Pilot",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 3,
+      "secondary": {
+        "damage": 30,
+        "cooldownSeconds": 2,
+        "aoeRadius": 3
+      }
+    },
+    {
+      "level": 5,
+      "cost": 7000,
+      "damage": 14,
+      "fireRate": 8.3333,
+      "range": 10,
+      "detectsHidden": true,
+      "hitsAir": true,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Ace_Pilot",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "aoeRadius": 4,
+      "secondary": {
+        "damage": 45,
+        "cooldownSeconds": 1.5,
+        "aoeRadius": 4
+      }
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Ace_Pilot",
+    "retrievedAt": "2026-09-17",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-17, for detection, footprint and the selling cost the refund fraction is derived from"
+  }
+}

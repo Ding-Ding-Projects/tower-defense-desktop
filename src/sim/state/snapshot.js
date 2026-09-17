@@ -172,6 +172,10 @@ export function serializeState(state) {
       // damage. Left out of the hash it would diverge in complete silence, and the
       // determinism proof would report the two runs identical while they were not.
       t.hitsLanded ?? 0,
+      // Decides when the second weapon comes up, so two replays that disagree about it
+      // deal different damage at different moments. Same reasoning as the line above,
+      // which is here because it was once missing.
+      t.secondaryCooldownTicks ?? 0,
     );
   }
 

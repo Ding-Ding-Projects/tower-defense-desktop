@@ -34,6 +34,12 @@ export function fireTowers(state, gameData) {
     const level = def.levels[tower.level];
     if (!level) continue;
 
+    // The second weapon runs BEFORE the reload check and on its own clock, because it
+    // is a separate weapon: a tower reloading its gun has not stopped carrying bombs.
+    // Running it after the reload guard would have tied the two together and quietly
+    // made the bomb fire less often than its own cooldown says.
+    fireSecondary(state, gameData, tower, level);
+
     if (tower.reloadTicks > 0) {
       tower.reloadTicks -= 1;
       continue;
@@ -119,6 +125,53 @@ function shoot(state, gameData, tower, level, stats, target) {
     statusTicks: level.statusDurationSeconds ? secondsToTicks(level.statusDurationSeconds) : 0,
     bonusVsTag: level.bonusVsTag ?? null,
   });
+}
+
+/**
+ * Run a tower's second weapon, if it has one.
+ *
+ * Ace Pilot carries a gun and a bomb, and its published damage per second is the two
+ * added together: at level 5, 14 every 0.12 seconds plus a 45 bomb every 1.5 seconds is
+ * exactly the 146.67 its page states. Modelling that as one weapon means choosing which
+ * half to ship and being wrong by the other.
+ *
+ * It picks its own target rather than sharing the gun's, because the gun may be
+ * reloading, out of burst, or between shots at the moment the bomb comes up.
+ *
+ * @param {import('../state/match-state.js').MatchState} state
+ * @param {import('../../data/schema/types.js').GameData} gameData
+ * @param {import('../state/match-state.js').Tower} tower
+ * @param {import('../../data/schema/types.js').TowerLevel} level
+ */
+function fireSecondary(state, gameData, tower, level) {
+  const weapon = level.secondary;
+  if (!weapon) return;
+
+  if (tower.secondaryCooldownTicks > 0) {
+    tower.secondaryCooldownTicks -= 1;
+    return;
+  }
+
+  const stats = effectiveStats(state, gameData, tower);
+  const inRange = candidates(state, gameData, tower, level, stats.range);
+  if (inRange.length === 0) return;
+
+  const target = selectTarget(inRange, /** @type {any} */ (tower.targeting), gameData, tower);
+  if (!target) return;
+
+  // Given its own level-shaped view, so the blast uses the bomb's radius rather than
+  // the gun's, and the gun's statuses are not applied a second time by the bomb.
+  const asLevel = /** @type {any} */ ({
+    ...level,
+    damage: weapon.damage,
+    aoeRadius: weapon.aoeRadius,
+    splashDamage: undefined,
+    appliesStatuses: [],
+    critDamage: undefined,
+    critEveryNthHit: undefined,
+  });
+  resolveHit(state, gameData, tower.seq, target, weapon.damage, asLevel);
+  tower.secondaryCooldownTicks = Math.max(1, secondsToTicks(weapon.cooldownSeconds));
 }
 
 /**

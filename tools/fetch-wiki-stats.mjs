@@ -255,6 +255,11 @@ export function extractLevels(html) {
     const iSplash = iDamage >= 0 && header[iDamage] !== 'splash damage'
       ? col('splash damage')
       : -1;
+
+    // A second weapon on its own clock. Where a page carries a splash figure AND a
+    // cooldown of its own for it, the two together describe a bomb rather than a blast
+    // around the ordinary shot, and the published damage per second adds them.
+    const iSecondaryCooldown = col('bomb cooldown');
     const iTick = col('tick');
 
     const levels = [];
@@ -275,7 +280,18 @@ export function extractLevels(html) {
       }
       if (iSplash >= 0) {
         const splash = money(row[iSplash]);
-        if (splash !== null && splash > 0) entry.splashDamage = splash;
+        const bombCooldown = iSecondaryCooldown >= 0 ? money(row[iSecondaryCooldown]) : null;
+        if (splash !== null && splash > 0 && bombCooldown !== null && bombCooldown > 0) {
+          // Its own cooldown makes it a separate weapon, not a blast around the shot.
+          entry.secondaryDamage = splash;
+          entry.secondaryCooldownSeconds = bombCooldown;
+          if (iAoe >= 0) {
+            const blast = money(row[iAoe]);
+            if (blast !== null && blast > 0) entry.secondaryAoeRadius = blast;
+          }
+        } else if (splash !== null && splash > 0) {
+          entry.splashDamage = splash;
+        }
       }
       if (iDot >= 0) {
         const dot = money(row[iDot]);

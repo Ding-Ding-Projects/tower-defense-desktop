@@ -169,7 +169,13 @@ test('every shipped level reproduces the damage per second its page states', () 
       // the source computes it: Ranger's top level deals 875 to what it hit and 375
       // around it, and both over the same 8 second interval make its published 156.25.
       const perShot = level.damage + (level.splashDamage ?? 0);
-      const dps = (perShot * shots) / cycleSeconds + overTime;
+      // A second weapon runs on its own clock and the source adds its contribution in:
+      // Ace Pilot's top level is 14 every 0.12 seconds from the gun plus a 45 bomb every
+      // 1.5 seconds, which is exactly the 146.67 its page states.
+      const secondary = level.secondary
+        ? level.secondary.damage / level.secondary.cooldownSeconds
+        : 0;
+      const dps = (perShot * shots) / cycleSeconds + overTime + secondary;
 
       // A tenth of a percent, to absorb the four decimal places the rate is rounded to
       // and nothing wider. Every class of error this has caught was off by a factor,

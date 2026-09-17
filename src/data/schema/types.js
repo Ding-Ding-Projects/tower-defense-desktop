@@ -49,6 +49,21 @@
  */
 
 /**
+ * A second weapon a tower fires on its own clock, alongside its ordinary shots.
+ *
+ * Ace Pilot is the case this exists for: it carries a gun AND a bomb, and its published
+ * damage per second is the two added together. At level 5 that is 14 damage every 0.12
+ * seconds from the gun plus a 45 bomb every 1.5 seconds, which comes to exactly the
+ * 146.67 its page states. Modelling it as one weapon means choosing which half to ship
+ * and being wrong by the other.
+ *
+ * @typedef {object} SecondaryWeaponDef
+ * @property {number} damage
+ * @property {number} cooldownSeconds  its own clock, unrelated to the tower's fire rate
+ * @property {number} [aoeRadius]      a bomb usually has one
+ */
+
+/**
  * One level of one tower. Level 0 is the placed, unupgraded tower.
  * @typedef {object} TowerLevel
  * @property {number} level
@@ -65,6 +80,8 @@
  * @property {number} [reloadSeconds]   pause after a burst
  * @property {number} [projectileSpeed] map units per second; omitted means hitscan
  * @property {number} [aoeRadius]
+ * @property {SecondaryWeaponDef} [secondary]  a second weapon on its own cooldown,
+ *   independent of the tower's ordinary firing cadence
  * @property {number} [splashDamage]      what everything OTHER than the direct target
  *   takes inside aoeRadius; without it the whole area takes `damage`
  * @property {number} [pierceCount]     how many enemies one shot passes through
