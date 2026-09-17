@@ -167,3 +167,91 @@ test('the list has not drifted from the schema either', () => {
     'the schema can express these and the list does not mention them: ' + missing.join(', '),
   );
 });
+
+/**
+ * The enemy ability kinds the simulation can run, and which shipped enemy uses each.
+ *
+ * Same reasoning as the tower half, and the same hazard: `runEnemyAbility` is a switch
+ * over these five strings, so a kind nothing on disk uses is a branch nothing ever
+ * enters. `buffPulse` was that branch on the tower side and it was empty for the life
+ * of the project.
+ */
+const ENEMY_ABILITY_KINDS = [
+  { kind: 'summon' },
+  { kind: 'shieldPhase' },
+  { kind: 'speedPhase' },
+  {
+    kind: 'stun',
+    unusedBecause: 'no shipped boss stuns towers. The three that ship are Molten Boss, ' +
+      'Fallen King and Fallen Swordmaster, and their abilities were set by hand as ' +
+      'engine values rather than read, because the enemy infobox carries no ability field',
+  },
+  {
+    kind: 'heal',
+    unusedBecause: 'same as stun: the shipped bosses do not heal, and boss abilities ' +
+      'are engine values rather than sourced',
+  },
+];
+
+/** Which shipped enemies use each ability kind. */
+function enemyAbilityUsers() {
+  /** @type {Map<string, string[]>} */
+  const users = new Map();
+  const dir = ROOT + 'src/data/enemies/';
+  for (const file of readdirSync(dir)) {
+    const def = JSON.parse(readFileSync(dir + file, 'utf8'));
+    for (const ability of def.abilities ?? []) {
+      if (!users.has(ability.kind)) users.set(ability.kind, []);
+      const list = /** @type {string[]} */ (users.get(ability.kind));
+      if (!list.includes(def.id)) list.push(def.id);
+    }
+  }
+  return users;
+}
+
+test('every enemy ability kind with no shipped user says why', () => {
+  const users = enemyAbilityUsers();
+  const silent = ENEMY_ABILITY_KINDS
+    .filter((k) => !k.unusedBecause && (users.get(k.kind) ?? []).length === 0)
+    .map((k) => k.kind);
+  assert.deepEqual(
+    silent, [],
+    'these enemy ability kinds are used by no shipped enemy and carry no reason: ' +
+      silent.join(', '),
+  );
+});
+
+test('an enemy ability kind recorded as unused really is unused', () => {
+  const users = enemyAbilityUsers();
+  const stale = ENEMY_ABILITY_KINDS
+    .filter((k) => k.unusedBecause && (users.get(k.kind) ?? []).length > 0)
+    .map((k) => k.kind + ' (now used by ' + (users.get(k.kind) ?? []).join(', ') + ')');
+  assert.deepEqual(stale, [], 'these carry a note saying nothing uses them: ' + stale.join('; '));
+});
+
+test('the enemy ability list matches the kinds the simulation can actually run', () => {
+  // Read off the switch itself. A kind added to the simulation and not listed here
+  // would otherwise be a branch nobody is watching, and a kind listed here that the
+  // simulation no longer has would make the list quietly describe a past version.
+  const source = readFileSync(ROOT + 'src/sim/systems/abilities.js', 'utf8');
+  const fn = source.slice(source.indexOf('function runEnemyAbility('));
+  assert.ok(fn.length > 200, 'could not find runEnemyAbility to read');
+
+  const handled = [...fn.matchAll(/^\s{4}case '(\w+)':/gm)].map((m) => m[1]);
+  assert.ok(handled.length >= 5, 'read only ' + handled.length + ' cases, so this is not reading the switch');
+
+  const listed = ENEMY_ABILITY_KINDS.map((k) => k.kind);
+  assert.deepEqual(
+    [...handled].sort(), [...listed].sort(),
+    'the simulation handles [' + handled.join(', ') + '] and the list says [' + listed.join(', ') + ']',
+  );
+});
+
+test('every ability a shipped enemy has is one the simulation can run', () => {
+  // The direction that would throw at runtime rather than silently doing nothing: the
+  // switch ends in a default that raises, so an unknown kind on a boss is a crash the
+  // moment that boss uses it, several waves into a match.
+  const known = new Set(ENEMY_ABILITY_KINDS.map((k) => k.kind));
+  const unknown = [...enemyAbilityUsers().keys()].filter((kind) => !known.has(kind));
+  assert.deepEqual(unknown, [], 'shipped enemies carry ability kinds nothing handles: ' + unknown.join(', '));
+});

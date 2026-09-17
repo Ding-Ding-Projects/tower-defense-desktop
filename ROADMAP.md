@@ -46,6 +46,15 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] The game is completable end to end on every difficulty, proven by a real playthrough
 - [x] Six open statistical questions resolved or recorded as unresolved
 - [x] Data validator with referential integrity and geometry checks
+- [x] Tables that open with a spanning caption row are read, and a tower whose page
+      declares branching upgrade paths is refused rather than shipped as one branch
+- [x] Explosions capped at the Max Hits their pages state (Paintballer 8, Ranger 3);
+      both shipped uncapped and so hit everything in radius
+- [x] Freezer's Frost Grenade, the roster's first ability
+- [x] Ranger's wave-start range buff, the roster's first aura
+- [x] Enemy concealment and flight read from the infobox instead of defaulted
+- [x] Every engine mechanic is used by a shipped tower or carries a written reason it
+      is not, checked by `tests/data/mechanic-coverage.test.js`
 
 ## Phase 4: the program
 
@@ -119,6 +128,21 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
       already; a sequence of them is not a recording and is not going to be called one
 
 ## Known open gaps
+
+- [ ] Four towers remain blocked on engine features, each recorded by name in
+  `docs/data-sources.md` with the exact blocker: Accelerator (a charge-up beam with no
+  rate column), Military Base and Commander's Support Caravan (friendly units nothing
+  can fight for), Medic (healing, which no aura can express), Warden (its own page
+  contradicts itself about its cost and damage), Pursuit (branching upgrade paths, and a
+  tower that drives around), DJ Booth (player-selected buff tracks).
+
+- [ ] Two enemy ability kinds, `stun` and `heal`, have no shipped user. Both are
+  recorded in the mechanic inventory rather than left as silent dead branches, which is
+  exactly the shape `buffPulse` had.
+
+- [ ] Mortar's cluster munition and Ranger's Explosive Impact scatter are unmodelled.
+  The sub-explosion positions are not published, so modelling them would be invention
+  rather than reading.
 
 - [x] Every file in `src/render` and `src/ui` passes the TypeScript check. It is a
   ratchet: `tsconfig.render.json` lists them, it runs as part of `npm run typecheck`,
