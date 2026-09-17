@@ -3,7 +3,7 @@
   "displayName": "Ranger",
   "baseCost": 4500,
   "allowedTerrain": [
-    "ground"
+    "cliff"
   ],
   "placementPool": "default",
   "maxCount": null,

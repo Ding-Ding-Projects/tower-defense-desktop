@@ -3,7 +3,7 @@
   "displayName": "Sniper",
   "baseCost": 450,
   "allowedTerrain": [
-    "ground"
+    "cliff"
   ],
   "placementPool": "default",
   "maxCount": null,

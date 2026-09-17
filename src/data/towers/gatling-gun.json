@@ -3,7 +3,8 @@
   "displayName": "Gatling Gun",
   "baseCost": 5250,
   "allowedTerrain": [
-    "ground"
+    "ground",
+    "cliff"
   ],
   "placementPool": "default",
   "maxCount": null,

@@ -3,7 +3,7 @@
   "displayName": "Mortar",
   "baseCost": 1000,
   "allowedTerrain": [
-    "ground"
+    "cliff"
   ],
   "placementPool": "default",
   "maxCount": null,

@@ -35,11 +35,11 @@ const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '
  * page had the real answer all along and nobody had gone to look.
  */
 const OVERLAY = {
-  scout: { terrain: ['ground'], pool: 'default', max: null },
-  sniper: { terrain: ['ground'], pool: 'default', max: null },
-  soldier: { terrain: ['ground'], pool: 'default', max: null },
+  scout: { pool: 'default', max: null },
+  sniper: { pool: 'default', max: null },
+  soldier: { pool: 'default', max: null },
   freezer: {
-    terrain: ['ground'], pool: 'default', max: null, applies: ['slow'], statusSeconds: 1.5,
+    pool: 'default', max: null, applies: ['slow'], statusSeconds: 1.5,
     // Transcribed from the Ability section of the same page the table comes from, which
     // reads in full: "Frost Grenade / Level 4 • 15s Cooldown / Throws a frost grenade
     // that freezes up to five enemies for 2 seconds in an explosion radius of 6."
@@ -53,27 +53,27 @@ const OVERLAY = {
       statusId: 'freeze', durationSeconds: 2, radius: 6, maxTargets: 5,
     },
   },
-  militant: { terrain: ['ground'], pool: 'default', max: null },
-  shotgunner: { terrain: ['ground'], pool: 'default', max: null },
-  hunter: { terrain: ['ground'], pool: 'default', max: null },
-  minigunner: { terrain: ['ground'], pool: 'default', max: null },
-  ranger: { terrain: ['ground'], pool: 'default', max: null },
-  electroshocker: { terrain: ['ground'], pool: 'default', max: null, chain: 3, chainRadius: 8 },
-  cowboy: { terrain: ['ground'], pool: 'default', max: null },
-  turret: { terrain: ['ground'], pool: 'default', max: null },
-  'gatling-gun': { terrain: ['ground'], pool: 'default', max: null },
-  paintballer: { terrain: ['ground'], pool: 'default', max: null },
-  demoman: { terrain: ['ground'], pool: 'default', max: null },
-  mortar: { terrain: ['ground'], pool: 'default', max: null },
-  rocketeer: { terrain: ['ground'], pool: 'default', max: null },
-  warden: { terrain: ['ground'], pool: 'default', max: null },
-  'ace-pilot': { terrain: ['ground'], pool: 'default', max: null },
+  militant: { pool: 'default', max: null },
+  shotgunner: { pool: 'default', max: null },
+  hunter: { pool: 'default', max: null },
+  minigunner: { pool: 'default', max: null },
+  ranger: { pool: 'default', max: null },
+  electroshocker: { pool: 'default', max: null, chain: 3, chainRadius: 8 },
+  cowboy: { pool: 'default', max: null },
+  turret: { pool: 'default', max: null },
+  'gatling-gun': { pool: 'default', max: null },
+  paintballer: { pool: 'default', max: null },
+  demoman: { pool: 'default', max: null },
+  mortar: { pool: 'default', max: null },
+  rocketeer: { pool: 'default', max: null },
+  warden: { pool: 'default', max: null },
+  'ace-pilot': { pool: 'default', max: null },
   // The burn duration is on the page as "Burn Time"; the magnitude comes off the page
   // too, per level, and is read by the scraper rather than written here.
-  pyromancer: { terrain: ['ground'], pool: 'default', max: null, applies: ['burn'], statusSeconds: 3 },
+  pyromancer: { pool: 'default', max: null, applies: ['burn'], statusSeconds: 3 },
   // The shared economy cap, which is what the placementPool field exists for: farms
   // compete with each other for a limited number of slots rather than with the guns.
-  farm: { terrain: ['ground'], pool: 'economy', max: 8 },
+  farm: { pool: 'economy', max: 8 },
 };
 
 const ALL_MODES = ['first', 'last', 'closest', 'strongest', 'weakest'];
@@ -309,6 +309,14 @@ for (const scraped of cache.results) {
   if (attributes.flying.raw == null) unread.push('flying detection is not on the fetched page');
   else if (unreadable(attributes.flying)) unread.push('flying detection reads "' + attributes.flying.raw + '", which is not a level');
   if (attributes.footprint == null) unread.push('placement footprint is not on the fetched page');
+  // Terrain used to be hand-written as `ground` for every tower in the roster, which put
+  // four of them on the wrong ground -- Mortar, Ranger and Sniper are filed under Cliff
+  // and Gatling Gun under both -- and left every cliff zone on both shipped maps
+  // permanently unbuildable. It is read from the page's own categories now, and a page
+  // that names no placement category is refused rather than defaulted back to ground.
+  if (!attributes.terrain || attributes.terrain.length === 0) {
+    unread.push('no placement category on the fetched page, so where it can be built is unknown');
+  }
   if (unread.length > 0) {
     skipped.push(scraped.id + ' (' + unread.join('; ') + '; a guess here is invisible)');
     continue;
@@ -345,7 +353,7 @@ for (const scraped of cache.results) {
     id: scraped.id,
     displayName: scraped.displayName,
     baseCost: scraped.levels[0].cost,
-    allowedTerrain: overlay.terrain,
+    allowedTerrain: attributes.terrain,
     placementPool: overlay.pool,
     maxCount: overlay.max,
     sellRefundFraction: REFUND_FRACTION,

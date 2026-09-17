@@ -306,6 +306,35 @@ The remaining mechanics with no shipped user are recorded as such by
 uses is a mechanic nothing exercises, and this project has now watched that go wrong
 twice.
 
+### Three cliff zones nobody could build on
+
+Terrain was hand-written as `ground` for all twenty towers. Four of them are not: the
+wiki files Mortar, Ranger and Sniper under Cliff, and Gatling Gun under both. Ranger's
+own tooltip says it outright -- "an expensive cliff tower with great range and damage" --
+and nobody had read it.
+
+The consequence was not a wrong label on a data row. Both shipped maps carry cliff zones,
+crossroads a ridge and riverbend a bluff, and every tower in the game refused them. They
+are drawn as placement zones, they read as placement zones, and nothing could be built on
+them. Nothing could have caught that from the tower side either, because a tower
+restricted to ground is a perfectly ordinary tower; it only appears when the question is
+asked from the map's side -- is there anything that can be built here at all?
+
+Terrain now comes from the page's own categories, which is the one structured place the
+wiki records it. The infobox has no field for it and the prose mentions it only
+sometimes. A page that names no placement category is refused rather than defaulted back
+to ground, which is how this went unnoticed in the first place.
+
+`tests/data/terrain.test.js` asks the question from the map's side, and also places a real
+Mortar in a real cliff zone and checks it can reach the lane -- a terrain correction that
+puts three towers somewhere they can stand but not shoot from would be worse than leaving
+them where they were, because it would look right everywhere except in play.
+
+Water is still unbuildable, and that is recorded rather than fixed. No tower in this
+tranche is filed under Water. The roster is 20 of roughly 40 and the maps are faithful to
+a game that has water towers, so riverbend's shallows stay and wait for one instead of
+being deleted to make a check pass.
+
 ### Boss abilities are on the page too, in the prose
 
 The enemy infobox has no ability field, so boss abilities were set by hand as engine

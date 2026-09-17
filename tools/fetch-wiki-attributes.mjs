@@ -128,7 +128,8 @@ export function scrapeAttributes(name) {
   // fetchPage owns the page cache. This used to keep a second one of its own, which
   // happened to agree with it and would not have stayed that way: two caches for one
   // set of pages is one cache and one thing that goes stale unnoticed.
-  const tokens = tokenise(fetchPage(url));
+  const html = fetchPage(url);
+  const tokens = tokenise(html);
   const baseCost = parseMoney(fieldAfter(tokens, 'Base Cost'));
   const baseSell = parseMoney(fieldAfter(tokens, 'Base Selling Cost'));
 
@@ -148,7 +149,34 @@ export function scrapeAttributes(name) {
     // average away.
     refundRatio: baseCost && baseSell ? Number((baseSell / baseCost).toFixed(4)) : null,
     immunities: fieldAfter(tokens, 'Immunities'),
+    terrain: terrainFromCategories(html),
   };
+}
+
+/**
+ * Where a tower may be placed, read from the page's own categories.
+ *
+ * The infobox does not carry this and the prose only sometimes mentions it -- Ranger's
+ * tooltip calls it "an expensive cliff tower" and Mortar's says nothing at all -- but
+ * the wiki files every tower under a placement category, and that is structured enough
+ * to read without guessing. Ranger, Mortar and Sniper are filed under Cliff; Gatling Gun
+ * is filed under both Ground and Cliff.
+ *
+ * This was hand-written as `ground` for all twenty towers, which put four of them on the
+ * wrong terrain and left every cliff zone on both shipped maps permanently unbuildable.
+ *
+ * @param {string} html
+ * @returns {string[]}  lowercase terrain names, in a stable order
+ */
+export function terrainFromCategories(html) {
+  const KNOWN = ['ground', 'cliff', 'water'];
+  const categories = new Set(
+    [...html.matchAll(/\/wiki\/Category:([A-Za-z0-9_%()-]+)/g)]
+      .map((m) => decodeURIComponent(m[1]).replace(/_/g, ' ').toLowerCase()),
+  );
+  // Ordered by the KNOWN list rather than by what the page happened to mention, so two
+  // towers with the same placement always produce the same array.
+  return KNOWN.filter((t) => categories.has(t));
 }
 
 const invokedDirectly =
