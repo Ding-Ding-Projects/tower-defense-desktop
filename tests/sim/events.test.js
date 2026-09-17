@@ -17,6 +17,7 @@ import { createMatch, submitCommand, runTicks } from '../../src/sim/core/match.j
 import { snapshot } from '../../src/sim/state/snapshot.js';
 import { TICK_RATE } from '../../src/sim/core/constants.js';
 import { makeGameData, placeEnemy } from '../fixtures/game-data.js';
+import { loadGameData } from '../../src/data/loader.js';
 
 const newMatch = () => createMatch({
   gameData: makeGameData(), seed: 9, mapId: 'proving-ground', difficultyId: 'standard',
@@ -93,5 +94,80 @@ test('the wave completion bonus reaches the snapshot', () => {
   assert.ok(
     snap.waveCompletionBonus > 0,
     'no wave has reported a completion bonus after two minutes; it is ' + snap.waveCompletionBonus,
+  );
+});
+
+test('every event type the renderer can draw actually turns up in a real match', () => {
+  // The coverage check in tests/render compares three lists of strings and would be
+  // perfectly happy with an event that is declared, handled, and emitted from a branch
+  // nothing reaches. This plays the shipped game and counts what arrives.
+  //
+  // Collected one tick at a time on purpose. Events are cleared at the start of each
+  // tick, so a probe that runs three ticks and then reads the snapshot sees only the
+  // third: the first pass at this reported towerPlaced, towerSold and abilityCast as
+  // missing when all three were being emitted correctly.
+  const gameData = loadGameData();
+  const match = createMatch({
+    gameData, seed: 11, mapId: 'crossroads', difficultyId: 'easy',
+  });
+  match.state.cash = 1000000;
+
+  /** @type {Record<string, number>} */
+  const seen = {};
+  const step = () => {
+    runTicks(match, 1);
+    for (const event of snapshot(match.state).events) {
+      seen[event.type] = (seen[event.type] ?? 0) + 1;
+    }
+  };
+  const steps = (n) => { for (let i = 0; i < n; i += 1) step(); };
+
+  const map = gameData.maps.get('crossroads');
+  const waypoints = map.lanes[0].waypoints;
+  const toLane = (x, y) => Math.min(...waypoints.map((p) => Math.hypot(p.x - x, p.y - y)));
+  const candidates = [];
+  for (let x = 1; x < 100; x += 1) {
+    for (let y = 1; y < 100; y += 1) {
+      const d = toLane(x, y);
+      if (d > 1.5 && d < 4) candidates.push({ x, y, d });
+    }
+  }
+  candidates.sort((a, b) => (a.d === b.d ? a.x - b.x || a.y - b.y : a.d - b.d));
+
+  let tower = null;
+  for (const c of candidates) {
+    submitCommand(match, 'PlaceTower', { towerId: 'freezer', x: c.x, y: c.y });
+    steps(3);
+    tower = match.state.towers[0] ?? null;
+    if (tower) break;
+  }
+  assert.ok(tower, 'could not place a Freezer beside the lane');
+
+  // Up to the level that carries the roster's only ability.
+  for (let i = 0; i < 4; i += 1) {
+    submitCommand(match, 'UpgradeTower', { seq: tower.seq });
+    steps(3);
+  }
+  assert.equal(tower.level, 4, 'the tower never reached the level with the ability');
+
+  for (let k = 0; k < 4000; k += 1) {
+    step();
+    if (tower.abilityCooldownTicks === 0 && match.state.enemies.length > 0) {
+      submitCommand(match, 'UseAbility', { seq: tower.seq });
+      steps(3);
+    }
+    if (seen.abilityCast && seen.towerFired && seen.damageDealt && seen.kill && seen.leak) break;
+  }
+  submitCommand(match, 'SellTower', { seq: tower.seq });
+  steps(3);
+
+  const EXPECTED = [
+    'damageDealt', 'kill', 'leak', 'towerFired', 'abilityCast', 'towerPlaced', 'towerSold',
+  ];
+  const missing = EXPECTED.filter((type) => !seen[type]);
+  assert.deepEqual(
+    missing, [],
+    'these never reached a real match, so whatever the renderer draws for them is dead: ' +
+      missing.join(', ') + '. Seen: ' + JSON.stringify(seen),
   );
 });

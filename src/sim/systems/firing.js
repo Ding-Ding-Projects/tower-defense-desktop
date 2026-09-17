@@ -78,6 +78,22 @@ export function fireTowers(state, gameData) {
     const target = selectTarget(inRange, /** @type {any} */ (tower.targeting), gameData, tower);
     if (!target) continue;
 
+    // A shot reports itself so the renderer can flash the muzzle. `drawMuzzleFlash` has
+    // been written and complete since the first pass and had never been called once: the
+    // renderer's handler already had a `towerFired` branch, the event was never emitted,
+    // and the type declaring what a snapshot event may be did not even list it -- so the
+    // branch was unreachable and the compiler could not say so, because the handler takes
+    // its event as `any`.
+    //
+    // The angle is worked out here rather than in the renderer, which has no target to
+    // measure against by the time it draws: the enemy has moved, or has died.
+    recordEvent(state, {
+      type: 'towerFired',
+      x: tower.xFixed,
+      y: tower.yFixed,
+      angle: Math.atan2(target.yFixed - tower.yFixed, target.xFixed - tower.xFixed),
+    });
+
     shoot(state, gameData, tower, level, stats, target);
 
     // Burst handling: count down the burst, and when it empties, take the reload.

@@ -24,10 +24,18 @@
  * arithmetic the engine does on them all day.
  *
  * @param {import('./match-state.js').MatchState} state
+ * The union is duplicated from `SnapshotEvent` in the renderer's interface file rather
+ * than imported, because the simulation must not depend on the renderer. That makes it
+ * a place the two can drift apart, so `tests/render/event-coverage.test.js` holds them
+ * together along with the set the renderer actually handles -- which is exactly the
+ * drift that left a finished muzzle flash unreachable and three event types declared
+ * and emitted by nothing.
+ *
  * @param {{
- *   type: 'damageDealt'|'kill'|'leak'|'abilityCast'|'towerPlaced'|'towerSold',
+ *   type: 'damageDealt'|'kill'|'leak'|'towerFired'|'abilityCast'|'towerPlaced'|'towerSold',
  *   x: number, y: number,
- *   amount?: number, enemyDefId?: string, towerDefId?: string,
+ *   amount?: number, angle?: number, radius?: number,
+ *   enemyDefId?: string, towerDefId?: string,
  * }} event
  */
 export function recordEvent(state, event) {

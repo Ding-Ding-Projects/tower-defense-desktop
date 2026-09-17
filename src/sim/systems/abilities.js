@@ -12,6 +12,7 @@ import { secondsToTicks } from '../core/constants.js';
 import { applyDamage, applyTrueDamage } from './damage.js';
 import { applyStatus } from './statuses.js';
 import { takeSeq } from '../state/match-state.js';
+import { recordEvent } from '../state/events.js';
 import { laneMetrics, positionAlong, requireLane } from './geometry.js';
 
 /**
@@ -31,6 +32,18 @@ export function runPendingAbilities(state, gameData) {
     const level = def ? def.levels[tower.level] : undefined;
     const ability = level ? level.ability : undefined;
     if (!ability) continue;
+
+    // Freezer's Frost Grenade is the roster's only ability, and using it produced no
+    // visible or audible sign that anything had happened at all -- the button greyed
+    // out and enemies slowed down a moment later. `abilityCast` was declared as a thing
+    // a snapshot event could be and was emitted by nothing.
+    recordEvent(state, {
+      type: 'abilityCast',
+      x: tower.xFixed,
+      y: tower.yFixed,
+      towerDefId: tower.defId,
+      radius: ability.radius ?? 0,
+    });
 
     const radiusFixed = toFixed(ability.radius ?? 0);
     const rSq = radiusFixed * radiusFixed;

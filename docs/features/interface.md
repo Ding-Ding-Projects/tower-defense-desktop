@@ -52,9 +52,26 @@ it was written against is this:
 `towers` / `enemies` / `projectiles`, each entity carrying a stable `id` (used
 for interpolation identity across ticks) plus fixed-point `x`/`y`. It also
 carries `events`: one-shot occurrences since the previous snapshot
-(`damageDealt`, `kill`, `leak`, `abilityCast`, `towerPlaced`, `towerSold`) that
-drive floating damage numbers, hit particles and the leak flash. Full field
-list is the JSDoc in `sim-interface.js`.
+(`damageDealt`, `kill`, `leak`, `towerFired`, `abilityCast`, `towerPlaced`,
+`towerSold`) that drive floating damage numbers, hit particles, muzzle flashes
+and the leak flash. Full field list is the JSDoc in `sim-interface.js`.
+
+That list is now held to what actually happens, in three directions at once,
+because for a long time it was fiction in both. `abilityCast`, `towerPlaced`
+and `towerSold` were declared here and emitted by nothing. `towerFired` was the
+reverse: the renderer had a branch for it driving `drawMuzzleFlash`, a finished
+piece of art that had never once been called, and this union did not list it at
+all. Nothing was red, because `_handleEvent` took its event as `any` — which
+turns a comparison against a type outside the union from a compile error into a
+comparison that is simply never true, and reads on the page as a feature.
+
+`tests/render/event-coverage.test.js` holds the set the simulation emits, the
+set this union declares, the second copy of that union inside the simulation,
+and the set the renderer draws for, and fails when any two disagree. It also
+requires the handler to keep its real type, since the `any` is what made the
+drift invisible. `tests/sim/events.test.js` then plays the shipped game and
+counts what arrives, because four lists of strings agreeing proves only that
+four lists agree.
 
 `Command` is a closed union: `placeTower`, `sellTower`, `upgradeTower`,
 `setTargetingMode`, `castAbility`, `skipIntermission`. The renderer and UI never

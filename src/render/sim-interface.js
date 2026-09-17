@@ -79,10 +79,21 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  * in every tick, and a renderer that misses one loses a visual, never a sim fact —
  * the sim's own cash/lives/hp fields are always the source of truth.
  * @typedef {object} SnapshotEvent
- * @property {'damageDealt'|'kill'|'leak'|'abilityCast'|'towerPlaced'|'towerSold'} type
+ * This union has to be exactly what the simulation emits and exactly what the renderer
+ * handles, and for a long time it was neither. `abilityCast`, `towerPlaced` and
+ * `towerSold` were listed here and emitted by nothing. `towerFired` was not listed at
+ * all and yet the renderer had a branch for it, driving a muzzle flash that had been
+ * written, finished and never once drawn. Nothing was red: the renderer's handler takes
+ * its event as `any`, so comparing it against a type outside the union was not an error,
+ * it was just a comparison that could never be true.
+ *
+ * `tests/render/event-coverage.test.js` now holds the three sets against each other.
+ * @property {'damageDealt'|'kill'|'leak'|'towerFired'|'abilityCast'|'towerPlaced'|'towerSold'} type
  * @property {import('../sim/core/fixed.js').Fixed} x
  * @property {import('../sim/core/fixed.js').Fixed} y
  * @property {number} [amount]      damageDealt: the number to float; leak: lives lost
+ * @property {number} [angle]       towerFired: radians, from the tower to its target
+ * @property {number} [radius]      abilityCast: how far the effect reaches, in map units
  * @property {string} [enemyDefId]  kill, leak
  * @property {string} [towerDefId]  abilityCast, towerPlaced, towerSold
  */

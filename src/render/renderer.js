@@ -377,7 +377,7 @@ export class CanvasRenderer {
   }
 
   /**
-   * @param {any} event
+   * @param {import('./sim-interface.js').SnapshotEvent} event
    * @param {any} particles
    * @param {number} now  milliseconds
    */
@@ -396,6 +396,15 @@ export class CanvasRenderer {
       this._effects.push({ kind: 'explosion', x, y, start: now, life: 420, radius: 1.6 });
     } else if (event.type === 'towerFired') {
       this._effects.push({ kind: 'muzzle', x, y, angle: event.angle ?? 0, start: now, life: 120 });
+    } else if (event.type === 'abilityCast') {
+      // Sized to the ability's own radius, so a player can see what it actually reached
+      // rather than a flourish that means nothing. Freezer's Frost Grenade covers 6 map
+      // units and used to produce no sign at all that it had gone off.
+      this._effects.push({
+        kind: 'explosion', x, y, start: now, life: 520, radius: event.radius ?? 3,
+      });
+    } else if (event.type === 'towerPlaced' || event.type === 'towerSold') {
+      this._effects.push({ kind: 'spark', x, y, start: now, life: 320 });
     }
   }
 

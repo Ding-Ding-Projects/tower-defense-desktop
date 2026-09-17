@@ -15,6 +15,7 @@ import { secondsToTicks } from './core/constants.js';
 import { toFixed } from './core/fixed.js';
 import { takeSeq, findTower } from './state/match-state.js';
 import { canPlace } from './systems/placement.js';
+import { recordEvent } from './state/events.js';
 import { skipIntermission } from './systems/wave-director.js';
 
 /**
@@ -107,6 +108,12 @@ function placeTower(state, gameData, payload) {
     waveAuraTicks: 0,
     totalSpent: def.baseCost,
   });
+  recordEvent(state, {
+    type: 'towerPlaced',
+    x: toFixed(payload.x),
+    y: toFixed(payload.y),
+    towerDefId: def.id,
+  });
   return { accepted: true };
 }
 
@@ -148,6 +155,11 @@ function sellTower(state, gameData, payload) {
   const def = gameData.towers.get(tower.defId);
   if (!def) return { accepted: false, reason: 'unknown tower' };
   state.cash += Math.trunc(tower.totalSpent * def.sellRefundFraction);
+  // Reported before the tower is removed, because afterwards there is nowhere to put
+  // the effect: the event carries the position, and the tower is gone.
+  recordEvent(state, {
+    type: 'towerSold', x: tower.xFixed, y: tower.yFixed, towerDefId: tower.defId,
+  });
   state.towers = state.towers.filter((t) => t.seq !== tower.seq);
   // Anything this tower had in flight is orphaned rather than left pointing at a
   // tower that no longer exists.
