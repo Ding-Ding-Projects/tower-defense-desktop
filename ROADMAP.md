@@ -55,6 +55,13 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] Enemy concealment and flight read from the infobox instead of defaulted
 - [x] Every engine mechanic is used by a shipped tower or carries a written reason it
       is not, checked by `tests/data/mechanic-coverage.test.js`
+- [x] Where a tower may be built read from the page instead of hand-written as `ground`
+      for all twenty, which had left every cliff zone on both maps unbuildable
+- [x] Boss abilities read from the page prose where the page gives numbers: the Fallen
+      King's Fallen Comet, and the Fallen Swordmaster's real 75,000 threshold
+- [x] Targeting modes refused at validation rather than throwing mid-match
+- [x] The seams between the interface and the simulation are checked: events, command
+      names, phase names, and status colours
 
 ## Phase 4: the program
 
@@ -125,24 +132,34 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
       desktop. Assembling a frame sequence from the per-window captures that DO work
       would produce a genuine recording, and there is no encoder installed to turn those
       frames into a file. Still images of the real program are captured and embedded
-      already; a sequence of them is not a recording and is not going to be called one
+      already; a sequence of them is not a recording and is not going to be called one. What the stills cannot show is the effects layer, since a muzzle flash lives 120ms
+      and an impact spark 220ms, so that is proven instead by
+      `tests/render/art-reached.test.js` driving the real renderer through a real match
 
 ## Known open gaps
 
-- [ ] Four towers remain blocked on engine features, each recorded by name in
+- [ ] Seven towers remain blocked on engine features, each recorded by name in
   `docs/data-sources.md` with the exact blocker: Accelerator (a charge-up beam with no
   rate column), Military Base and Commander's Support Caravan (friendly units nothing
   can fight for), Medic (healing, which no aura can express), Warden (its own page
   contradicts itself about its cost and damage), Pursuit (branching upgrade paths, and a
   tower that drives around), DJ Booth (player-selected buff tracks).
 
-- [ ] Two enemy ability kinds, `stun` and `heal`, have no shipped user. Both are
+- [ ] Two enemy ability kinds, `shieldPhase` and `heal`, have no shipped user. Both are
   recorded in the mechanic inventory rather than left as silent dead branches, which is
-  exactly the shape `buffPulse` had.
+  exactly the shape `buffPulse` had. `stun` was on this list until the Fallen King gained
+  its sourced Fallen Comet, and `shieldPhase` joined it the same day, when the invented
+  shield phase that was its only user came off.
 
 - [ ] Mortar's cluster munition and Ranger's Explosive Impact scatter are unmodelled.
   The sub-explosion positions are not published, so modelling them would be invention
   rather than reading.
+
+- [ ] Riverbend's water zone is drawn and cannot be built on. No tower in this tranche is
+  filed under Water on the wiki. The map is faithful to a game that has water towers, so
+  the zone waits for one rather than being deleted; `tests/data/terrain.test.js` records
+  it and turns red if a water tower ever ships without the note being removed.
+
 
 - [x] Every file in `src/render` and `src/ui` passes the TypeScript check. It is a
   ratchet: `tsconfig.render.json` lists them, it runs as part of `npm run typecheck`,
