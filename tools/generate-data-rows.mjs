@@ -54,6 +54,9 @@ const OVERLAY = {
   rocketeer: { terrain: ['ground'], pool: 'default', max: null },
   warden: { terrain: ['ground'], pool: 'default', max: null },
   'ace-pilot': { terrain: ['ground'], pool: 'default', max: null },
+  // The burn duration is on the page as "Burn Time"; the magnitude comes off the page
+  // too, per level, and is read by the scraper rather than written here.
+  pyromancer: { terrain: ['ground'], pool: 'default', max: null, applies: ['burn'], statusSeconds: 3 },
   // The shared economy cap, which is what the placementPool field exists for: farms
   // compete with each other for a limited number of slots rather than with the guns.
   farm: { terrain: ['ground'], pool: 'economy', max: 8 },

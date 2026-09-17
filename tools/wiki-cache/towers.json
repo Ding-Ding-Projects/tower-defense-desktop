@@ -2,6 +2,7 @@
   "retrievedAt": "2026-09-17",
   "results": [
     {
+      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "ace-pilot",
       "displayName": "Ace Pilot",
@@ -71,8 +72,7 @@
           "secondaryAoeRadius": 4,
           "pageDps": 146.67
         }
-      ],
-      "retrievedAt": "2026-09-17"
+      ]
     },
     {
       "retrievedAt": "2026-09-17",
@@ -701,6 +701,76 @@
     },
     {
       "kind": "attack",
+      "id": "pyromancer",
+      "displayName": "Pyromancer",
+      "url": "https://tds.fandom.com/wiki/Pyromancer",
+      "levels": [
+        {
+          "level": 0,
+          "cost": 900,
+          "damage": 1,
+          "shotIntervalSeconds": 0.275,
+          "range": 9,
+          "statusDamagePerTick": 2,
+          "statusTickSeconds": 1,
+          "pageDps": 5.64
+        },
+        {
+          "level": 1,
+          "cost": 325,
+          "damage": 1,
+          "shotIntervalSeconds": 0.175,
+          "range": 11,
+          "statusDamagePerTick": 2,
+          "statusTickSeconds": 1,
+          "pageDps": 7.71
+        },
+        {
+          "level": 2,
+          "cost": 1000,
+          "damage": 2,
+          "shotIntervalSeconds": 0.175,
+          "range": 11,
+          "statusDamagePerTick": 2,
+          "statusTickSeconds": 1,
+          "pageDps": 13.43
+        },
+        {
+          "level": 3,
+          "cost": 2000,
+          "damage": 3,
+          "shotIntervalSeconds": 0.175,
+          "range": 12.5,
+          "statusDamagePerTick": 5,
+          "statusTickSeconds": 1,
+          "pageDps": 22.14
+        },
+        {
+          "level": 4,
+          "cost": 3777,
+          "damage": 5,
+          "shotIntervalSeconds": 0.175,
+          "range": 12.5,
+          "statusDamagePerTick": 10,
+          "statusTickSeconds": 1,
+          "pageDps": 38.57
+        },
+        {
+          "level": 5,
+          "cost": 11111,
+          "damage": 9,
+          "shotIntervalSeconds": 0.175,
+          "range": 14,
+          "statusDamagePerTick": 25,
+          "statusTickSeconds": 1,
+          "pageDps": 76.43
+        }
+      ],
+      "retrievedAt": "2026-09-17"
+    },
+    {
+      "retrievedAt": "2026-09-17",
+      "kind": "attack",
       "id": "ranger",
       "displayName": "Ranger",
       "url": "https://tds.fandom.com/wiki/Ranger",
@@ -747,8 +817,7 @@
           "splashDamage": 375,
           "pageDps": 156.25
         }
-      ],
-      "retrievedAt": "2026-09-17"
+      ]
     },
     {
       "retrievedAt": "2026-09-17",

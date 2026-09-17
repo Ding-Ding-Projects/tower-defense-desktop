@@ -211,6 +211,19 @@ Ace Pilot also caught the scraper preferring a splash column over a normal one, 
 read its bomb as its entire output and silently dropped the two levels where the bomb
 does not exist yet and the cell reads N/A.
 
+## Pyromancer ships, with one part of it honestly missing
+
+Once a tower could carry its own burn figure, Pyromancer's published damage per second
+came out exact at all six levels: direct damage over its interval plus the burn, from
+5.64 at level 0 to 76.43 at level 5. It is in the game.
+
+Its table also lists a **defence melt**, rising from nothing to 25 percent, which
+reduces an armoured enemy's flat reduction. That is not modelled. The consequence is
+stated rather than hidden: Pyromancer is correct against anything unarmoured, which is
+what its published figure measures, and weaker than it should be against anything with
+defence. Nothing about its numbers is invented; one of its mechanics is absent, and the
+status registry would need a reduction of its own to carry it.
+
 ## The rest of the roster, and why each one is still absent
 
 Every remaining tower was fetched and its page read. They are not all the same kind of
@@ -259,7 +272,6 @@ checked, and waiting.
 | --- | --- |
 | Warden | **The engine can model it now; the source contradicts itself.** Its upgrade table lists $1,000 to place with 6 base damage, and its own infobox lists $1,850 with 12. A row built from two readings that disagree is a row nobody can trust, so it does not ship and the generator refuses it by name. |
 | Accelerator | A charge-up beam. Its table has no rate column at all, only charge-up, tick and overcharge. |
-| Pyromancer | Burn damage, burn time, tick rate and defence melt as one coherent status. The status registry can carry a burn, but not the defence melt. |
 | Military Base | Friendly units. It spawns them; nothing in the simulation fights on the player's side. |
 | Medic | Healing and shield recharge for other towers. Auras can buff a stat; nothing repairs. |
 

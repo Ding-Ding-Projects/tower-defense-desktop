@@ -2,6 +2,7 @@
   "retrievedAt": "2026-09-17",
   "results": [
     {
+      "retrievedAt": "2026-09-17",
       "id": "ace-pilot",
       "displayName": "Ace Pilot",
       "url": "https://tds.fandom.com/wiki/Ace_Pilot",
@@ -25,8 +26,7 @@
       "baseCost": 500,
       "baseSell": 166,
       "refundRatio": 0.332,
-      "immunities": "Stun",
-      "retrievedAt": "2026-09-17"
+      "immunities": "Stun"
     },
     {
       "retrievedAt": "2026-09-16",
@@ -324,6 +324,33 @@
       "baseSell": 33,
       "refundRatio": 0.33,
       "immunities": "None"
+    },
+    {
+      "id": "pyromancer",
+      "displayName": "Pyromancer",
+      "url": "https://tds.fandom.com/wiki/Pyromancer",
+      "hidden": {
+        "fromLevel": 1,
+        "never": false,
+        "raw": "Level 1+"
+      },
+      "flying": {
+        "fromLevel": null,
+        "never": true,
+        "raw": "N/A"
+      },
+      "lead": {
+        "fromLevel": 0,
+        "never": false,
+        "raw": "Level 0+"
+      },
+      "footprint": 1.5,
+      "footprintRaw": "Average (1.5)",
+      "baseCost": 900,
+      "baseSell": 300,
+      "refundRatio": 0.3333,
+      "immunities": "None",
+      "retrievedAt": "2026-09-17"
     },
     {
       "retrievedAt": "2026-09-16",

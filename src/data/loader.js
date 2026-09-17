@@ -31,6 +31,7 @@ import mortar from './towers/mortar.json' with { type: 'json' };
 import rocketeer from './towers/rocketeer.json' with { type: 'json' };
 import farm from './towers/farm.json' with { type: 'json' };
 import acePilot from './towers/ace-pilot.json' with { type: 'json' };
+import pyromancer from './towers/pyromancer.json' with { type: 'json' };
 
 import normal from './enemies/normal.json' with { type: 'json' };
 import speedy from './enemies/speedy.json' with { type: 'json' };
@@ -79,7 +80,7 @@ export const RAW = Object.freeze({
   towers: [
     scout, sniper, soldier, freezer, militant, shotgunner,
     hunter, minigunner, ranger, electroshocker, cowboy, turret,
-    gatlingGun, paintballer, demoman, mortar, rocketeer, farm, acePilot,
+    gatlingGun, paintballer, demoman, mortar, rocketeer, farm, acePilot, pyromancer,
   ],
   enemies: [
     normal, speedy, slowEnemy, quick, slime, molten, ghost,

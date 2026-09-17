@@ -1,0 +1,140 @@
+{
+  "id": "pyromancer",
+  "displayName": "Pyromancer",
+  "baseCost": 900,
+  "allowedTerrain": [
+    "ground"
+  ],
+  "placementPool": "default",
+  "maxCount": null,
+  "sellRefundFraction": 0.3333333333333333,
+  "footprintRadius": 1.5,
+  "targetingModes": [
+    "first",
+    "last",
+    "closest",
+    "strongest",
+    "weakest"
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "cost": 0,
+      "damage": 1,
+      "fireRate": 3.6364,
+      "range": 9,
+      "detectsHidden": false,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Pyromancer",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "appliesStatuses": [
+        "burn"
+      ],
+      "statusDurationSeconds": 3,
+      "statusDamagePerTick": 2
+    },
+    {
+      "level": 1,
+      "cost": 325,
+      "damage": 1,
+      "fireRate": 5.7143,
+      "range": 11,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Pyromancer",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "appliesStatuses": [
+        "burn"
+      ],
+      "statusDurationSeconds": 3,
+      "statusDamagePerTick": 2
+    },
+    {
+      "level": 2,
+      "cost": 1000,
+      "damage": 2,
+      "fireRate": 5.7143,
+      "range": 11,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Pyromancer",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "appliesStatuses": [
+        "burn"
+      ],
+      "statusDurationSeconds": 3,
+      "statusDamagePerTick": 2
+    },
+    {
+      "level": 3,
+      "cost": 2000,
+      "damage": 3,
+      "fireRate": 5.7143,
+      "range": 12.5,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Pyromancer",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "appliesStatuses": [
+        "burn"
+      ],
+      "statusDurationSeconds": 3,
+      "statusDamagePerTick": 5
+    },
+    {
+      "level": 4,
+      "cost": 3777,
+      "damage": 5,
+      "fireRate": 5.7143,
+      "range": 12.5,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Pyromancer",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "appliesStatuses": [
+        "burn"
+      ],
+      "statusDurationSeconds": 3,
+      "statusDamagePerTick": 10
+    },
+    {
+      "level": 5,
+      "cost": 11111,
+      "damage": 9,
+      "fireRate": 5.7143,
+      "range": 14,
+      "detectsHidden": true,
+      "hitsAir": false,
+      "source": {
+        "wikiUrl": "https://tds.fandom.com/wiki/Pyromancer",
+        "retrievedAt": "2026-09-17",
+        "notes": "upgrade table; firerate column read as a cooldown in seconds"
+      },
+      "appliesStatuses": [
+        "burn"
+      ],
+      "statusDurationSeconds": 3,
+      "statusDamagePerTick": 25
+    }
+  ],
+  "source": {
+    "wikiUrl": "https://tds.fandom.com/wiki/Pyromancer",
+    "retrievedAt": "2026-09-17",
+    "notes": "upgrade table for the per-level statistics; the page infobox, retrieved 2026-09-17, for detection, footprint and the selling cost the refund fraction is derived from"
+  }
+}
