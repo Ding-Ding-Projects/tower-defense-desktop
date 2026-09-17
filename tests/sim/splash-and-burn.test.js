@@ -16,6 +16,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import { createMatchState } from '../../src/sim/state/match-state.js';
 import { fireTowers } from '../../src/sim/systems/firing.js';
@@ -142,4 +143,87 @@ test('a tower with no second weapon is untouched by any of it', () => {
   for (let tick = 0; tick < 90; tick += 1) fireTowers(state, gameData);
   const dealt = before - enemy.hp;
   assert.ok(dealt > 25 && dealt < 35, 'expected about thirty shots of 1, got ' + dealt);
+});
+
+/**
+ * Fire once into a crowd and report how many enemies took anything at all.
+ * @param {{maxSplashTargets?: number}} overrides
+ * @param {number} crowd
+ */
+function blastSpread(overrides, crowd = 10) {
+  const gameData = makeGameData();
+  const level = gameData.towers.get('gunner').levels[0];
+  Object.assign(level, { fireRate: 1, range: 1000, damage: 100, aoeRadius: 60 }, overrides);
+
+  const state = createMatchState(gameData, { seed: 4, mapId: 'proving-ground', difficultyId: 'standard' });
+  state.towers.push(/** @type {any} */ ({
+    seq: 1, defId: 'gunner', level: 0, xFixed: 100 * 1024, yFixed: 80 * 1024,
+    targeting: 'first', cooldownTicks: 0, spinUpTicks: 0, burstLeft: 0,
+    reloadTicks: 0, abilityCooldownTicks: 0, abilityActiveTicks: 0,
+    totalSpent: 100, hitsLanded: 0, secondaryCooldownTicks: 0,
+  }));
+  // Spread along the lane so "nearest to the blast" is a real ordering, not a tie.
+  const planted = [];
+  for (let i = 0; i < crowd; i += 1) {
+    planted.push(placeEnemy(state, 'grunt', (100 + i * 3) * 1024, { hp: 100000, maxHp: 100000 }));
+  }
+  fireTowers(state, gameData);
+  return planted.filter((e) => e.hp < 100000).length;
+}
+
+test('an uncapped blast damages everything standing in it', () => {
+  // The behaviour every splash tower had, kept explicit so the cap below is measured
+  // against something rather than asserted on its own.
+  assert.ok(blastSpread({}) > 5, 'the crowd is not packed into the blast, so this proves nothing');
+});
+
+test('a blast with a stated Max Hits damages exactly that many', () => {
+  // Paintballer's page lists Max Hits 8 at every level and Ranger's top level lists 3,
+  // and both shipped uncapped, hitting everything in radius. On a packed lane that is a
+  // strictly stronger tower than the source describes, and nothing could see it: the
+  // damage per enemy was right, there were simply more enemies than the page allows.
+  //
+  // The page proves the reading on its own. Paintballer prints a DPS and a Max DPS, and
+  // the second is the first times eight, at every level.
+  assert.equal(blastSpread({ maxSplashTargets: 3 }), 3);
+  assert.equal(blastSpread({ maxSplashTargets: 8 }), 8);
+});
+
+test('the cap never denies the enemy that was actually aimed at', () => {
+  // A cap of one means the blast hits nothing but the target. Dropping the direct hit
+  // to make room for a nearer bystander would turn a capped splash tower into one that
+  // sometimes fires at nobody.
+  const gameData = makeGameData();
+  const level = gameData.towers.get('gunner').levels[0];
+  Object.assign(level, {
+    fireRate: 1, range: 1000, damage: 100, aoeRadius: 60, splashDamage: 40, maxSplashTargets: 1,
+  });
+  const state = createMatchState(gameData, { seed: 4, mapId: 'proving-ground', difficultyId: 'standard' });
+  state.towers.push(/** @type {any} */ ({
+    seq: 1, defId: 'gunner', level: 0, xFixed: 100 * 1024, yFixed: 80 * 1024,
+    targeting: 'first', cooldownTicks: 0, spinUpTicks: 0, burstLeft: 0,
+    reloadTicks: 0, abilityCooldownTicks: 0, abilityActiveTicks: 0,
+    totalSpent: 100, hitsLanded: 0, secondaryCooldownTicks: 0,
+  }));
+  const lead = placeEnemy(state, 'grunt', 130 * 1024, { hp: 100000, maxHp: 100000 });
+  const bystander = placeEnemy(state, 'grunt', 101 * 1024, { hp: 100000, maxHp: 100000 });
+
+  fireTowers(state, gameData);
+  assert.equal(100000 - lead.hp, 100, 'the enemy that was aimed at took nothing');
+  assert.equal(100000 - bystander.hp, 0, 'a cap of one damaged a bystander as well');
+});
+
+test('the shipped rows carry the caps their pages state', () => {
+  // Read off disk rather than from the scraper, because the question is what the game
+  // actually ships with.
+  const paintballer = JSON.parse(
+    readFileSync(new URL('../../src/data/towers/paintballer.json', import.meta.url), 'utf8'));
+  assert.deepEqual(
+    paintballer.levels.map((l) => l.maxSplashTargets), [8, 8, 8, 8, 8, 8],
+    'Paintballer lists Max Hits 8 at every level',
+  );
+  const ranger = JSON.parse(
+    readFileSync(new URL('../../src/data/towers/ranger.json', import.meta.url), 'utf8'));
+  assert.equal(ranger.levels[4].maxSplashTargets, 3, 'Ranger lists Max Hits 3 at level 4');
+  assert.equal(ranger.levels[3].maxSplashTargets, undefined, 'Ranger lists no Max Hits below level 4');
 });

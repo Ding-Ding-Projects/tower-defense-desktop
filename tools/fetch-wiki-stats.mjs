@@ -302,6 +302,10 @@ export function extractLevels(html, options = {}) {
     // page's own DPS column folds it in — Rocketeer's top level lists 84.44, and
     // 95 damage over a 4.5 second cycle is 21.11 unless the four missiles are counted.
     const iBurst = firstCol('burst count', 'missile count', 'bullet count', 'ammo');
+    // "Max Hits": how many enemies one explosion may damage. Paintballer's page
+    // proves the reading on its own, printing both a DPS and a Max DPS where the second
+    // is the first times this number.
+    const iMaxHits = firstCol('max hits');
     const iCooldown = firstCol('cooldown', 'reload time');
 
     // A wind-up before the first shot. The engine has a field for it, and without it a
@@ -383,6 +387,10 @@ export function extractLevels(html, options = {}) {
       if (iDps >= 0) {
         const pageDps = money(row[iDps]);
         if (pageDps !== null) entry.pageDps = pageDps;
+      }
+      if (iMaxHits >= 0) {
+        const maxHits = money(row[iMaxHits]);
+        if (maxHits !== null && maxHits > 0) entry.maxSplashTargets = maxHits;
       }
       if (iBurst >= 0) {
         const burst = money(row[iBurst]);

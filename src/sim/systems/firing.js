@@ -128,6 +128,7 @@ function shoot(state, gameData, tower, level, stats, target) {
     damage,
     aoeRadiusFixed: level.aoeRadius ? toFixed(level.aoeRadius) : 0,
     splashDamage: level.splashDamage ?? null,
+    maxSplashTargets: level.maxSplashTargets ?? null,
     pierceLeft: level.pierceCount ?? 1,
     appliesStatuses: level.appliesStatuses ?? [],
     statusTicks: level.statusDurationSeconds ? secondsToTicks(level.statusDurationSeconds) : 0,
@@ -236,6 +237,24 @@ export function resolveHit(state, gameData, sourceSeq, target, damage, level) {
       if (distanceSquared(target.xFixed, target.yFixed, other.xFixed, other.yFixed) <= rSq) {
         struck.push(other);
       }
+    }
+    // "Max Hits" on the page: an explosion damages a stated number of enemies, not
+    // everything standing in it. Paintballer's is 8 at every level and Ranger's top
+    // level is 3, and both shipped uncapped, which on a packed lane is a strictly
+    // better tower than the source describes. The page proves the reading itself --
+    // Paintballer prints a DPS and a Max DPS, and the second is the first times 8.
+    //
+    // The direct target is always kept; the cap applies to the blast around it, taken
+    // nearest-first with the spawn sequence breaking an exact tie so two replays damage
+    // the same enemies.
+    if (level.maxSplashTargets != null && struck.length > level.maxSplashTargets) {
+      const splashed = struck.slice(1).sort((a, b) => {
+        const da = distanceSquared(target.xFixed, target.yFixed, a.xFixed, a.yFixed);
+        const db = distanceSquared(target.xFixed, target.yFixed, b.xFixed, b.yFixed);
+        return da === db ? a.seq - b.seq : da - db;
+      });
+      struck.length = 1;
+      struck.push(...splashed.slice(0, level.maxSplashTargets - 1));
     }
   }
 
@@ -367,11 +386,23 @@ function landProjectile(state, gameData, shot, target) {
  */
 function landAreaOnly(state, gameData, shot) {
   const rSq = shot.aoeRadiusFixed * shot.aoeRadiusFixed;
-  const caught = state.enemies
+  let caught = state.enemies
     .filter(
       (e) => e.hp > 0 && distanceSquared(shot.xFixed, shot.yFixed, e.xFixed, e.yFixed) <= rSq,
     )
     .sort((a, b) => a.seq - b.seq);
+  // Same cap as the direct path above, and it has to be here too: a tower with a
+  // projectile speed lands through this function instead, so capping only one of the
+  // two would leave the limit depending on whether the shot had travel time.
+  if (shot.maxSplashTargets != null && caught.length > shot.maxSplashTargets) {
+    caught = [...caught]
+      .sort((a, b) => {
+        const da = distanceSquared(shot.xFixed, shot.yFixed, a.xFixed, a.yFixed);
+        const db = distanceSquared(shot.xFixed, shot.yFixed, b.xFixed, b.yFixed);
+        return da === db ? a.seq - b.seq : da - db;
+      })
+      .slice(0, shot.maxSplashTargets);
+  }
   for (const enemy of caught) {
     const def = gameData.enemies.get(enemy.defId);
     if (!def) continue;

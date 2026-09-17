@@ -84,6 +84,8 @@
  *   independent of the tower's ordinary firing cadence
  * @property {number} [splashDamage]      what everything OTHER than the direct target
  *   takes inside aoeRadius; without it the whole area takes `damage`
+ * @property {number} [maxSplashTargets]  how many enemies one explosion may damage;
+ *   without it the blast damages everything inside `aoeRadius`
  * @property {number} [pierceCount]     how many enemies one shot passes through
  * @property {number} [chainCount]
  * @property {number} [chainRadius]

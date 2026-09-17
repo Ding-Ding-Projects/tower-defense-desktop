@@ -70,6 +70,8 @@ import { secondsToTicks } from '../core/constants.js';
  * @property {number} aoeRadiusFixed
  * @property {number|null} splashDamage  what the blast deals to anything that was not
  *   the direct target; null means the whole area takes the full damage
+ * @property {number|null} maxSplashTargets  how many enemies the blast may damage;
+ *   null means everything inside the radius
  * @property {number} pierceLeft
  * @property {string[]} appliesStatuses
  * @property {number} statusTicks

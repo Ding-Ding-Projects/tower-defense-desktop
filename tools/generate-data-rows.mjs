@@ -191,6 +191,7 @@ function toLevel(row, overlay, attributes, source) {
     // opinion about either.
     if (row.statusDamagePerTick) level.statusDamagePerTick = row.statusDamagePerTick;
   }
+  if (row.maxSplashTargets) level.maxSplashTargets = row.maxSplashTargets;
   if (overlay.chain) {
     level.chainCount = overlay.chain;
     level.chainRadius = overlay.chainRadius ?? 8;

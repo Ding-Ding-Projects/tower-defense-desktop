@@ -604,7 +604,6 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "mortar",
       "displayName": "Mortar",
@@ -664,10 +663,11 @@
           "aoeRadius": 9,
           "pageDps": 85.45
         }
-      ]
+      ],
+      "branchingPathCaptions": [],
+      "retrievedAt": "2026-09-17"
     },
     {
-      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "paintballer",
       "displayName": "Paintballer",
@@ -680,7 +680,8 @@
           "shotIntervalSeconds": 1.7,
           "range": 7.5,
           "aoeRadius": 3,
-          "pageDps": 0.59
+          "pageDps": 0.59,
+          "maxSplashTargets": 8
         },
         {
           "level": 1,
@@ -689,7 +690,8 @@
           "shotIntervalSeconds": 1.7,
           "range": 9,
           "aoeRadius": 3.5,
-          "pageDps": 0.59
+          "pageDps": 0.59,
+          "maxSplashTargets": 8
         },
         {
           "level": 2,
@@ -698,7 +700,8 @@
           "shotIntervalSeconds": 1.4,
           "range": 9,
           "aoeRadius": 4,
-          "pageDps": 1.43
+          "pageDps": 1.43,
+          "maxSplashTargets": 8
         },
         {
           "level": 3,
@@ -707,7 +710,8 @@
           "shotIntervalSeconds": 0.7,
           "range": 9,
           "aoeRadius": 4,
-          "pageDps": 4.29
+          "pageDps": 4.29,
+          "maxSplashTargets": 8
         },
         {
           "level": 4,
@@ -716,7 +720,8 @@
           "shotIntervalSeconds": 0.7,
           "range": 10.5,
           "aoeRadius": 4.5,
-          "pageDps": 11.43
+          "pageDps": 11.43,
+          "maxSplashTargets": 8
         },
         {
           "level": 5,
@@ -725,9 +730,12 @@
           "shotIntervalSeconds": 0.7,
           "range": 10.5,
           "aoeRadius": 5,
-          "pageDps": 28.57
+          "pageDps": 28.57,
+          "maxSplashTargets": 8
         }
-      ]
+      ],
+      "branchingPathCaptions": [],
+      "retrievedAt": "2026-09-17"
     },
     {
       "retrievedAt": "2026-09-17",
@@ -849,7 +857,6 @@
       ]
     },
     {
-      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "ranger",
       "displayName": "Ranger",
@@ -895,9 +902,12 @@
           "range": 70,
           "aoeRadius": 5,
           "splashDamage": 375,
-          "pageDps": 156.25
+          "pageDps": 156.25,
+          "maxSplashTargets": 3
         }
-      ]
+      ],
+      "branchingPathCaptions": [],
+      "retrievedAt": "2026-09-17"
     },
     {
       "retrievedAt": "2026-09-17",

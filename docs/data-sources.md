@@ -266,6 +266,37 @@ tower does not quietly stop helping on every third swing.
 The tower itself is held back by the contradiction above. The mechanic is implemented,
 checked, and waiting.
 
+### Columns that were on the page all along
+
+Auditing which engine mechanics have no shipped user turned up three columns nobody had
+read, all of them in tables the scraper was already downloading.
+
+**Max Hits** is the one that was actively wrong rather than merely missing. It states
+how many enemies one explosion may damage: 8 for Paintballer at every level, 3 for
+Ranger at level 4. Both shipped uncapped, hitting everything inside the radius, which on
+a packed lane is a strictly stronger tower than the source describes. Nothing could see
+it, because the damage per enemy was right; there were simply more enemies taking it
+than the page allows. Paintballer's page proves the reading on its own, printing a DPS
+and a Max DPS where the second is the first times eight at every level. Both rows now
+carry the cap, and the blast takes the nearest enemies first with the spawn sequence
+breaking an exact tie, so two replays damage the same ones.
+
+**Ranger's Buff Range, Range Buff and Buff Time** -- 12, 10% and 20 seconds from level 2
+-- are a genuine aura that this tower does not have. It is not a standing one: the buff
+is applied and then lasts twenty seconds, so modelling it as permanent would be an
+interpretation rather than a reading, and the engine has no aura that is applied by
+firing. Recorded here rather than guessed at.
+
+**Mortar's Cluster Damage, Cluster Count and Cluster Explosion Radius** at levels 4 and
+5 are a cluster munition with its own published DPS column. The engine's secondary
+weapon is one shot on its own cooldown, not a number of sub-explosions, so this is
+unmodelled and Mortar ships with its main barrel only.
+
+The remaining mechanics with no shipped user are recorded as such by
+`tests/data/mechanic-coverage.test.js`, which is what found these: a mechanic nothing
+uses is a mechanic nothing exercises, and this project has now watched that go wrong
+twice.
+
 ### Abilities come from the page's prose, and are transcribed rather than scraped
 
 Everything else here is read out of a table or an infobox, which is what makes it

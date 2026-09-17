@@ -87,7 +87,8 @@
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
       },
       "aoeRadius": 5,
-      "splashDamage": 375
+      "splashDamage": 375,
+      "maxSplashTargets": 3
     }
   ],
   "source": {
