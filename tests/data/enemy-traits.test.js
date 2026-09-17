@@ -144,3 +144,38 @@ test('the anti-air flag is real sourced data, not filler', () => {
     'every shipped tower level agrees about hitsAir, so the field is carrying no information',
   );
 });
+
+test('a sourced boss threshold is the page figure, not a rounded guess', () => {
+  // Refusing Will: "After its health drops below 75,000 health, the Fallen Swordmaster
+  // begins to pant [...] It also starts moving faster." Its infobox says 150,000 health,
+  // so the threshold is exactly half. The shipped value was 0.35, somebody's estimate of
+  // a number the page states outright, and an estimate is indistinguishable from a
+  // reading once it is in the file.
+  const swordmaster = shippedEnemies().find((e) => e.id === 'fallen-swordmaster');
+  assert.ok(swordmaster, 'fallen-swordmaster is not shipped');
+  const phase = swordmaster.abilities.find((a) => a.kind === 'speedPhase');
+  assert.ok(phase, 'the Fallen Swordmaster has no speed phase');
+  assert.equal(
+    phase.hpThreshold * swordmaster.maxHp, 75000,
+    'the page says Refusing Will triggers below 75,000 health; this row triggers at ' +
+      (phase.hpThreshold * swordmaster.maxHp),
+  );
+});
+
+test('a row whose abilities are partly sourced says which part', () => {
+  // The blanket note said every ability was an engine value. Once one of them is read
+  // off the page, that note is a false description of where the numbers came from, in
+  // the direction that matters: it understates what is known, so nobody goes looking.
+  const partlySourced = shippedEnemies().filter((e) => /Except:/.test(e.source.notes));
+  assert.deepEqual(
+    partlySourced.map((e) => e.id).sort(),
+    ['fallen-king', 'fallen-swordmaster'],
+    'the wrong set of enemies claims partly-sourced abilities',
+  );
+  for (const enemy of partlySourced) {
+    assert.match(
+      enemy.source.notes, /Except: \S[\s\S]{30,}/,
+      enemy.id + ' says its abilities are partly sourced without saying which part',
+    );
+  }
+});

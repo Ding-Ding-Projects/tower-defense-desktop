@@ -18,12 +18,12 @@
       "kind": "speedPhase",
       "cooldownSeconds": 999,
       "durationSeconds": 8,
-      "hpThreshold": 0.35
+      "hpThreshold": 0.5
     }
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Fallen_Swordmaster",
     "retrievedAt": "2026-09-17",
-    "notes": "health, speed, reward, concealment and flight read from the infobox. Leak damage and abilities are engine values, not sourced: see docs/data-sources.md."
+    "notes": "health, speed, reward, concealment and flight read from the infobox. Leak damage and abilities are engine values, not sourced: see docs/data-sources.md. Except: Refusing Will triggers below 75,000 of its 150,000 health, read from the page; its speed phase stands in for the \"starts moving faster\" half of that ability, and its duration remains an engine value."
   }
 }

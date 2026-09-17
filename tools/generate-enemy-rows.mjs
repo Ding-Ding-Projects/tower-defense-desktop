@@ -57,7 +57,18 @@ const TRAITS = {
   },
   'fallen-swordmaster': {
     leak: 30, boss: true, immunities: ['stun'],
-    abilities: [{ kind: 'speedPhase', cooldownSeconds: 999, durationSeconds: 8, hpThreshold: 0.35 }],
+    // The threshold is the page's own number, not a guess. Its fourth ability: "Refusing
+    // Will - After its health drops below 75,000 health, the Fallen Swordmaster begins to
+    // pant, giving it immunity to all damage. After it is done panting, it will
+    // immediately perform its Spike Summon move. It also starts moving faster." Its
+    // infobox says 150,000 health, so 75,000 is exactly half, and the shipped 0.35 was
+    // somebody's estimate of a figure the page states outright.
+    //
+    // "It also starts moving faster" is the part the engine can express. The panting
+    // immunity to all damage is not: nothing here can make an enemy untargetable for a
+    // while. The duration is an engine value because the page gives none.
+    sourcedAbilities: 'Refusing Will triggers below 75,000 of its 150,000 health, read from the page; its speed phase stands in for the "starts moving faster" half of that ability, and its duration remains an engine value',
+    abilities: [{ kind: 'speedPhase', cooldownSeconds: 999, durationSeconds: 8, hpThreshold: 0.5 }],
   },
 };
 

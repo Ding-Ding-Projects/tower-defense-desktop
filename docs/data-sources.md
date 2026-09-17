@@ -337,6 +337,26 @@ which are in the shipped roster, so a faithful version has nothing to summon. Sw
 stuns for 6 seconds over an arc that grows to a full circle, and the radius of that
 circle is not published. Bone Armor needs defense that changes with health.
 
+The other two bosses publish their abilities as well, and almost none of the numbers.
+Molten Boss has Magma Stomp (stuns every tower it hits, 250 damage), Scythe Slam (summons
+six enemies "based on the mode") and Fireball (sets a tower and its neighbours alight,
+"stunning them for a period of time"). Fallen Swordmaster has Dagger Throw, Double Slash
+and Spike Summon, all of which stun. Not one of those carries a cooldown, a duration or a
+radius, so none of them ships: the effects are known and the figures are not, and an
+invented cooldown is indistinguishable from a read one once it is in the file.
+
+One number among them is published, and it was already in the game as a guess. Refusing
+Will triggers "after its health drops below 75,000 health", and the Fallen Swordmaster's
+infobox says 150,000, so the threshold is exactly half. The shipped row said 0.35. Its
+speed phase stands in for the "it also starts moving faster" half of that ability and
+says so; the panting immunity to all damage has no equivalent here, because nothing can
+make an enemy untargetable for a while, and the duration stays an engine value because
+the page gives none.
+
+A row whose abilities are partly sourced now says which part, rather than carrying the
+blanket note that all of them are engine values. That note understated what was known,
+which is the direction that stops anyone from looking again.
+
 ### Every enemy trait read false, which looked like a roster with no traits
 
 Concealment and flight were engine defaults across the whole enemy roster, and the rows
