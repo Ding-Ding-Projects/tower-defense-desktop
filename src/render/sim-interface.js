@@ -32,25 +32,25 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  * integers (see src/sim/core/fixed.js); the renderer converts with fromFixed and
  * never earlier.
  * @typedef {object} SnapshotTower
- * @property {string} id                 stable identity across ticks, for interpolation
+ * @property {number} id                 stable identity across ticks, for interpolation
  * @property {string} defId              key into GameData.towers
  * @property {import('../sim/core/fixed.js').Fixed} x
  * @property {import('../sim/core/fixed.js').Fixed} y
  * @property {number} level              index into TowerDef.levels
  * @property {TargetingMode} targetingMode
  * @property {number} abilityCooldownRemainingSeconds  0 when ready or no ability
+ * @property {number} totalSpent         placement plus every upgrade, for the sell value
  */
 
 /**
  * @typedef {object} SnapshotStatusInstance
  * @property {string} id           key into GameData.statuses
  * @property {number} stacks
- * @property {number} remainingSeconds
  */
 
 /**
  * @typedef {object} SnapshotEnemy
- * @property {string} id
+ * @property {number} id
  * @property {string} defId        key into GameData.enemies
  * @property {import('../sim/core/fixed.js').Fixed} x
  * @property {import('../sim/core/fixed.js').Fixed} y
@@ -61,12 +61,16 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  */
 
 /**
+ * `fromTowerDefId` used to be declared here as the field driving which sprite to draw.
+ * The simulation never emitted it and the renderer never read it; the view model
+ * faithfully copied undefined into a property with no consumer. A documented field that
+ * does not exist is worse than an undocumented one, because it reads as a feature.
+ *
  * @typedef {object} SnapshotProjectile
- * @property {string} id
+ * @property {number} id
  * @property {import('../sim/core/fixed.js').Fixed} x
  * @property {import('../sim/core/fixed.js').Fixed} y
- * @property {string} fromTowerDefId  drives which procedural sprite to draw
- * @property {string|null} targetEnemyId
+ * @property {number|null} targetEnemyId
  */
 
 /**
@@ -97,6 +101,9 @@ export const SIM_TICK_INTERVAL_MS = 1000 / SIM_TICK_HZ;
  * @property {SnapshotTower[]} towers
  * @property {SnapshotEnemy[]} enemies
  * @property {SnapshotProjectile[]} projectiles
+ * @property {number} killCount        running total, for the interface's own readouts
+ * @property {number} leakCount        running total; the wave-clear card diffs it
+ * @property {number} waveCompletionBonus  what the wave just cleared paid out
  * @property {SnapshotEvent[]} events  since the previous snapshot only
  */
 

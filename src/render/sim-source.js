@@ -53,7 +53,8 @@ export function createMatch(options) {
 
 /**
  * @param {any} match
- * @param {{ kind: string } & Record<string, any>} command
+ * @param {{ kind?: string, type?: string } & Record<string, any>} command  either
+ *   spelling; see below for why both are accepted
  */
 export function submitCommand(match, command) {
   // `type` is accepted as well as `kind` because both spellings existed in the
@@ -100,6 +101,7 @@ export function tick(match) {
 
 /**
  * @param {any} match
+ * @returns {import('./sim-interface.js').Snapshot}
  */
 export function snapshot(match) {
   return snapshotState(match.state);

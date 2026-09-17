@@ -29,8 +29,14 @@ const PHASE_VIEW = Object.freeze({
 
 /**
  * The read-only view the interface consumes.
+ *
+ * Declared as the shape the interface actually documents rather than as `object`, which
+ * accepts anything and then refuses every property read off it. The renderer's own
+ * contract lives in src/render/sim-interface.js, and naming it here is what makes the
+ * two halves of the seam check against each other instead of merely coexisting.
+ *
  * @param {import('./match-state.js').MatchState} state
- * @returns {object}
+ * @returns {import('../../render/sim-interface.js').Snapshot}
  */
 export function snapshot(state) {
   return {
@@ -46,6 +52,10 @@ export function snapshot(state) {
       state.phase === 'intermission' ? state.phaseTicks / TICK_RATE : 0,
     killCount: state.killCount,
     leakCount: state.leakCount,
+    waveCompletionBonus: state.lastWaveCompletionBonus,
+    // Copied rather than handed over, so the next tick clearing its own list cannot
+    // empty a snapshot somebody is still interpolating from.
+    events: state.events.slice(),
     // Positions stay FIXED-POINT here, deliberately.
     //
     // The interface layer converts them itself, in one place, as part of
@@ -55,12 +65,20 @@ export function snapshot(state) {
     // like a stray decoration. Nothing threw, no check failed, and the lane simply
     // appeared empty. Field names below match what the interface reads for the same
     // reason: a mismatch there is silent too.
+    // Branded here, at the boundary, and nowhere else.
+    //
+    // The simulation does arithmetic on these constantly, and a brand does not survive
+    // addition: every `x + dx` inside the engine would need a cast for no benefit,
+    // because the engine never converts them. What the brand is for is the moment they
+    // LEAVE: converting a coordinate to map units twice drew the whole battlefield on
+    // the map origin, and one cast here makes a second conversion a compile error in
+    // everything downstream.
     towers: state.towers.map((t) => ({
       id: t.seq,
       defId: t.defId,
       level: t.level,
-      x: t.xFixed,
-      y: t.yFixed,
+      x: /** @type {import('../core/fixed.js').Fixed} */ (t.xFixed),
+      y: /** @type {import('../core/fixed.js').Fixed} */ (t.yFixed),
       targetingMode: t.targeting,
       abilityCooldownRemainingSeconds: t.abilityCooldownTicks / TICK_RATE,
       totalSpent: t.totalSpent,
@@ -68,8 +86,8 @@ export function snapshot(state) {
     enemies: state.enemies.map((e) => ({
       id: e.seq,
       defId: e.defId,
-      x: e.xFixed,
-      y: e.yFixed,
+      x: /** @type {import('../core/fixed.js').Fixed} */ (e.xFixed),
+      y: /** @type {import('../core/fixed.js').Fixed} */ (e.yFixed),
       hpCurrent: e.hp,
       hpMax: e.maxHp,
       shieldCurrent: e.shield,
@@ -77,8 +95,8 @@ export function snapshot(state) {
     })),
     projectiles: state.projectiles.map((p) => ({
       id: p.seq,
-      x: p.xFixed,
-      y: p.yFixed,
+      x: /** @type {import('../core/fixed.js').Fixed} */ (p.xFixed),
+      y: /** @type {import('../core/fixed.js').Fixed} */ (p.yFixed),
       targetEnemyId: p.targetSeq,
     })),
   };

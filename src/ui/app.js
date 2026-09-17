@@ -29,6 +29,10 @@ const MAX_ZOOM = 24;
 
 export function bootstrap(doc = document) {
   const root = doc.getElementById('app-root');
+  // index.html ships alongside this file, so a missing root means the page was edited
+  // and the whole interface has nowhere to go. Said once here rather than guarded at
+  // each of the dozen places that append to it.
+  if (!root) throw new Error('app: index.html has no #app-root to mount into');
   const gameData = sim.getGameData();
   const mapDef = [...gameData.maps.values()][0];
   // Chosen from the data rather than named in code. The first version of this line
@@ -77,10 +81,11 @@ export function bootstrap(doc = document) {
   let fittedOnce = false;
   let camera = createCamera({ x: mapDef.width / 2, y: mapDef.height / 2, zoom: 1 });
   let paused = false;
+  /** @type {string|null} */
   let placingTowerDefId = null;
+  /** @type {string|number|null} */
   let selectedTowerId = null;
   let matchState = sim.createMatch({ seed: 1, mapId: mapDef.id, difficultyId: difficultyDef.id });
-  let lastPhase = null;
   const waveTable = gameData.waveTables.get(mapDef.id + ':' + difficultyDef.id);
   const totalWaves = waveTable ? waveTable.waves.length : 0;
 
@@ -118,6 +123,9 @@ export function bootstrap(doc = document) {
    * accessibility mirror. Both routes land here so a keyboard user and a mouse user
    * cannot drift apart.
    * @param {{ kind: string } & Record<string, any>} action
+   */
+  /**
+   * @param {{kind: string} & Record<string, any>} action
    */
   function handleInterfaceAction(action) {
     switch (action.kind) {
@@ -158,7 +166,7 @@ export function bootstrap(doc = document) {
         if (paused) pauseSettings.openPause();
         break;
       case 'dismissOverlay':
-        interfaceLayer.dismissOverlay?.();
+        interfaceLayer.dismissOverlay();
         break;
       case 'overlayBlocked':
         // A click inside a modal overlay that missed its button. Swallowed on
@@ -169,12 +177,21 @@ export function bootstrap(doc = document) {
     }
   }
 
-  root.addEventListener('interface-action', (e) => handleInterfaceAction(e.detail));
+  // The interface layer dispatches a CustomEvent; `detail` is not on the base Event
+  // type, so the cast names what the listener is actually handed.
+  root.addEventListener('interface-action', (e) => {
+    handleInterfaceAction(/** @type {CustomEvent} */ (e).detail);
+  });
   // --- input: pan, zoom, select/place ---
   let isDragging = false;
+  /** @type {{x: number, y: number}|null} */
   let dragLast = null;
 
   /** Canvas-local coordinates, the same space the interface layer lays itself out in. */
+  /**
+   * @param {{clientX: number, clientY: number}} e
+   * @returns {{x: number, y: number}}
+   */
   function localPoint(e) {
     const rect = canvas.getBoundingClientRect();
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -216,6 +233,10 @@ export function bootstrap(doc = document) {
     loop.setCamera(camera);
   }, { passive: false });
 
+  /**
+   * @param {{x: number, y: number, zoom: number}} cam
+   * @returns {{x: number, y: number, zoom: number}}
+   */
   function clampAfterPan(cam) {
     const rect = canvas.getBoundingClientRect();
     return clampCamera(cam, {
@@ -228,6 +249,7 @@ export function bootstrap(doc = document) {
     });
   }
 
+  /** @param {{clientX: number, clientY: number}} e */
   function handleCanvasClick(e) {
     const rect = canvas.getBoundingClientRect();
     const world = screenToWorld(camera, rect.width, rect.height, e.clientX - rect.left, e.clientY - rect.top);
@@ -267,7 +289,7 @@ export function bootstrap(doc = document) {
   // Pause is a control inside the canvas now; it arrives as a togglePause action.
   root.addEventListener('pause-resume', () => { paused = false; });
   root.addEventListener('settings-reduced-motion-change', (e) => {
-    renderer.reducedMotion = e.detail.reducedMotion;
+    renderer.reducedMotion = /** @type {CustomEvent} */ (e).detail.reducedMotion;
   });
 
   // --- wave-state overlays ---
@@ -277,7 +299,6 @@ export function bootstrap(doc = document) {
     selectedTowerId = null;
     renderer.selectedTowerId = null;
     
-    lastPhase = null;
   });
 
   // --- fixed-rate simulation tick, decoupled from the render loop ---
@@ -287,13 +308,14 @@ export function bootstrap(doc = document) {
     const snap = sim.snapshot(matchState);
     loop.pushSnapshot(snap);
 
-    if (snap.phase !== lastPhase) {
-      // Wave, victory and defeat states are drawn by the interface layer inside the
-      // canvas now, from the phase in the snapshot it is handed every tick. There is
-      // nothing to push at an HTML dialog.
-      interfaceLayer.onPhaseChange?.(snap.phase, snap.waveIndex, totalWaves);
-      lastPhase = snap.phase;
-    }
+    // Nothing to do on a phase change here. Wave, victory and defeat are drawn by the
+    // interface layer inside the canvas, derived from the phase in the snapshot it is
+    // handed every tick, so it needs no telling.
+    //
+    // What used to sit here was a call to `interfaceLayer.onPhaseChange`, which does not
+    // exist. Optional-chained, so it raised nothing and did nothing, and the comment
+    // beside it already said there was nothing to push. The tracking variable it needed
+    // has gone with it.
 
     const placementPoolCounts = new Map();
     for (const t of snap.towers) {

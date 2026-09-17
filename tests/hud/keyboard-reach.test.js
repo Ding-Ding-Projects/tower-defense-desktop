@@ -197,3 +197,42 @@ test('the mirror swaps to the overlay controls when an overlay takes over', () =
   const names = mirroredButtons(host).map((el) => el.getAttribute('aria-label'));
   assert.deepEqual(names, ['Continue'], 'the mirror still offers: ' + names.join(', '));
 });
+
+test('dismissOverlay actually closes the overlay', () => {
+  // app.js called this method and it did not exist. The call was optional-chained, so
+  // it did nothing and raised nothing, and the overlay closed anyway because hitTest
+  // clears it as a side effect of being asked what was clicked. The branch read as the
+  // thing that dismissed the overlay while being the only part of that path with no
+  // effect at all.
+  const gameData = makeGameData();
+  const ctx = createFakeContext();
+  const { doc, host } = createFakeHost();
+  const layer = new InterfaceLayer({ doc });
+  layer.mountAccessibilityMirror(host);
+
+  const base = {
+    cash: 1000, lives: 100, waveIndex: 1, intermissionSecondsRemaining: 0,
+    leakCount: 0, towers: [], enemies: [], projectiles: [], events: [],
+  };
+  const state = (phase) => ({
+    snapshot: { ...base, phase },
+    gameData, totalWaves: 40, selectedTowerId: null,
+    placingTowerDefId: null, paused: false, uiScale: 1,
+  });
+
+  layer.draw(ctx, VIEWPORT, state('intermission'));
+  layer.draw(ctx, VIEWPORT, state('active'));
+  assert.deepEqual(
+    mirroredButtons(host).map((el) => el.getAttribute('aria-label')),
+    ['Continue'],
+    'the wave-start overlay did not open, so there is nothing to dismiss',
+  );
+
+  layer.dismissOverlay();
+  layer.draw(ctx, VIEWPORT, state('active'));
+  const after = mirroredButtons(host).map((el) => el.getAttribute('aria-label'));
+  assert.ok(
+    !after.includes('Continue') && after.length > 1,
+    'the overlay is still showing after being dismissed: ' + after.join(', '),
+  );
+});

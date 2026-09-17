@@ -200,7 +200,8 @@ export class InterfaceLayer {
   /**
    * @param {number} x  CSS pixels, relative to the canvas's top-left corner
    * @param {number} y
-   * @returns {object|null}
+   * @returns {({kind: string} & Record<string, any>)|null}  the described action, or
+   *   null when the click belongs to the battlefield underneath
    */
   hitTest(x, y) {
     const { lx, ly } = this._toLocal(x, y);
@@ -234,6 +235,22 @@ export class InterfaceLayer {
     this._hud.setHover(lx, ly);
     this._shop.setHover(lx, ly);
     this._towerPanel.setHover(lx, ly);
+  }
+
+  /**
+   * Close whatever overlay is showing.
+   *
+   * app.js called this and it did not exist. The call was optional-chained, so it did
+   * nothing at all and raised nothing, and the overlay closed anyway because hitTest
+   * clears it as a side effect of being asked what was clicked. The branch read as the
+   * thing that dismissed the overlay while being the one part of that path with no
+   * effect whatsoever.
+   *
+   * Dismissing twice is harmless, and a caller that asks for something should get it
+   * rather than be quietly relying on a query to have mutated state on its way past.
+   */
+  dismissOverlay() {
+    this._overlay = null;
   }
 
   /** Scrolls the shop's tower list by `deltaY` pixels (e.g. from a wheel event). */

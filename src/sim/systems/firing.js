@@ -15,6 +15,7 @@ import { effectiveStats } from './buffs.js';
 import { candidates, selectTarget, canTarget } from './targeting.js';
 import { applyDamage } from './damage.js';
 import { applyStatus } from './statuses.js';
+import { recordEvent } from '../state/events.js';
 import { takeSeq, findEnemy } from '../state/match-state.js';
 
 /**
@@ -212,9 +213,17 @@ export function resolveHit(state, gameData, sourceSeq, target, damage, level) {
     const def = gameData.enemies.get(enemy.defId);
     if (!def) continue;
     const result = applyDamage(enemy, def, damage, gameData, level.bonusVsTag ?? null);
+    if (result.dealt > 0) {
+      recordEvent(state, {
+        type: 'damageDealt', x: enemy.xFixed, y: enemy.yFixed, amount: result.dealt,
+      });
+    }
     if (result.killed) {
       state.cash += result.reward;
       state.killCount += 1;
+      recordEvent(state, {
+        type: 'kill', x: enemy.xFixed, y: enemy.yFixed, enemyDefId: enemy.defId,
+      });
     }
     for (const statusId of level.appliesStatuses ?? []) {
       const status = gameData.statuses.get(statusId);

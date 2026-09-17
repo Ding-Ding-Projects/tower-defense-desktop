@@ -112,53 +112,43 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 
 ## Known open gaps
 
-- [ ] One of the forty-one files in `src/render` and `src/ui` is still outside
-  the TypeScript check: `app.js`, which is the bootstrap and the largest single file in
-  the interface. Forty are in, including the whole art directory, the whole interface
-  layer, the renderer and every Material Design component.
+- [x] Every file in `src/render` and `src/ui` passes the TypeScript check. It is a
+  ratchet: `tsconfig.render.json` lists them, it runs as part of `npm run typecheck`,
+  and `tests/ui/typecheck-ratchet.test.js` refuses to let one be quietly dropped from
+  that list to make a red check green.
 
-  Two files left the list by being deleted rather than fixed. `stub-sim.js` was the
-  simulation stand-in this lane was built against before the real one existed, and its
-  own note said it was not meant to survive contact with `src/sim`; `procedural-draw.js`
-  was superseded by the art directory. Nothing imported either, and the interface
-  documentation still described both as current, including the claim that the real
-  simulation modules "do not exist yet".
-
-  It is a ratchet, not an open hole. `tsconfig.render.json` lists the files that pass,
-  runs as part of `npm run typecheck`, and `tests/ui/typecheck-ratchet.test.js` refuses
-  to let one be quietly dropped from that list to make a red check green.
-
-  Nothing it found was a missing annotation. The full list, because each is the kind of
-  defect that produces no error and no red check:
+  Nothing it found was a missing annotation. Each of these produced no error, no crash
+  and no red check:
 
   - `sim-interface.js` had a `@typedef` whose type expression spanned several lines,
-    which does not parse. The compiler stopped at the first line break and could not
-    find `Command` at all, so every signature mentioning it had silently lost its type.
-  - `renderer.js` read the 2D context from the canvas and never checked it. Every one
-    of its methods was reaching into something that can be null.
-  - `renderer.js` set `dpr`, `cssWidth` and `cssHeight` only in `resize()`, so drawing
-    before the first resize computes with undefined, and undefined arithmetic gives NaN
-    coordinates: a blank frame with nothing to say about it.
-  - An effect's lifetime was optional in its shape and divided by unconditionally.
-    Dividing by undefined gives NaN, which compares false against every threshold, so
-    the effect would never expire and would be redrawn forever.
-  - `object-pool.js` declared its type parameter on the constructor, which TypeScript
-    rejects outright. `T` then existed nowhere, so both pools in `particles.js` were
-    handing out untyped objects.
-  - `Widget` never declared the `_draw` its own `draw` calls, so a subclass that forgot
-    to provide one would have failed at run time in silence.
-  - `Button` took its parameter types from its own default values, so `action` was
-    typed `null` and every real action assigned to it was an error nobody was shown.
-  - The tower panel built a control with a label of `x ? undefined : undefined`,
-    overwritten on the next line, which left every control appended after it a type
-    error.
-  - The shop's entry map declared five of the seven fields the code actually stores.
-  - `colorDistance` had adopted `mixColors`' documentation, because it was inserted
-    directly beneath that block and a doc comment attaches to whatever follows it.
-  - `hash2` was annotated as taking a numeric seed while callers pass composed strings.
-  - `fbm2D` derived each octave's seed with `seed + o * 101`, which is addition for a
-    number and concatenation for a string: two derivations behind one expression.
-  - Fixed-point coordinates were declared as plain numbers with the truth in a comment.
+    which does not parse, so `Command` did not exist and every signature mentioning it
+    had silently lost its type.
+  - **The simulation emitted no events at all.** The renderer has carried the whole
+    feedback layer since the first pass, and the view model read `next.events ?? []` and
+    got the empty array every tick of every match ever played.
+  - **The wave completion bonus was paid and never reported**, so the wave-clear card's
+    line announcing it read zero and never appeared once.
+  - `app.js` called `interfaceLayer.dismissOverlay` and `onPhaseChange`, neither of
+    which existed. Both optional-chained, so both did nothing and raised nothing.
+  - `fromTowerDefId` and `remainingSeconds` were declared across two type files each and
+    emitted by nothing; the view model copied undefined into properties with no consumer.
+  - Snapshot ids were declared as strings and emitted as numbers, throughout.
+  - `renderer.js` never checked the 2D context for null, and set `dpr`, `cssWidth` and
+    `cssHeight` only in `resize()`, so drawing first gives NaN coordinates and a blank
+    frame with nothing to say about it.
+  - An effect's lifetime was optional and divided by unconditionally, so it would never
+    expire and would be redrawn forever.
+  - All four Material Design components read `this.shadowRoot` to use the root they had
+    just created, and cached unguarded `querySelector` results.
+  - `object-pool.js` declared its type parameter where TypeScript rejects it, so `T`
+    existed nowhere and both pools handed out untyped objects.
+  - `Widget` never declared the `_draw` its own `draw` calls; `Button` took its types
+    from its default values, so `action` was typed `null`.
+  - The tower panel built a control labelled `x ? undefined : undefined`; the shop's
+    entry map declared five of the seven fields it stores.
+  - `colorDistance` had adopted `mixColors`' documentation; `hash2` was annotated as
+    taking a number while callers pass strings; `fbm2D` derived octave seeds by an
+    expression that was addition for one type and concatenation for the other.
 
 ## Deliberately not doing
 

@@ -21,6 +21,7 @@ import { applyTrueDamage } from '../systems/damage.js';
 import { advancePhase, drainSpawnQueue } from '../systems/wave-director.js';
 import { runPendingAbilities, coolAbilities, runEnemyAbilities } from '../systems/abilities.js';
 import { payWaveIncome } from '../systems/income.js';
+import { clearEvents } from '../state/events.js';
 
 export { TICK_RATE };
 
@@ -67,6 +68,12 @@ export function tick(match) {
   if (state.phase === 'won' || state.phase === 'lost') return [];
 
   state.tick += 1;
+
+  // Cleared at the top, so a snapshot taken after this tick carries exactly what
+  // happened during it. Events are presentation only: the simulation's own cash, lives
+  // and health stay the source of truth, and a renderer that misses one loses a visual,
+  // never a fact.
+  clearEvents(state);
 
   // 1. Player intent first, so a tower bought this tick can shoot this tick. Anything
   //    else makes the input delay feel a tick longer than it is.

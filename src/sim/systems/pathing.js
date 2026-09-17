@@ -10,6 +10,7 @@ import { toFixed } from '../core/fixed.js';
 import { TICK_SECONDS } from '../core/constants.js';
 import { laneMetrics, positionAlong, requireLane } from './geometry.js';
 import { speedMultiplier, isStunned } from './statuses.js';
+import { recordEvent } from '../state/events.js';
 
 /**
  * Advance every living enemy, and report the ones that reached the end.
@@ -68,8 +69,12 @@ export function resolveLeaks(state, gameData, leaked) {
   const leakedSeqs = new Set(leaked.map((e) => e.seq));
   for (const enemy of leaked) {
     const def = gameData.enemies.get(enemy.defId);
-    state.lives -= def ? def.leakDamage : 1;
+    const cost = def ? def.leakDamage : 1;
+    state.lives -= cost;
     state.leakCount += 1;
+    recordEvent(state, {
+      type: 'leak', x: enemy.xFixed, y: enemy.yFixed, amount: cost, enemyDefId: enemy.defId,
+    });
   }
   state.enemies = state.enemies.filter((e) => !leakedSeqs.has(e.seq));
   if (state.lives <= 0) {

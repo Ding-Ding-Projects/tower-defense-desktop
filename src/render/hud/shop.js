@@ -268,7 +268,7 @@ export class ShopHud {
   /**
    * @param {number} x
    * @param {number} y
-   * @returns {object|null}
+   * @returns {({kind: string} & Record<string, any>)|null}
    */
   hitTest(x, y) {
     if (!this.rect || !containsPoint(this.rect, x, y)) return null;

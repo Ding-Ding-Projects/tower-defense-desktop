@@ -59,6 +59,7 @@ const RATCHETED_IN = [
   'src/render/sim-source.js',
   'src/render/view-model.js',
   'src/ui/affordability.js',
+  'src/ui/app.js',
   'src/ui/components/md3-button.js',
   'src/ui/components/md3-dialog.js',
   'src/ui/components/md3-icon-button.js',

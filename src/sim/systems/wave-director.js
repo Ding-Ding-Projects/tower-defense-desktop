@@ -125,7 +125,16 @@ export function advancePhase(state, gameData) {
   // both matters: an empty map mid-wave is a lull, not a victory.
   if (state.spawnQueue.length === 0 && state.enemies.length === 0) {
     const finished = table.waves.find((w) => w.index === state.waveIndex);
-    if (finished) state.cash += finished.completionBonus;
+    if (finished) {
+      state.cash += finished.completionBonus;
+      // Recorded as well as paid, because the wave-clear card wants to say what the
+      // wave was worth. It read `snapshot.waveCompletionBonus`, which the simulation
+      // never emitted, so the figure was always zero and the line announcing it never
+      // appeared once. The money was always paid; only the sentence about it was
+      // missing, which is the sort of gap nobody reports because nobody knows it was
+      // meant to be there.
+      state.lastWaveCompletionBonus = finished.completionBonus;
+    }
     const hasNext = table.waves.some((w) => w.index === state.waveIndex + 1);
     if (!hasNext) {
       state.phase = 'won';

@@ -14,7 +14,7 @@ import { lerp } from './interpolation.js';
 
 /**
  * @typedef {object} ViewTower
- * @property {string} id
+ * @property {number} id
  * @property {string} defId
  * @property {number} x  map units
  * @property {number} y  map units
@@ -24,15 +24,21 @@ import { lerp } from './interpolation.js';
  */
 
 /**
+ * A status as the interface sees it.
+ *
+ * `remainingSeconds` used to be declared here and in the snapshot contract, and the
+ * simulation emitted neither: it sends the id and the stack count. Nothing read the
+ * missing field, so it sat in two type declarations describing a value that never
+ * existed.
+ *
  * @typedef {object} ViewStatus
  * @property {string} id
  * @property {number} stacks
- * @property {number} remainingSeconds
  */
 
 /**
  * @typedef {object} ViewEnemy
- * @property {string} id
+ * @property {number} id
  * @property {string} defId
  * @property {number} x
  * @property {number} y
@@ -44,11 +50,10 @@ import { lerp } from './interpolation.js';
 
 /**
  * @typedef {object} ViewProjectile
- * @property {string} id
+ * @property {number} id
  * @property {number} x
  * @property {number} y
- * @property {string} fromTowerDefId
- * @property {string|null} targetEnemyId
+ * @property {number|null} targetEnemyId
  */
 
 /**
@@ -131,7 +136,7 @@ function snapshotToViewModel(prev, next, alpha) {
  * both to the mapper. An entity that has only just appeared has no earlier self and
  * the mapper gets undefined, which is why every mapper below takes a nullable `prev`.
  *
- * @template {{ id: string }} TIn
+ * @template {{ id: number }} TIn
  * @template TOut
  * @param {TIn[]|undefined} prevList
  * @param {TIn[]|undefined} nextList
@@ -219,7 +224,6 @@ function interpolateProjectile(prev, next, alpha) {
     id: next.id,
     x,
     y,
-    fromTowerDefId: next.fromTowerDefId,
     targetEnemyId: next.targetEnemyId ?? null,
   };
 }

@@ -166,7 +166,9 @@ function setTargeting(state, gameData, payload) {
   if (!def.targetingModes.includes(/** @type {any} */ (payload.mode))) {
     return { accepted: false, reason: 'this tower has no ' + payload.mode + ' mode' };
   }
-  tower.targeting = payload.mode;
+  // Narrowed by the membership test above: a mode the tower does not have was already
+  // refused, so what reaches here is one of its own declared modes.
+  tower.targeting = /** @type {import('../data/schema/types.js').TargetingMode} */ (payload.mode);
   return { accepted: true };
 }
 

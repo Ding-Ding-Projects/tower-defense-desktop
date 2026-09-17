@@ -44,7 +44,7 @@ import { secondsToTicks } from '../core/constants.js';
  * @property {number} level
  * @property {number} xFixed
  * @property {number} yFixed
- * @property {string} targeting
+ * @property {import('../../data/schema/types.js').TargetingMode} targeting
  * @property {number} cooldownTicks   ticks until the next shot is allowed
  * @property {number} spinUpTicks     ticks of continuous target contact so far
  * @property {number} burstLeft
@@ -98,6 +98,8 @@ import { secondsToTicks } from '../core/constants.js';
  * @property {number} spawnedThisWave
  * @property {number} killCount
  * @property {number} leakCount
+ * @property {number} lastWaveCompletionBonus  what the wave just cleared paid out
+ * @property {import('../../render/sim-interface.js').SnapshotEvent[]} events  this tick only
  * @property {Array<{ towerSeq: number, abilityId: string }>} [pendingAbilities]
  */
 
@@ -132,6 +134,8 @@ export function createMatchState(gameData, { seed, mapId, difficultyId }) {
     spawnQueue: [],
     spawnedThisWave: 0,
     killCount: 0,
+    lastWaveCompletionBonus: 0,
+    events: [],
     leakCount: 0,
     pendingAbilities: [],
   };
