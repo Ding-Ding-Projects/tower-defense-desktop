@@ -44,6 +44,8 @@ export class TowerPanelHud {
     this._sellButton = new Button({ id: 'sell', action: { kind: 'sellTower' } });
     this._hasAbility = false;
     this._abilityReady = false;
+    /** The ability's own name, so the mirror says what the button says. */
+    this._abilityName = '';
     this._upgradeAvailable = false;
     this._sellValue = 0;
     this._towerId = null;
@@ -191,6 +193,7 @@ export class TowerPanelHud {
     if (this._hasAbility) {
       this._abilityReady = isAbilityReady(tower.abilityCooldownRemainingSeconds);
       const abilityLabel = levelDef.ability.displayName;
+      this._abilityName = abilityLabel;
       const abilitySublabel = this._abilityReady ? 'Ready' : `Ready in ${Math.ceil(tower.abilityCooldownRemainingSeconds)}s`;
       const abilityRect = { x: inner.x, y, width: inner.width, height: BUTTON_HEIGHT };
       this._abilityButton.draw(ctx, abilityRect, {
@@ -305,7 +308,16 @@ export class TowerPanelHud {
     if (this._hasAbility) {
       controls.push({
         key: 'tower-panel-ability',
-        label: this._abilityReady ? 'Use ability' : `Ability on cooldown`,
+        // Named after the ability, because the drawn button already is. A sighted
+        // player read "Frost Grenade" while a screen reader said "Use ability", which
+        // is the same mismatch the pause control is guarded against: a name that does
+        // not describe what the button does is worse than no name, since there is no
+        // way to notice it is wrong. Nothing caught it because no tower on disk had an
+        // ability until Freezer's grenade, so this control had never been drawn from
+        // real data.
+        label: this._abilityReady
+          ? (this._abilityName ? 'Use ' + this._abilityName : 'Use ability')
+          : (this._abilityName ? this._abilityName + ', on cooldown' : 'Ability on cooldown'),
         disabled: !this._abilityReady,
         action: { kind: 'useAbility' },
       });

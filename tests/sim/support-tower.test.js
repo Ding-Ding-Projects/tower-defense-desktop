@@ -172,3 +172,126 @@ test('selling the source takes its buff away immediately', () => {
   );
   assert.ok(rateOn(match, gunner) < buffed, 'the buff outlived the tower projecting it');
 });
+
+test('an ability that catches "up to" a number of enemies stops at that number', () => {
+  // Freezer's Frost Grenade is the shipped user: its page says it "freezes up to five
+  // enemies", and without a cap a pulse catches everything inside its radius, which on
+  // a packed lane is a very different ability.
+  const gameData = makeGameData();
+  const gunner = gameData.towers.get('gunner');
+  gameData.towers.set('bomber', {
+    id: 'bomber', displayName: 'Bomber', baseCost: 100, allowedTerrain: ['ground'],
+    placementPool: 'default', maxCount: null, sellRefundFraction: 1 / 3, footprintRadius: 1,
+    targetingModes: ['first'],
+    levels: [{
+      level: 0, cost: 0, damage: 0, fireRate: 0, range: 0,
+      detectsHidden: false, hitsAir: false,
+      ability: {
+        id: 'grenade', displayName: 'Grenade', cooldownSeconds: 15, effect: 'stunPulse',
+        magnitude: 0, statusId: 'slow', durationSeconds: 2, radius: 20, maxTargets: 5,
+      },
+      source: gunner.levels[0].source,
+    }],
+    source: gunner.source,
+  });
+
+  // An ability naming a status the data does not carry fails in silence: the lookup
+  // returns nothing and the pulse returns having spent its cooldown. That is a
+  // validation failure on real data, and here it would just make this check vacuous.
+  assert.ok(gameData.statuses.has('slow'), 'the fixture lost the status this check uses');
+
+  const match = createMatch({
+    gameData, seed: 7, mapId: 'proving-ground', difficultyId: 'standard',
+  });
+  match.state.cash = 100000;
+  // The fixture map's buildable band sits about fifteen units off the lane, so the
+  // ability's radius is what puts the crowd inside the blast, not the placement.
+  submitCommand(match, 'PlaceTower', { towerId: 'bomber', x: 62, y: 65 });
+  runTicks(match, 3);
+  const bomber = match.state.towers.find((t) => t.defId === 'bomber');
+  assert.ok(bomber, 'the tower was not placed, so this proves nothing');
+
+  for (let i = 0; i < 12; i += 1) {
+    placeEnemy(match.state, 'grunt', 62 * 1024, { hp: 100000, maxHp: 100000 });
+  }
+  const crowd = match.state.enemies.slice(-12);
+  const radiusFixed = 20 * 1024;
+  const inBlast = crowd.filter((e) =>
+    (e.xFixed - bomber.xFixed) ** 2 + (e.yFixed - bomber.yFixed) ** 2 <= radiusFixed * radiusFixed);
+  assert.ok(
+    inBlast.length > 5,
+    'only ' + inBlast.length + ' enemies are inside the blast, so a cap of five cannot bind',
+  );
+
+  submitCommand(match, 'UseAbility', { seq: bomber.seq });
+  runTicks(match, 2);
+  const frozen = crowd.filter((e) => e.statuses.some((s) => s.id === 'slow'));
+  assert.equal(
+    frozen.length, 5,
+    'the cap is five and it froze ' + frozen.length + ' of ' + inBlast.length + ' in range',
+  );
+});
+
+test('the capped five are the nearest five, and the same five every run', () => {
+  // A cap has to choose, and a choice that is not deterministic makes the replay proof
+  // worthless: two runs would freeze different enemies and the hash would diverge.
+  const pick = () => {
+    const gameData = makeGameData();
+    const gunner = gameData.towers.get('gunner');
+    gameData.towers.set('bomber', {
+      id: 'bomber', displayName: 'Bomber', baseCost: 100, allowedTerrain: ['ground'],
+      placementPool: 'default', maxCount: null, sellRefundFraction: 1 / 3, footprintRadius: 1,
+      targetingModes: ['first'],
+      levels: [{
+        level: 0, cost: 0, damage: 0, fireRate: 0, range: 0,
+        detectsHidden: false, hitsAir: false,
+        ability: {
+          id: 'grenade', displayName: 'Grenade', cooldownSeconds: 15, effect: 'stunPulse',
+          magnitude: 0, statusId: 'slow', durationSeconds: 2, radius: 40, maxTargets: 5,
+        },
+        source: gunner.levels[0].source,
+      }],
+      source: gunner.source,
+    });
+    const match = createMatch({
+      gameData, seed: 7, mapId: 'proving-ground', difficultyId: 'standard',
+    });
+    match.state.cash = 100000;
+    submitCommand(match, 'PlaceTower', { towerId: 'bomber', x: 62, y: 65 });
+    runTicks(match, 3);
+    const bomber = match.state.towers.find((t) => t.defId === 'bomber');
+    // Spread down the lane, so "nearest" is a real ordering rather than a tie.
+    for (let i = 0; i < 10; i += 1) {
+      placeEnemy(match.state, 'grunt', (50 + i * 3) * 1024, { hp: 100000, maxHp: 100000 });
+    }
+    // Measured before the pulse resolves. Everything here walks the same lane at the
+    // same speed, so the ordering by distance does not change over the two ticks in
+    // between; only the absolute distances do.
+    const expected = [...match.state.enemies]
+      .map((e) => ({
+        seq: e.seq,
+        d: (e.xFixed - bomber.xFixed) ** 2 + (e.yFixed - bomber.yFixed) ** 2,
+      }))
+      .sort((a, b) => (a.d === b.d ? a.seq - b.seq : a.d - b.d))
+      .slice(0, 5)
+      .map((e) => e.seq)
+      .sort((a, b) => a - b);
+
+    submitCommand(match, 'UseAbility', { seq: bomber.seq });
+    runTicks(match, 2);
+    const caught = match.state.enemies
+      .filter((e) => e.statuses.some((s) => s.id === 'slow'))
+      .map((e) => e.seq)
+      .sort((a, b) => a - b);
+    return { caught, expected };
+  };
+
+  const first = pick();
+  assert.equal(first.caught.length, 5, 'expected five caught, got ' + first.caught.length);
+  assert.deepEqual(
+    first.caught, first.expected,
+    'the cap did not take the nearest five: caught ' + first.caught.join(',') +
+      ', nearest were ' + first.expected.join(','),
+  );
+  assert.deepEqual(pick().caught, first.caught, 'two identical runs caught different enemies');
+});

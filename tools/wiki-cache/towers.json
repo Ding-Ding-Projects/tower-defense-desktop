@@ -730,6 +730,7 @@
       ]
     },
     {
+      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "pursuit",
       "displayName": "Pursuit",
@@ -776,8 +777,7 @@
         "Bottom Path Stats",
         "Top Path Stats",
         "Bottom Path Stats"
-      ],
-      "retrievedAt": "2026-09-17"
+      ]
     },
     {
       "retrievedAt": "2026-09-17",

@@ -111,7 +111,18 @@
         "slow"
       ],
       "statusDurationSeconds": 1.5,
-      "statusDamagePerTick": 5
+      "statusDamagePerTick": 5,
+      "ability": {
+        "id": "frost-grenade",
+        "displayName": "Frost Grenade",
+        "cooldownSeconds": 15,
+        "effect": "stunPulse",
+        "magnitude": 0,
+        "statusId": "freeze",
+        "durationSeconds": 2,
+        "radius": 6,
+        "maxTargets": 5
+      }
     }
   ],
   "source": {

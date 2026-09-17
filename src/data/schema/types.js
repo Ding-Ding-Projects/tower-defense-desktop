@@ -121,6 +121,8 @@
  * @property {number} [radius]
  * @property {number} [durationSeconds]
  * @property {AuraDef} [aura]  a `buffPulse` applies this only while the ability runs
+ * @property {string} [statusId]  which status a `stunPulse` applies; defaults to stun
+ * @property {number} [maxTargets]  how many enemies it may catch at once
  */
 
 /**

@@ -57,12 +57,33 @@ export function runPendingAbilities(state, gameData) {
         state.enemies = state.enemies.filter((e) => e.hp > 0);
         break;
       case 'stunPulse': {
-        const stun = gameData.statuses.get('stun');
-        if (!stun) break;
-        for (const enemy of caught) {
+        // The status is named by the data row rather than assumed. It used to be
+        // hardcoded to stun, which is a full stop, and the roster's actual user of this
+        // effect is Freezer's Frost Grenade: its page says it freezes, and this project
+        // already carries `freeze` as a distinct status with its own speed multiplier.
+        // Hardcoding stun would have quietly shipped a stronger ability than the source
+        // describes, with the data row saying nothing either way.
+        const status = gameData.statuses.get(ability.statusId ?? 'stun');
+        if (!status) break;
+
+        // A grenade that catches "up to five enemies" needs a cap, and the cap needs to
+        // pick the same five on every run or the replay proof is worthless. Nearest to
+        // the blast first, with the spawn sequence breaking an exact tie, which is both
+        // deterministic and the way an explosion actually behaves.
+        const reached = ability.maxTargets == null
+          ? caught
+          : [...caught]
+            .sort((a, b) => {
+              const da = distanceSquared(tower.xFixed, tower.yFixed, a.xFixed, a.yFixed);
+              const db = distanceSquared(tower.xFixed, tower.yFixed, b.xFixed, b.yFixed);
+              return da === db ? a.seq - b.seq : da - db;
+            })
+            .slice(0, ability.maxTargets);
+
+        for (const enemy of reached) {
           const enemyDef = gameData.enemies.get(enemy.defId);
           if (!enemyDef) continue;
-          applyStatus(enemy, enemyDef, stun, secondsToTicks(ability.durationSeconds ?? 1));
+          applyStatus(enemy, enemyDef, status, secondsToTicks(ability.durationSeconds ?? 1));
         }
         break;
       }

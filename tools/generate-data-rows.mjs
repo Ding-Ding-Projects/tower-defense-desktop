@@ -38,7 +38,21 @@ const OVERLAY = {
   scout: { terrain: ['ground'], pool: 'default', max: null },
   sniper: { terrain: ['ground'], pool: 'default', max: null },
   soldier: { terrain: ['ground'], pool: 'default', max: null },
-  freezer: { terrain: ['ground'], pool: 'default', max: null, applies: ['slow'], statusSeconds: 1.5 },
+  freezer: {
+    terrain: ['ground'], pool: 'default', max: null, applies: ['slow'], statusSeconds: 1.5,
+    // Transcribed from the Ability section of the same page the table comes from, which
+    // reads in full: "Frost Grenade / Level 4 • 15s Cooldown / Throws a frost grenade
+    // that freezes up to five enemies for 2 seconds in an explosion radius of 6."
+    // Hand-written rather than scraped because that is one sentence of prose, and a
+    // regex confident enough to read "up to five" out of it would be confident enough
+    // to read the wrong number out of the next tower's sentence without saying so.
+    ability: {
+      fromLevel: 4,
+      id: 'frost-grenade', displayName: 'Frost Grenade',
+      cooldownSeconds: 15, effect: 'stunPulse', magnitude: 0,
+      statusId: 'freeze', durationSeconds: 2, radius: 6, maxTargets: 5,
+    },
+  },
   militant: { terrain: ['ground'], pool: 'default', max: null },
   shotgunner: { terrain: ['ground'], pool: 'default', max: null },
   hunter: { terrain: ['ground'], pool: 'default', max: null },
@@ -180,6 +194,12 @@ function toLevel(row, overlay, attributes, source) {
   if (overlay.chain) {
     level.chainCount = overlay.chain;
     level.chainRadius = overlay.chainRadius ?? 8;
+  }
+  if (overlay.ability && row.level >= overlay.ability.fromLevel) {
+    // `fromLevel` selects which levels carry it and is not part of the ability itself,
+    // so it is dropped rather than written into the row as a field nothing reads.
+    const { fromLevel, ...ability } = overlay.ability;
+    level.ability = ability;
   }
   return level;
 }

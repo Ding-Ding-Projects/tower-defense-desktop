@@ -266,6 +266,33 @@ tower does not quietly stop helping on every third swing.
 The tower itself is held back by the contradiction above. The mechanic is implemented,
 checked, and waiting.
 
+### Abilities come from the page's prose, and are transcribed rather than scraped
+
+Everything else here is read out of a table or an infobox, which is what makes it
+checkable: a column has one value and the DPS column next to it can be used to prove the
+reading. An ability is a sentence. Freezer's reads, in full:
+
+> Frost Grenade / Level 4 • 15s Cooldown / Throws a frost grenade that freezes up to
+> five enemies for 2 seconds in an explosion radius of 6.
+
+Every number in the shipped row -- level 4, 15 second cooldown, 2 second duration,
+radius 6, five targets -- comes from that sentence, transcribed by hand into the
+generator's overlay with the sentence quoted beside it. Not scraped, because a regex
+confident enough to pull "up to five" out of that prose is confident enough to pull the
+wrong number out of the next tower's sentence without saying so, and an ability read
+wrongly is not something a player can tell apart from an ability balanced differently.
+
+The validator carries the checks that a transcription cannot make for itself: an ability
+naming a status the data does not have is refused, and so is one whose duration is at
+least its own cooldown, which would make it permanently on. The first of those matters
+most, because that failure is completely silent at runtime -- the simulation looks the
+status up, gets nothing, and returns having spent the cooldown, so the button greys out
+and nothing happens.
+
+Freezer's grenade is the first ability anything on disk has. Until it shipped, the
+ability system, the aura system, and the interface's ability control had all never run
+outside the synthetic fixture.
+
 ### Blocked on an engine feature, not on data
 
 | Tower | What it needs |

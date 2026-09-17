@@ -134,6 +134,27 @@ for (const raw of RAW.towers) {
     for (const statusId of level.appliesStatuses ?? []) {
       must(data.statuses.has(statusId), lw + ': applies unknown status ' + statusId);
     }
+    if (level.ability) {
+      // An ability naming a status that does not exist fails in total silence: the
+      // simulation looks it up, gets nothing, and returns having spent the cooldown.
+      // The player presses a button, watches it go grey, and nothing happens. That is
+      // exactly how this system's buffPulse branch went unnoticed for the whole life
+      // of the project, so it is a validation failure rather than a runtime shrug.
+      if (level.ability.statusId !== undefined) {
+        must(
+          data.statuses.has(level.ability.statusId),
+          lw + ': ability ' + level.ability.id + ' applies unknown status ' + level.ability.statusId,
+        );
+      }
+      must(
+        level.ability.cooldownSeconds > (level.ability.durationSeconds ?? 0),
+        lw + ': ability ' + level.ability.id + ' lasts at least as long as its own cooldown, so it is permanently on',
+      );
+      must(
+        level.ability.maxTargets === undefined || level.ability.maxTargets > 0,
+        lw + ': ability ' + level.ability.id + ' may catch ' + level.ability.maxTargets + ' enemies',
+      );
+    }
     if (level.bonusVsTag) {
       const tagExists = RAW.statuses.some((s) => /** @type {any} */ (s).tag === level.bonusVsTag.tag);
       must(tagExists, lw + ': bonus against tag ' + level.bonusVsTag.tag + ', which no status carries');
