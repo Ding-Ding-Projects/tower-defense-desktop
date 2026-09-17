@@ -35,7 +35,11 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 ## Phase 3: the roster
 
 - [x] Status effect rows, each cited
-- [x] First tranche of towers, each cited (20 of roughly 40)
+- [x] First tranche of towers, each cited (20 of the 85 the wiki files under
+      Category:Towers, read 2026-09-17; eight of those are Golden variants of towers
+      already in the list, and the remainder mixes base-game with limited-event towers
+      in a way the categories do not separate cleanly, so "20 of 85" is the honest
+      figure rather than a smaller flattering one)
 - [x] Tower detection, footprint and sell refund read off the page instead of hand-written
 - [x] Every shipped level cross-checked against its page's own damage-per-second column
       (83 levels; Cowboy excluded by name, with its arithmetic recorded)

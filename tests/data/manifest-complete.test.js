@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { RAW } from '../../src/data/loader.js';
 
 const DATA_DIR = fileURLToPath(new URL('../../src/data/', import.meta.url));
+const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
 /** Directory on disk -> the key it is loaded under in the manifest. */
 const DIRECTORIES = [
@@ -77,3 +78,45 @@ for (const [directory, manifestKey] of DIRECTORIES) {
     );
   });
 }
+
+test('the counts written in the roadmap and the docs match what is on disk', () => {
+  // Every number in this project that anyone has written in prose has gone stale at some
+  // point, usually within the hour. The roadmap said four towers were blocked and listed
+  // seven; it said the roster was 20 of roughly 40 when the wiki files 85.
+  //
+  // Only the counts this project controls are checked. How many towers the wiki has is
+  // not one of them: it changes when somebody else edits a page, and a check that turns
+  // red for that would be a false alarm about somebody else's work. It carries the date
+  // it was read instead, exactly like every data row.
+  const shipped = readdirSync(DATA_DIR + 'towers/').length;
+  const roadmap = readFileSync(ROOT + 'ROADMAP.md', 'utf8');
+  const sources = readFileSync(ROOT + 'docs/data-sources.md', 'utf8');
+
+  const roadmapCount = roadmap.match(/First tranche of towers, each cited \((\d+) of/);
+  assert.ok(roadmapCount, 'the roadmap no longer states how many towers ship');
+  assert.equal(
+    Number(roadmapCount[1]), shipped,
+    'the roadmap says ' + roadmapCount[1] + ' towers ship and there are ' + shipped + ' on disk',
+  );
+
+  const docsCount = sources.match(/(\w+) towers ship\./);
+  assert.ok(docsCount, 'docs/data-sources.md no longer states how many towers ship');
+  const WORDS = { twenty: 20, 'twenty-one': 21, 'twenty-two': 22, 'twenty-three': 23 };
+  const written = WORDS[docsCount[1].toLowerCase()] ?? Number(docsCount[1]);
+  assert.equal(
+    written, shipped,
+    'the docs say ' + docsCount[1] + ' towers ship and there are ' + shipped + ' on disk',
+  );
+});
+
+test('a count claimed about the source carries the date it was read', () => {
+  // The one number here that is somebody else's to change. It is not checked against the
+  // wiki, because that would fail on an edit nobody here made; it is required to say when
+  // it was true, which is what every data row already does.
+  const sources = readFileSync(ROOT + 'docs/data-sources.md', 'utf8');
+  assert.match(
+    sources,
+    /85 pages under `Category:Towers`, read on \d{4}-\d{2}-\d{2}/,
+    'the roster size is claimed about the wiki without saying when it was read',
+  );
+});

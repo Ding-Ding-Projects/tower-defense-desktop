@@ -306,6 +306,20 @@ The remaining mechanics with no shipped user are recorded as such by
 uses is a mechanic nothing exercises, and this project has now watched that go wrong
 twice.
 
+### How much of the roster this is
+
+Twenty towers ship. The wiki files 85 pages under `Category:Towers`, read on 2026-09-17
+through its API. Eight of those are Golden variants of towers already in the list.
+
+The rest cannot be split cleanly into base-game and limited-event from the categories:
+`Limited Events` and `Exclusive Content` between them tag only three of the 85, so most
+event towers are not marked as such anywhere a script can see. That being so, the figure
+recorded here is the raw one -- 20 of 85 -- rather than a smaller and more flattering
+number arrived at by guessing which of the other 65 do not count.
+
+Seven of the unshipped towers have been read and refused for a named reason, in the table
+below. The remaining 58 have not been looked at.
+
 ### Three cliff zones nobody could build on
 
 Terrain was hand-written as `ground` for all twenty towers. Four of them are not: the
