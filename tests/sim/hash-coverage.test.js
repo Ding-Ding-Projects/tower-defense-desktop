@@ -32,7 +32,7 @@ import { makeGameData } from '../fixtures/game-data.js';
 const TOWER_STATE_FIELDS = [
   'seq', 'defId', 'level', 'xFixed', 'yFixed', 'targeting',
   'cooldownTicks', 'spinUpTicks', 'burstLeft', 'reloadTicks',
-  'abilityCooldownTicks', 'abilityActiveTicks', 'totalSpent', 'hitsLanded',
+  'abilityCooldownTicks', 'abilityActiveTicks', 'waveAuraTicks', 'totalSpent', 'hitsLanded',
   'secondaryCooldownTicks',
 ];
 
@@ -42,7 +42,7 @@ function stateWithTower() {
   state.towers.push(/** @type {any} */ ({
     seq: 1, defId: 'gunner', level: 0, xFixed: 100 * 1024, yFixed: 80 * 1024,
     targeting: 'first', cooldownTicks: 2, spinUpTicks: 1, burstLeft: 1,
-    reloadTicks: 3, abilityCooldownTicks: 4, abilityActiveTicks: 7,
+    reloadTicks: 3, abilityCooldownTicks: 4, abilityActiveTicks: 7, waveAuraTicks: 9,
     totalSpent: 100, hitsLanded: 5, secondaryCooldownTicks: 6,
   }));
   return state;

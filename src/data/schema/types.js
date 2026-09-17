@@ -96,6 +96,9 @@
  * @property {{ tag: string, damageMultiplier: number }} [bonusVsTag]
  * @property {number} [incomePerWave]   economy towers
  * @property {AuraDef} [aura]
+ * @property {AuraDef} [waveStartAura]  projected for a while at the start of each wave
+ *   rather than standing; see `waveStartAuraSeconds`
+ * @property {number} [waveStartAuraSeconds]  how long `waveStartAura` lasts
  * @property {AbilityDef} [ability]
  * @property {boolean} [firesOnlyDuringAbility]  a tower with no weapon of its own
  *   except while its ability is running

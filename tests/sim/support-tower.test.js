@@ -22,6 +22,9 @@ import { createMatch, submitCommand, runTicks } from '../../src/sim/core/match.j
 import { TICK_RATE } from '../../src/sim/core/constants.js';
 import { effectiveStats } from '../../src/sim/systems/buffs.js';
 import { makeGameData, placeEnemy } from '../fixtures/game-data.js';
+import { loadGameData } from '../../src/data/loader.js';
+
+const shippedGameData = loadGameData();
 
 const ABILITY_SECONDS = 4;
 const COOLDOWN_SECONDS = 20;
@@ -294,4 +297,75 @@ test('the capped five are the nearest five, and the same five every run', () => 
       ', nearest were ' + first.expected.join(','),
   );
   assert.deepEqual(pick().caught, first.caught, 'two identical runs caught different enemies');
+});
+
+test('a wave-start aura comes up when the wave does, and times out inside it', () => {
+  // Ranger, and the shipped roster's only aura. Its page: "At Level 2, it gains the
+  // ability to give towers a 10% Range Buff within its inner radius at the start of
+  // every wave for 20 seconds." Neither standing nor player-pressed, so it needed its
+  // own clock; approximating it with a permanent aura would have been an interpretation
+  // rather than a reading, and a generous one, since twenty seconds is a fraction of a
+  // wave.
+  const gameData = makeGameData();
+  const gunner = gameData.towers.get('gunner');
+  const BUFF_SECONDS = 3;
+  gameData.towers.set('herald', {
+    id: 'herald', displayName: 'Herald', baseCost: 100, allowedTerrain: ['ground'],
+    placementPool: 'default', maxCount: null, sellRefundFraction: 1 / 3, footprintRadius: 1,
+    targetingModes: ['first'],
+    levels: [{
+      level: 0, cost: 0, damage: 0, fireRate: 0, range: 0,
+      detectsHidden: false, hitsAir: false,
+      waveStartAura: { stat: 'range', mode: 'multiplicative', radius: 30, value: 1.1 },
+      waveStartAuraSeconds: BUFF_SECONDS,
+      source: gunner.levels[0].source,
+    }],
+    source: gunner.source,
+  });
+
+  const match = createMatch({
+    gameData, seed: 5, mapId: 'proving-ground', difficultyId: 'standard',
+  });
+  match.state.cash = 100000;
+  submitCommand(match, 'PlaceTower', { towerId: 'gunner', x: 60, y: 65 });
+  submitCommand(match, 'PlaceTower', { towerId: 'herald', x: 62, y: 65 });
+  runTicks(match, 3);
+  const buffed = match.state.towers.find((t) => t.defId === 'gunner');
+  const herald = match.state.towers.find((t) => t.defId === 'herald');
+  assert.ok(buffed && herald, 'both towers must be placed for any of this to mean anything');
+
+  const rangeOf = () => effectiveStats(match.state, match.gameData, buffed).range;
+  const base = gameData.towers.get('gunner').levels[0].range;
+  assert.equal(rangeOf(), base, 'the aura is up before a wave has started');
+
+  // Run until the director actually starts a wave, rather than assuming a tick count.
+  let started = false;
+  for (let i = 0; i < TICK_RATE * 120 && !started; i += 1) {
+    runTicks(match, 1);
+    started = herald.waveAuraTicks > 0;
+  }
+  assert.ok(started, 'no wave ever began, so this proves nothing');
+  assert.ok(rangeOf() > base, 'the wave began and the aura did not: ' + rangeOf() + ' vs ' + base);
+
+  runTicks(match, TICK_RATE * BUFF_SECONDS);
+  assert.equal(herald.waveAuraTicks, 0, 'the aura outlived its own stated duration');
+  assert.equal(rangeOf(), base, 'the aura expired and the range stayed buffed');
+});
+
+test('the shipped Ranger carries the wave-start aura its page states', () => {
+  const ranger = shippedGameData.towers.get('ranger');
+  assert.ok(ranger, 'ranger is not in the shipped roster');
+  const from = ranger.levels.findIndex((l) => l.waveStartAura);
+  assert.equal(from, 2, 'the page puts the Range Buff at Level 2, the row puts it at ' + from);
+  for (const level of ranger.levels.slice(2)) {
+    assert.equal(level.waveStartAura.stat, 'range');
+    assert.equal(level.waveStartAura.radius, 12, 'the page lists a Buff Range of 12');
+    // 10% more range, which is 1.1 times it. Written as a multiplier because that is
+    // what the aura system applies; as an additive value it would mean ten map units.
+    assert.ok(
+      Math.abs(level.waveStartAura.value - 1.1) < 1e-9,
+      'the page lists a 10% Range Buff, the row says ' + level.waveStartAura.value,
+    );
+    assert.equal(level.waveStartAuraSeconds, 20, 'the page lists a Buff Time of 20');
+  }
 });

@@ -47,6 +47,8 @@ const MECHANICS = [
   { field: 'incomePerWave' },
   { field: 'secondary' },
   { field: 'ability' },
+  { field: 'waveStartAura' },
+  { field: 'waveStartAuraSeconds' },
   {
     field: 'critDamage',
     unusedBecause: 'the critical-hit model was solved for Warden, whose own page ' +
@@ -73,10 +75,10 @@ const MECHANICS = [
   },
   {
     field: 'aura',
-    unusedBecause: 'every support tower carrying one is blocked. Commander has two ' +
-      'abilities on one level and summons friendly units, DJ Booth has player-selected ' +
-      'buff tracks, and the Ranger range buff is applied by firing and lasts twenty ' +
-      'seconds rather than standing, which is not an aura this engine has',
+    unusedBecause: 'a standing aura, as opposed to the wave-start one Ranger now ' +
+      'carries. Every support tower with a permanent buff is blocked: Commander has ' +
+      'two abilities on one level and summons friendly units, and DJ Booth has ' +
+      'player-selected buff tracks',
   },
   {
     field: 'firesOnlyDuringAbility',

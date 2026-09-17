@@ -306,6 +306,11 @@ export function extractLevels(html, options = {}) {
     // proves the reading on its own, printing both a DPS and a Max DPS where the second
     // is the first times this number.
     const iMaxHits = firstCol('max hits');
+    // Ranger's wave-start range buff, which its page states in three columns: how far
+    // the buff reaches, how much range it adds, and how long it lasts.
+    const iBuffRange = firstCol('buff range');
+    const iRangeBuff = firstCol('range buff');
+    const iBuffTime = firstCol('buff time');
     const iCooldown = firstCol('cooldown', 'reload time');
 
     // A wind-up before the first shot. The engine has a field for it, and without it a
@@ -387,6 +392,18 @@ export function extractLevels(html, options = {}) {
       if (iDps >= 0) {
         const pageDps = money(row[iDps]);
         if (pageDps !== null) entry.pageDps = pageDps;
+      }
+      if (iBuffRange >= 0 && iRangeBuff >= 0 && iBuffTime >= 0) {
+        const buffRadius = money(row[iBuffRange]);
+        // A percentage, so the per-cent sign has to come off before it is a number.
+        const buffPercent = money(String(row[iRangeBuff]).replace('%', ''));
+        const buffSeconds = money(row[iBuffTime]);
+        if (buffRadius !== null && buffPercent !== null && buffSeconds !== null &&
+            buffRadius > 0 && buffPercent > 0 && buffSeconds > 0) {
+          entry.buffRadius = buffRadius;
+          entry.buffRangePercent = buffPercent;
+          entry.buffSeconds = buffSeconds;
+        }
       }
       if (iMaxHits >= 0) {
         const maxHits = money(row[iMaxHits]);

@@ -57,7 +57,14 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
         "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "waveStartAura": {
+        "stat": "range",
+        "mode": "multiplicative",
+        "radius": 12,
+        "value": 1.1
+      },
+      "waveStartAuraSeconds": 20
     },
     {
       "level": 3,
@@ -71,7 +78,14 @@
         "wikiUrl": "https://tds.fandom.com/wiki/Ranger",
         "retrievedAt": "2026-09-17",
         "notes": "upgrade table; firerate column read as a cooldown in seconds"
-      }
+      },
+      "waveStartAura": {
+        "stat": "range",
+        "mode": "multiplicative",
+        "radius": 12,
+        "value": 1.1
+      },
+      "waveStartAuraSeconds": 20
     },
     {
       "level": 4,
@@ -88,7 +102,14 @@
       },
       "aoeRadius": 5,
       "splashDamage": 375,
-      "maxSplashTargets": 3
+      "maxSplashTargets": 3,
+      "waveStartAura": {
+        "stat": "range",
+        "mode": "multiplicative",
+        "radius": 12,
+        "value": 1.1
+      },
+      "waveStartAuraSeconds": 20
     }
   ],
   "source": {

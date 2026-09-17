@@ -192,6 +192,20 @@ function toLevel(row, overlay, attributes, source) {
     if (row.statusDamagePerTick) level.statusDamagePerTick = row.statusDamagePerTick;
   }
   if (row.maxSplashTargets) level.maxSplashTargets = row.maxSplashTargets;
+  if (row.buffRadius && row.buffRangePercent && row.buffSeconds) {
+    // Ranger. Its page: "At Level 2, it gains the ability to give towers a 10% Range
+    // Buff within its inner radius at the start of every wave for 20 seconds." Neither
+    // a standing aura nor an activated one, so it carries its own trigger. The
+    // percentage becomes a multiplier because that is what the aura system applies:
+    // a 10% range buff is 1.1 times the range, not 10 map units of it.
+    level.waveStartAura = {
+      stat: 'range',
+      mode: 'multiplicative',
+      radius: row.buffRadius,
+      value: 1 + row.buffRangePercent / 100,
+    };
+    level.waveStartAuraSeconds = row.buffSeconds;
+  }
   if (overlay.chain) {
     level.chainCount = overlay.chain;
     level.chainRadius = overlay.chainRadius ?? 8;

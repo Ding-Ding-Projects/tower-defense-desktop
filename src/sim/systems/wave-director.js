@@ -117,6 +117,7 @@ export function advancePhase(state, gameData) {
     state.waveIndex += 1;
     state.spawnedThisWave = 0;
     state.phase = 'wave';
+    startWaveAuras(state, gameData);
     scheduleWave(state, next);
     return;
   }
@@ -155,4 +156,27 @@ export function skipIntermission(state) {
   if (state.phase !== 'intermission' || state.phaseTicks <= 0) return false;
   state.phaseTicks = 0;
   return true;
+}
+
+/**
+ * Start every tower's wave-start aura.
+ *
+ * Ranger is the reason this exists, and its page is specific about the trigger: "At
+ * Level 2, it gains the ability to give towers a 10% Range Buff within its inner radius
+ * at the start of every wave for 20 seconds." That is neither a standing aura nor
+ * anything a player presses, so it needed its own clock rather than being approximated
+ * by one of the two the engine already had. Modelling it as permanent would have been
+ * an interpretation rather than a reading, and a generous one: twenty seconds is a
+ * fraction of a wave.
+ *
+ * @param {import('../state/match-state.js').MatchState} state
+ * @param {import('../../data/schema/types.js').GameData} gameData
+ */
+function startWaveAuras(state, gameData) {
+  for (const tower of state.towers) {
+    const def = gameData.towers.get(tower.defId);
+    const level = def ? def.levels[tower.level] : undefined;
+    if (!level || !level.waveStartAura) continue;
+    tower.waveAuraTicks = secondsToTicks(level.waveStartAuraSeconds ?? 0);
+  }
 }

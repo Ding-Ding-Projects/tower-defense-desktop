@@ -119,6 +119,7 @@ export function coolAbilities(state) {
   for (const tower of state.towers) {
     if (tower.abilityCooldownTicks > 0) tower.abilityCooldownTicks -= 1;
     if (tower.abilityActiveTicks > 0) tower.abilityActiveTicks -= 1;
+    if (tower.waveAuraTicks > 0) tower.waveAuraTicks -= 1;
   }
 }
 

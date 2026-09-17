@@ -604,6 +604,7 @@
       ]
     },
     {
+      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "mortar",
       "displayName": "Mortar",
@@ -664,10 +665,10 @@
           "pageDps": 85.45
         }
       ],
-      "branchingPathCaptions": [],
-      "retrievedAt": "2026-09-17"
+      "branchingPathCaptions": []
     },
     {
+      "retrievedAt": "2026-09-17",
       "kind": "attack",
       "id": "paintballer",
       "displayName": "Paintballer",
@@ -734,8 +735,7 @@
           "maxSplashTargets": 8
         }
       ],
-      "branchingPathCaptions": [],
-      "retrievedAt": "2026-09-17"
+      "branchingPathCaptions": []
     },
     {
       "retrievedAt": "2026-09-17",
@@ -884,7 +884,10 @@
           "damage": 185,
           "shotIntervalSeconds": 4.75,
           "range": 70,
-          "pageDps": 38.95
+          "pageDps": 38.95,
+          "buffRadius": 12,
+          "buffRangePercent": 10,
+          "buffSeconds": 20
         },
         {
           "level": 3,
@@ -892,7 +895,10 @@
           "damage": 430,
           "shotIntervalSeconds": 4.5,
           "range": 70,
-          "pageDps": 95.56
+          "pageDps": 95.56,
+          "buffRadius": 12,
+          "buffRangePercent": 10,
+          "buffSeconds": 20
         },
         {
           "level": 4,
@@ -903,6 +909,9 @@
           "aoeRadius": 5,
           "splashDamage": 375,
           "pageDps": 156.25,
+          "buffRadius": 12,
+          "buffRangePercent": 10,
+          "buffSeconds": 20,
           "maxSplashTargets": 3
         }
       ],

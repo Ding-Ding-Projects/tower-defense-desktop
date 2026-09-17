@@ -172,6 +172,9 @@ export function serializeState(state) {
       // fighting under. Two runs that disagree about it deal different damage
       // everywhere at once.
       t.abilityActiveTicks ?? 0,
+      // Decides whether a tower is currently buffing every neighbour's range, which
+      // changes what all of them can reach and therefore what they shoot.
+      t.waveAuraTicks ?? 0,
       t.totalSpent,
       // Drives which swings crit, so two replays that disagree about it deal different
       // damage. Left out of the hash it would diverge in complete silence, and the

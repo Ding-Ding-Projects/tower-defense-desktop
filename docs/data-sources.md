@@ -282,10 +282,18 @@ carry the cap, and the blast takes the nearest enemies first with the spawn sequ
 breaking an exact tie, so two replays damage the same ones.
 
 **Ranger's Buff Range, Range Buff and Buff Time** -- 12, 10% and 20 seconds from level 2
--- are a genuine aura that this tower does not have. It is not a standing one: the buff
-is applied and then lasts twenty seconds, so modelling it as permanent would be an
-interpretation rather than a reading, and the engine has no aura that is applied by
-firing. Recorded here rather than guessed at.
+-- are a real aura the tower shipped without, and the page is specific about what starts
+it: "At Level 2, it gains the ability to give towers a 10% Range Buff within its inner
+radius at the start of every wave for 20 seconds."
+
+That is neither a standing aura nor one a player presses, so it got its own trigger
+rather than being approximated by one of the two the engine already had. Calling it
+permanent would have been an interpretation rather than a reading, and a generous one:
+twenty seconds is a fraction of a wave. The percentage is stored as a multiplier because
+that is what the aura system applies -- a 10% range buff is 1.1 times the range, and
+writing 10 there would have meant ten map units.
+
+Ranger is the shipped roster's only aura of any kind.
 
 **Mortar's Cluster Damage, Cluster Count and Cluster Explosion Radius** at levels 4 and
 5 are a cluster munition with its own published DPS column. The engine's secondary

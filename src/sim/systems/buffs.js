@@ -51,6 +51,7 @@ export function aurasReaching(state, gameData, xFixed, yFixed, excludeSeq) {
     const active = [];
     if (level.aura) active.push(level.aura);
     if (source.abilityActiveTicks > 0 && level.ability?.aura) active.push(level.ability.aura);
+    if (source.waveAuraTicks > 0 && level.waveStartAura) active.push(level.waveStartAura);
     if (active.length === 0) continue;
 
     for (const aura of active) {
