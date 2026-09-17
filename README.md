@@ -7,7 +7,7 @@ Defense Simulator: the same targeting modes, status effects, income model, wave
 structure and difficulty behaviour, with every sourced number carrying the wiki URL
 and the date it was read, inside the data file itself.
 
-![The battlefield, the shop and a wave starting, captured from the running program](docs/evidence/battlefield.png)
+![Wave 1 of 40 in progress: a placed Scout, enemies marching the lane, and health bars over the two that have been hit. Captured from the running program on an off-screen desktop.](docs/evidence/game-04-wave-in-progress.png)
 
 <details>
 <summary><b>Contents</b></summary>

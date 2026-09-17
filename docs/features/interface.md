@@ -186,6 +186,22 @@ the centering branch). Both were watched red, fixed, and watched green again.
 short-circuited to always return the current mode) to confirm its guard
 actually fails when the implementation is wrong, then restored.
 
+## What a still capture cannot show
+
+The feedback layer is mostly made of effects that last a fraction of a second: a muzzle
+flash lives 120ms, an impact spark 220ms. Catching one in a screenshot is luck, and a
+capture that happens to miss them all is not evidence that they are absent.
+
+So the proof is not a picture. `tests/render/art-reached.test.js` plays a real match on
+the shipped data, one tick at a time, feeds every snapshot event into the real renderer
+against a recording canvas, and fails if any effect the renderer can draw is never
+produced, if any effect produced is never drawn, or if a full match never reaches one.
+The captures in the readme are illustration; that check is the evidence.
+
+A screen recording would show the whole layer at once and remains the honest gap. It is
+recorded in `ROADMAP.md` as blocked rather than skipped: the capture route records
+monitors, the program runs on an off-screen desktop, and no encoder is installed.
+
 ## Suggested articles
 
 - [The deterministic simulation and replay](simulation-and-replay.md) — what the interface is actually reading, and why it may only read.
