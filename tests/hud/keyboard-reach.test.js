@@ -236,3 +236,45 @@ test('dismissOverlay actually closes the overlay', () => {
     'the overlay is still showing after being dismissed: ' + after.join(', '),
   );
 });
+
+test('a new match does not open by announcing the last one', () => {
+  // The phase tracker compares each snapshot against the previous one, and that memory
+  // survived a restart: a new match begins in `intermission`, the finished one was in
+  // `active`, so the first frame of a fresh game read as a wave having just been cleared
+  // and opened a card saying "Wave 0 cleared. No leaks got through."
+  //
+  // Found by starting a real match on a different map in the running program, which is
+  // the only place it appears -- until the setup screen existed, restarting always put
+  // you back into the same match and this could not happen.
+  const gameData = makeGameData();
+  const ctx = createFakeContext();
+  const { doc, host } = createFakeHost();
+  const layer = new InterfaceLayer({ doc });
+  layer.mountAccessibilityMirror(host);
+
+  const base = {
+    cash: 1000, lives: 100, waveIndex: 3, intermissionSecondsRemaining: 0,
+    leakCount: 0, towers: [], enemies: [], projectiles: [], events: [],
+  };
+  const frame = (phase, waveIndex = 3) => ({
+    snapshot: { ...base, phase, waveIndex },
+    gameData, totalWaves: 40, selectedTowerId: null,
+    placingTowerDefId: null, paused: false, uiScale: 1,
+  });
+
+  // A match in progress, mid-wave.
+  layer.draw(ctx, VIEWPORT, frame('intermission'));
+  layer.draw(ctx, VIEWPORT, frame('active'));
+  layer.dismissOverlay();
+
+  // Now a brand new match: wave 0, intermission.
+  layer.resetForNewMatch();
+  layer.draw(ctx, VIEWPORT, frame('intermission', 0));
+
+  const names = host.children.flatMap((c) => c.children)
+    .map((el) => el.getAttribute('aria-label'));
+  assert.ok(
+    !names.includes('Next wave'),
+    'a fresh match opened with a wave-cleared card: ' + names.join(', '),
+  );
+});

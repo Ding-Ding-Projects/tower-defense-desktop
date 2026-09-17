@@ -53,6 +53,17 @@ class FakeElement extends FakeEventTarget {
     return child;
   }
 
+  /**
+   * The multi-argument sibling of appendChild, which the real DOM has and this did not.
+   * Its absence was not neutral: `pause-settings.js` builds its whole dialog with
+   * `append`, so that module could not be driven against this fake at all, and the first
+   * screen written to use it failed here rather than in the browser.
+   * @param {...any} children
+   */
+  append(...children) {
+    for (const child of children) this.appendChild(child);
+  }
+
   removeChild(child) {
     const i = this.children.indexOf(child);
     if (i !== -1) this.children.splice(i, 1);

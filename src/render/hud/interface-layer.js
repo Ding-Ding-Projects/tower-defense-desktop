@@ -253,6 +253,22 @@ export class InterfaceLayer {
     this._overlay = null;
   }
 
+  /**
+   * Forget everything remembered about the match that just ended.
+   *
+   * The phase tracker compares each snapshot's phase against the previous one, and that
+   * memory used to survive a restart. A new match begins in `intermission`, the finished
+   * one was in `active`, so the very first frame of a fresh game read as a wave having
+   * just been cleared and opened a card announcing "Wave 0 cleared. No leaks got
+   * through." Nothing was wrong with the new match; it was being described using the old
+   * one's last known state.
+   */
+  resetForNewMatch() {
+    this._overlay = null;
+    this._lastPhase = null;
+    this._leaksAtWaveStart = 0;
+  }
+
   /** Scrolls the shop's tower list by `deltaY` pixels (e.g. from a wheel event). */
   /** @param {number} deltaY */
   scrollShop(deltaY) {

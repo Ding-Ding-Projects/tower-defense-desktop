@@ -29,6 +29,14 @@ export class RenderLoop {
     this.buffer.push(snapshot, performance.now());
   }
 
+  /**
+   * Forget the match that just ended, so the next frame is not interpolated between two
+   * different games.
+   */
+  resetForNewMatch() {
+    this.buffer.reset();
+  }
+
   start() {
     if (this._running) return;
     this._running = true;

@@ -66,6 +66,9 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
 - [x] Targeting modes refused at validation rather than throwing mid-match
 - [x] The seams between the interface and the simulation are checked: events, command
       names, phase names, and status colours
+- [x] A setup screen, so the two maps and five selectable difficulties can actually be
+      reached. Until it existed the program took the first map and the first selectable
+      difficulty, both `const`, and restarting replayed the same combination
 
 ## Phase 4: the program
 
@@ -141,6 +144,17 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
       `tests/render/art-reached.test.js` driving the real renderer through a real match
 
 ## Known open gaps
+
+- [ ] Starting a match from the setup screen opens with a stale "Wave 0 cleared" card
+  for one dismissal. The cause is not found. The interface layer remembers the previous
+  frame's phase and the render loop keeps the last two snapshots to interpolate between,
+  so the finished match's `active` followed by the new match's `intermission` reads as a
+  wave clear -- and "Wave 0 cleared" is that signature exactly, the new match's wave
+  number wearing the old match's phase history. Both are reset on a new match now, which
+  is correct and necessary either way, and `tests/hud/keyboard-reach.test.js` proves the
+  layer half red then green. A headless probe running the same sequence against the real
+  modules does not reproduce it. The card dismisses and the match underneath is correct,
+  so this is cosmetic, and it is written down rather than called fixed.
 
 - [ ] Seven towers remain blocked on engine features, each recorded by name in
   `docs/data-sources.md` with the exact blocker: Accelerator (a charge-up beam with no

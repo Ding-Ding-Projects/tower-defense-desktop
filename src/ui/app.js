@@ -19,6 +19,7 @@ import { fromFixed } from '../sim/core/fixed.js';
 import { createTitleBar } from './titlebar.js';
 import { InterfaceLayer } from '../render/hud/interface-layer.js';
 import { PauseAndSettings } from './pause-settings.js';
+import { MatchSetup } from './match-setup.js';
 import { ALL_TARGETING_MODES, cycleTargetingMode } from './targeting.js';
 
 // Zoom is pixels per map unit. A map is a couple of hundred units across and a
@@ -34,12 +35,17 @@ export function bootstrap(doc = document) {
   // each of the dozen places that append to it.
   if (!root) throw new Error('app: index.html has no #app-root to mount into');
   const gameData = sim.getGameData();
-  const mapDef = [...gameData.maps.values()][0];
   // Chosen from the data rather than named in code. The first version of this line
   // hardcoded the development stub identifiers, so once the real roster landed the
   // match could not be created at all: the window opened, the chrome rendered, and
   // the battlefield and the shop were simply empty with nothing reported anywhere.
-  const difficultyDef =
+  //
+  // These are the opening defaults now rather than the only possibility. Until the setup
+  // screen existed they were both, so one of the two maps and five of the six
+  // difficulties were content nobody playing could reach, and restarting after a victory
+  // put you back on the same combination you had just finished.
+  let mapDef = [...gameData.maps.values()][0];
+  let difficultyDef =
     [...gameData.difficulties.values()].find((d) => d.selectable) ??
     [...gameData.difficulties.values()][0];
   if (!mapDef || !difficultyDef) {
@@ -70,6 +76,12 @@ export function bootstrap(doc = document) {
   const pauseSettings = new PauseAndSettings(doc);
   pauseSettings.mount(root);
 
+  const matchSetup = new MatchSetup({
+    maps: [...gameData.maps.values()],
+    difficulties: [...gameData.difficulties.values()],
+  }, doc);
+  matchSetup.mount(root);
+
   const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   pauseSettings.setSystemReducedMotionHint(reducedMotionQuery?.matches ?? false);
 
@@ -86,8 +98,55 @@ export function bootstrap(doc = document) {
   /** @type {string|number|null} */
   let selectedTowerId = null;
   let matchState = sim.createMatch({ seed: 1, mapId: mapDef.id, difficultyId: difficultyDef.id });
-  const waveTable = gameData.waveTables.get(mapDef.id + ':' + difficultyDef.id);
-  const totalWaves = waveTable ? waveTable.waves.length : 0;
+  let totalWaves = waveCountFor(mapDef, difficultyDef);
+
+  /**
+   * How many waves this pairing runs to. Read per pairing, because it differs: the wave
+   * tables are generated per map AND per difficulty, so a hud that kept the first
+   * answer would count a later match against the wrong total.
+   * @param {any} map
+   * @param {any} difficulty
+   */
+  function waveCountFor(map, difficulty) {
+    const table = gameData.waveTables.get(map.id + ':' + difficulty.id);
+    return table ? table.waves.length : 0;
+  }
+
+  /**
+   * Begin a match on a chosen map and difficulty.
+   * @param {string} mapId
+   * @param {string} difficultyId
+   */
+  function startMatch(mapId, difficultyId) {
+    mapDef = gameData.maps.get(mapId) ?? mapDef;
+    difficultyDef = gameData.difficulties.get(difficultyId) ?? difficultyDef;
+    // The renderer reads its map through this reference every frame, and the terrain
+    // sprite cache is keyed by map id, so pointing it at another map is the whole of
+    // what changing map requires.
+    renderer.mapDef = mapDef;
+    totalWaves = waveCountFor(mapDef, difficultyDef);
+    matchState = sim.createMatch({
+      seed: Date.now() >>> 0, mapId: mapDef.id, difficultyId: difficultyDef.id,
+    });
+    selectedTowerId = null;
+    renderer.selectedTowerId = null;
+    placingTowerDefId = null;
+    renderer.placingTowerDefId = null;
+    // Otherwise the first frame of the new match is described using the last frame of
+    // the old one, and a brand new game opens by announcing "Wave 0 cleared".
+    //
+    // Both of them, and the second is the one that actually did it. The interface layer
+    // remembers the previous phase, and the render loop keeps the last two snapshots to
+    // interpolate between -- so even with the layer reset, the loop still held the
+    // finished match's final frame and handed the layer `active` followed by
+    // `intermission` one more time.
+    interfaceLayer.resetForNewMatch();
+    loop.resetForNewMatch();
+    // Refit, because the two maps are not the same size and a camera framed for one
+    // shows the other half off-screen.
+    fittedOnce = false;
+    resize();
+  }
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -295,10 +354,14 @@ export function bootstrap(doc = document) {
   // --- wave-state overlays ---
   root.addEventListener('game-state-continue', () => {});
   root.addEventListener('game-state-restart', () => {
-    matchState = sim.createMatch({ seed: Date.now() >>> 0, mapId: mapDef.id, difficultyId: difficultyDef.id });
-    selectedTowerId = null;
-    renderer.selectedTowerId = null;
-    
+    // Back to the setup screen rather than straight into a repeat of the match that just
+    // ended. Play again meant play exactly the same thing again, which with two maps and
+    // six difficulties on disk was the wrong offer.
+    matchSetup.open();
+  });
+  root.addEventListener('match-setup-start', (e) => {
+    const detail = /** @type {CustomEvent} */ (e).detail;
+    startMatch(detail.mapId, detail.difficultyId);
   });
 
   // --- fixed-rate simulation tick, decoupled from the render loop ---
@@ -348,6 +411,12 @@ export function bootstrap(doc = document) {
   resize();
   loop.setCamera(camera);
   loop.start();
+
+  // Opened straight away, so the first thing a player does is choose where to play
+  // rather than being dropped onto whichever map happened to load first. A match is
+  // already running behind it on the defaults, so dismissing the dialog leaves a playable
+  // game rather than an empty screen.
+  matchSetup.open();
 
   return {
     stop() {

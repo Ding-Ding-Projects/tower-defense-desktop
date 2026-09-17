@@ -85,6 +85,24 @@ export class SnapshotBuffer {
     this._nextAtMs = atMs;
   }
 
+  /**
+   * Throw away both snapshots, for when the next one describes a different match.
+   *
+   * Without this, starting a new match leaves the finished one's last frame in `_prev`
+   * and the fresh one's first frame in `_next`, and the renderer spends a frame
+   * interpolating between two unrelated games. The visible result was a brand new match
+   * opening with a card reading "Wave 0 cleared. No leaks got through.": the interface
+   * layer watches the phase move from one frame to the next, saw `active` followed by
+   * `intermission`, and correctly reported a wave clear about a wave from the previous
+   * match.
+   */
+  reset() {
+    this._prev = null;
+    this._next = null;
+    this._prevAtMs = 0;
+    this._nextAtMs = 0;
+  }
+
   /** True once at least one snapshot has been pushed. */
   hasData() {
     return this._next !== null;

@@ -67,6 +67,7 @@ const RATCHETED_IN = [
   'src/ui/components/register.js',
   'src/ui/game-states.js',
   'src/ui/hud.js',
+  'src/ui/match-setup.js',
   'src/ui/pause-settings.js',
   'src/ui/selected-tower-panel.js',
   'src/ui/shop.js',
