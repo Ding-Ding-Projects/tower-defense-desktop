@@ -178,18 +178,22 @@ test('the list has not drifted from the schema either', () => {
  */
 const ENEMY_ABILITY_KINDS = [
   { kind: 'summon' },
-  { kind: 'shieldPhase' },
   { kind: 'speedPhase' },
+  { kind: 'stun' },
   {
-    kind: 'stun',
-    unusedBecause: 'no shipped boss stuns towers. The three that ship are Molten Boss, ' +
-      'Fallen King and Fallen Swordmaster, and their abilities were set by hand as ' +
-      'engine values rather than read, because the enemy infobox carries no ability field',
+    kind: 'shieldPhase',
+    unusedBecause: 'it had exactly one user, an invented 25,000-shield phase on the ' +
+      'Fallen King that appears nowhere in the source. Its fourth published ability is ' +
+      'Bone Armor, which raises the DEFENSE of the boss as its health falls, and the ' +
+      'simulation has flat defense with no way to raise it mid-life -- so the invention ' +
+      'was not even standing in for the right mechanic. It was replaced by the sourced ' +
+      'Fallen Comet, and no shipped enemy gains a shield',
   },
   {
     kind: 'heal',
-    unusedBecause: 'same as stun: the shipped bosses do not heal, and boss abilities ' +
-      'are engine values rather than sourced',
+    unusedBecause: 'none of the three shipped bosses heals. Molten Boss and Fallen ' +
+      'Swordmaster have their abilities set by hand as engine values, and the page for ' +
+      'the Fallen King lists no heal among its five',
   },
 ];
 

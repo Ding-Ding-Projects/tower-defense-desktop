@@ -306,6 +306,37 @@ The remaining mechanics with no shipped user are recorded as such by
 uses is a mechanic nothing exercises, and this project has now watched that go wrong
 twice.
 
+### Boss abilities are on the page too, in the prose
+
+The enemy infobox has no ability field, so boss abilities were set by hand as engine
+values and said so. That was true of the field and not of the page: abilities live in the
+prose, the same place the towers keep theirs, and the Fallen King publishes five with
+their cooldowns.
+
+One of them is fully sourced and now ships:
+
+> Cooldown: 45 / Fallen Comet - The Fallen King slams its sword into the ground [...]
+> making a large number of purple spikes fall down from the sky, stunning towers for 5
+> seconds and dealing 50 damage to units with no range limit for the ability.
+
+It replaced an invented shield phase that granted the boss 25,000 shield at half health
+and appears nowhere in the source. The page's fourth ability is Bone Armor, which raises
+the boss's *defense* as its health falls; the simulation has flat defense and no way to
+raise it mid-life, so the invention was not even standing in for the right mechanic.
+
+"No range limit" is the page's own phrasing, and the simulation did not honour it. Its
+enemy stun computed a zero-radius circle when no radius was given and stunned nothing at
+all, which meant the ability would have fired on schedule forever and done nothing. No
+radius now means the whole map, which is what the player-ability code a few lines away
+had always meant by it.
+
+The other four are not modellable yet and are recorded rather than approximated. Undead
+Charge summons Necrotic Skeletons, and Summon calls up a one-off wave of forty Possessed
+Armor, Corrupted Fallen, Fallen Hero, Fallen Giant and Fallen Necromancer -- none of
+which are in the shipped roster, so a faithful version has nothing to summon. Sword Swing
+stuns for 6 seconds over an arc that grows to a full circle, and the radius of that
+circle is not published. Bone Armor needs defense that changes with health.
+
 ### Every enemy trait read false, which looked like a roster with no traits
 
 Concealment and flight were engine defaults across the whole enemy roster, and the rows

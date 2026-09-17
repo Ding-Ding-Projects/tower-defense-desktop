@@ -34,9 +34,25 @@ const TRAITS = {
   },
   'fallen-king': {
     leak: 50, boss: true, immunities: ['stun', 'freeze'],
+    // Fallen Comet is transcribed from the Abilities section of the same page the rest
+    // of this enemy comes from: "Cooldown: 45 / Fallen Comet - ... stunning towers for
+    // 5 seconds and dealing 50 damage to units with no range limit for the ability."
+    // No radius is the page's own phrasing, and means the whole map here.
+    //
+    // It replaces an invented shieldPhase that granted 25,000 shield at half health,
+    // which appears nowhere in the source. The page's fourth ability is Bone Armor,
+    // which grows the boss's DEFENSE as its health drops, and the simulation has flat
+    // defense with no way to raise it mid-life -- so the invention was not even
+    // standing in for the right mechanic.
+    //
+    // The summon stays an engine value and still says so. The page's two real summons
+    // call up Necrotic Skeletons and a one-off wave of forty Possessed Armor, Corrupted
+    // Fallen, Fallen Hero, Fallen Giant and Fallen Necromancer, none of which are in
+    // the shipped roster, so a faithful version has nothing to summon yet.
+    sourcedAbilities: 'Fallen Comet read from the page: 45s cooldown, stuns every tower for 5 seconds, no range limit',
     abilities: [
       { kind: 'summon', cooldownSeconds: 10, summonEnemyId: 'normal', count: 4 },
-      { kind: 'shieldPhase', cooldownSeconds: 999, magnitude: 25000, hpThreshold: 0.5 },
+      { kind: 'stun', cooldownSeconds: 45, durationSeconds: 5 },
     ],
   },
   'fallen-swordmaster': {
@@ -85,7 +101,8 @@ for (const scraped of cache.results) {
     retrievedAt: scraped.retrievedAt ?? cache.retrievedAt,
     notes:
       'health, speed, reward, concealment and flight read from the infobox. Leak damage ' +
-      'and abilities are engine values, not sourced: see docs/data-sources.md.',
+      'and abilities are engine values, not sourced: see docs/data-sources.md.' +
+      (traits.sourcedAbilities ? ' Except: ' + traits.sourcedAbilities + '.' : ''),
   };
   const row = {
     id: scraped.id,

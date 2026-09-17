@@ -22,15 +22,14 @@
       "count": 4
     },
     {
-      "kind": "shieldPhase",
-      "cooldownSeconds": 999,
-      "magnitude": 25000,
-      "hpThreshold": 0.5
+      "kind": "stun",
+      "cooldownSeconds": 45,
+      "durationSeconds": 5
     }
   ],
   "source": {
     "wikiUrl": "https://tds.fandom.com/wiki/Fallen_King",
     "retrievedAt": "2026-09-17",
-    "notes": "health, speed, reward, concealment and flight read from the infobox. Leak damage and abilities are engine values, not sourced: see docs/data-sources.md."
+    "notes": "health, speed, reward, concealment and flight read from the infobox. Leak damage and abilities are engine values, not sourced: see docs/data-sources.md. Except: Fallen Comet read from the page: 45s cooldown, stuns every tower for 5 seconds, no range limit."
   }
 }

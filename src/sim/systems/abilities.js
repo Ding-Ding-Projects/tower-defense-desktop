@@ -217,13 +217,20 @@ function runEnemyAbility(state, gameData, enemy, ability) {
     case 'stun': {
       // Stuns towers, not enemies: the radius is measured from the enemy and every
       // tower inside it loses its next shots.
+      // No radius means the whole map, which is what the player-ability code a few
+      // lines up has always meant by it and what this branch did not: with no radius it
+      // computed a zero-radius circle and stunned nothing at all. The Fallen King's
+      // Fallen Comet is exactly this case -- its page says it stuns towers "with no
+      // range limit for the ability" -- so without the convention the ability would
+      // have fired on schedule and done nothing, forever.
       const radiusFixed = toFixed(ability.radius ?? 0);
       const rSq = radiusFixed * radiusFixed;
+      const everywhere = radiusFixed === 0;
       const ticks = secondsToTicks(ability.durationSeconds ?? 1);
       for (const tower of state.towers) {
-        if (distanceSquared(enemy.xFixed, enemy.yFixed, tower.xFixed, tower.yFixed) <= rSq) {
-          tower.reloadTicks = Math.max(tower.reloadTicks, ticks);
-        }
+        const reached = everywhere ||
+          distanceSquared(enemy.xFixed, enemy.yFixed, tower.xFixed, tower.yFixed) <= rSq;
+        if (reached) tower.reloadTicks = Math.max(tower.reloadTicks, ticks);
       }
       break;
     }

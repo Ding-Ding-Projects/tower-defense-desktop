@@ -126,3 +126,54 @@ test('the grenade wears off after the two seconds the page states', () => {
   );
   assert.ok(TICK_RATE > 0);
 });
+
+test('the Fallen King stuns every tower on the map, at the range its page states', () => {
+  // Fallen Comet: "Cooldown: 45 / ... stunning towers for 5 seconds and dealing 50
+  // damage to units with no range limit for the ability." No range limit is the page's
+  // own phrasing, and the enemy stun branch did not honour it: with no radius it
+  // computed a zero-radius circle and stunned nothing whatsoever, so the ability would
+  // have fired on schedule forever and done nothing.
+  const king = gameData.enemies.get('fallen-king');
+  assert.ok(king, 'fallen-king is not in the shipped roster');
+  const comet = king.abilities.find((a) => a.kind === 'stun');
+  assert.ok(comet, 'the Fallen King has no stun ability');
+  assert.equal(comet.cooldownSeconds, 45);
+  assert.equal(comet.durationSeconds, 5);
+  assert.equal(comet.radius, undefined, 'the page says no range limit, so it carries no radius');
+
+  const match = createMatch({
+    gameData, seed: 3, mapId: 'crossroads', difficultyId: 'easy',
+  });
+  match.state.cash = 1000000;
+
+  // A tower as far from the boss as the map allows, so a radius that was being honoured
+  // would leave it alone.
+  const map = gameData.maps.get('crossroads');
+  let tower = null;
+  for (let x = 2; x < 100 && !tower; x += 2) {
+    for (let y = 2; y < 100 && !tower; y += 2) {
+      submitCommand(match, 'PlaceTower', { towerId: 'scout', x, y });
+      runTicks(match, 3);
+      tower = match.state.towers[0] ?? null;
+    }
+  }
+  assert.ok(tower, 'could not place a tower anywhere on ' + map.id);
+  tower.reloadTicks = 0;
+
+  // The boss placed at the far end of the lane from the tower.
+  match.state.enemies.push({
+    seq: 9001, defId: 'fallen-king', laneId: map.lanes[0].id, segment: 0,
+    distFixed: 0, xFixed: 95 * 1024, yFixed: 95 * 1024, offsetFixed: 0,
+    hp: king.maxHp, maxHp: king.maxHp, shield: 0,
+    statuses: [], abilityCooldowns: {}, firedThresholds: [],
+  });
+  const apart = Math.hypot(95 - tower.xFixed / 1024, 95 - tower.yFixed / 1024);
+  assert.ok(apart > 20, 'the boss is only ' + apart.toFixed(1) + ' units away, so range proves nothing');
+
+  runTicks(match, 2);
+  assert.ok(
+    tower.reloadTicks >= TICK_RATE * 4,
+    'a boss on the other side of the map did not stun the tower: reloadTicks is ' +
+      tower.reloadTicks + ', expected about ' + TICK_RATE * 5,
+  );
+});
