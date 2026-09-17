@@ -155,10 +155,9 @@ state named beside it. A roadmap full of optimistic ticks is worse than no roadm
   The sub-explosion positions are not published, so modelling them would be invention
   rather than reading.
 
-- [ ] Riverbend's water zone is drawn and cannot be built on. No tower in this tranche is
-  filed under Water on the wiki. The map is faithful to a game that has water towers, so
-  the zone waits for one rather than being deleted; `tests/data/terrain.test.js` records
-  it and turns red if a water tower ever ships without the note being removed.
+- [x] Riverbend's water zone removed. The wiki's API settles it: Category:Water and
+      Category:Air have no members at all, so there is no water placement in the source
+      game and the zone was a promise nothing could keep
 
 
 - [x] Every file in `src/render` and `src/ui` passes the TypeScript check. It is a

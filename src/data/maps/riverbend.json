@@ -125,28 +125,6 @@
       ]
     },
     {
-      "id": "shallows",
-      "terrain": "water",
-      "polygon": [
-        [
-          39,
-          48
-        ],
-        [
-          71,
-          48
-        ],
-        [
-          71,
-          56
-        ],
-        [
-          39,
-          56
-        ]
-      ]
-    },
-    {
       "id": "east-bend",
       "terrain": "ground",
       "polygon": [

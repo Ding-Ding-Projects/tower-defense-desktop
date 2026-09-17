@@ -29,14 +29,7 @@ const gameData = loadGameData();
  * check: a terrain listed must genuinely have no tower, so one that gains a tower turns
  * this red and the note has to come out.
  */
-const UNBUILDABLE = [
-  {
-    terrain: 'water',
-    reason: 'no tower in this tranche is filed under Water on the wiki. The roster is ' +
-      '20 of roughly 40, and the maps are faithful to a game that has water towers, so ' +
-      'the zone stays and waits for one rather than being deleted to make a check pass',
-  },
-];
+const UNBUILDABLE = [];
 
 function towersByTerrain() {
   /** @type {Map<string, string[]>} */
@@ -112,6 +105,20 @@ test('a terrain excused as unbuildable really has no tower', () => {
     stale, [],
     'these carry a note saying nothing can be built on them, and something can: ' +
       stale.join('; ') + '. Remove the note rather than leaving a false explanation.',
+  );
+});
+
+test('the maps offer no terrain the source game has no towers for', () => {
+  // Water was on the excused list on the reasoning that the roster is a tranche and a
+  // water tower would arrive later. Asking the wiki settled it: Category:Ground has 76
+  // members, Category:Cliff has six, and Category:Water and Category:Air have none at
+  // all. There is no water placement in the source game, so riverbend's shallows were
+  // not a zone waiting for a tower -- they were a promise nothing could ever keep, drawn
+  // on the map and highlighted green every time a player went to place something.
+  const offered = [...terrainsOnMaps().keys()].sort();
+  assert.deepEqual(
+    offered, ['cliff', 'ground'],
+    'the maps offer [' + offered.join(', ') + '] and the source game places towers on ground and cliff',
   );
 });
 

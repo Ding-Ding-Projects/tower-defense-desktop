@@ -162,3 +162,39 @@ test('a real match drives the renderer through every effect it has', () => {
       never.join(', ') + '. Produced: ' + [...created].sort().join(', '),
   );
 });
+
+test('placing a tower highlights only the ground that tower can stand on', () => {
+  // Every zone used to light up green whatever was being placed. That was survivable
+  // while all twenty towers allowed the same terrain, and stopped being survivable the
+  // moment four of them became cliff-only: a player carrying a Scout was shown the cliff
+  // as somewhere to put it, and placing there was refused with no warning it would be.
+  const gameData = loadGameData();
+  const map = gameData.maps.get('riverbend');
+  const cliffZones = map.placementZones.filter((z) => z.terrain === 'cliff').length;
+  const groundZones = map.placementZones.filter((z) => z.terrain === 'ground').length;
+  assert.ok(cliffZones > 0 && groundZones > 0, 'riverbend needs both kinds for this to prove anything');
+
+  const zonesDrawnFor = (defId) => {
+    const recorder = createFakeContext();
+    const canvas = { width: 1280, height: 800, style: {}, getContext: () => recorder.ctx };
+    const renderer = new CanvasRenderer(canvas, gameData, map);
+    renderer.placingTowerDefId = defId;
+    renderer._drawZones({ x: 50, y: 50, zoom: 8 }, 1280, 800);
+    // One closePath per zone outline, which is the one call the loop makes exactly once
+    // per zone it decides to draw.
+    return recorder.calls.filter((c) => c.type === 'closePath').length;
+  };
+
+  assert.equal(
+    zonesDrawnFor('scout'), groundZones,
+    'a ground-only tower should light up the ' + groundZones + ' ground zones and nothing else',
+  );
+  assert.equal(
+    zonesDrawnFor('mortar'), cliffZones,
+    'a cliff-only tower should light up the ' + cliffZones + ' cliff zone(s) and nothing else',
+  );
+  assert.equal(
+    zonesDrawnFor('gatling-gun'), groundZones + cliffZones,
+    'Gatling Gun is filed under both, so it should light up every zone on the map',
+  );
+});

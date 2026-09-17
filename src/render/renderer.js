@@ -233,6 +233,15 @@ export class CanvasRenderer {
    */
   _drawZones(camera, w, h) {
     if (!this.placingTowerDefId) return;
+
+    // Only the ground this particular tower can stand on. Every zone used to light up
+    // green whatever was being placed, so a player carrying a Scout was shown the cliff
+    // as somewhere to put it, and placing there was refused with no warning that it
+    // would be. That was survivable while every tower allowed the same terrain; it stops
+    // being survivable the moment four of them are cliff-only.
+    const def = this.gameData.towers.get(this.placingTowerDefId);
+    const allowed = def ? def.allowedTerrain : [];
+
     const ctx = this.ctx;
     ctx.save();
     ctx.fillStyle = 'rgba(122, 214, 138, 0.16)';
@@ -240,6 +249,7 @@ export class CanvasRenderer {
     ctx.lineWidth = Math.max(1, 0.2 * camera.zoom);
     ctx.setLineDash([0.9 * camera.zoom, 0.7 * camera.zoom]);
     for (const zone of this.mapDef.placementZones) {
+      if (!allowed.includes(zone.terrain)) continue;
       ctx.beginPath();
       zone.polygon.forEach(([x, y], i) => {
         const p = worldToScreen(camera, w, h, x, y);

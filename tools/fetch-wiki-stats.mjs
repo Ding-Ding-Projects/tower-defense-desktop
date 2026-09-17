@@ -56,6 +56,57 @@ function cachePathFor(url) {
  * @param {{ refresh?: boolean }} [options]
  * @returns {string}
  */
+/**
+ * Fetch a MediaWiki API response.
+ *
+ * Separate from `fetchPage` because of that function's length guard, and the guard is
+ * right: an article that comes back under fifty thousand bytes did not really arrive,
+ * and without that check a truncated page reads downstream as a page with no statistics
+ * on it. An API reply is a few hundred bytes when it is perfectly healthy, so it fails
+ * that test every time.
+ *
+ * The same question still has to be asked, just in the shape this response has: did we
+ * get the thing we asked for? So the check here is that the body parses as JSON and
+ * carries a `query`, which a throttle page, an error page and an empty body all fail.
+ *
+ * Worth having rather than scraping the rendered page, because some things the wiki
+ * knows are not in its HTML at all: a category page lists its members through a script,
+ * so the static document contains the heading and none of the list.
+ *
+ * @param {string} url
+ * @returns {any}  the parsed response
+ */
+export function fetchJson(url) {
+  let lastError = new Error('no attempt was made');
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    const temp = join(tmpdir(), 'tds-api-' + process.pid + '-' + Date.now() + '.json');
+    try {
+      execFileSync('curl', ['-sS', '--compressed', '-A', BROWSER_UA, '-o', temp, url], {
+        stdio: ['ignore', 'ignore', 'pipe'],
+      });
+      const body = readFileSync(temp, 'utf8');
+      const parsed = JSON.parse(body);
+      if (!parsed || typeof parsed !== 'object' || !('query' in parsed)) {
+        throw new Error('no query in the response: ' + body.slice(0, 120));
+      }
+      return parsed;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      const until = Date.now() + attempt * 1500;
+      while (Date.now() < until) {
+        // waiting out the throttle
+      }
+    } finally {
+      try {
+        unlinkSync(temp);
+      } catch {
+        // A leftover temporary file is not worth failing a scrape over.
+      }
+    }
+  }
+  throw new Error('gave up on ' + url + ' after 4 attempts: ' + lastError.message);
+}
+
 export function fetchPage(url, options = {}) {
   const cached = cachePathFor(url);
   if (!options.refresh && existsSync(cached)) {

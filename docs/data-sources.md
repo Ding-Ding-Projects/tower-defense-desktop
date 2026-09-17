@@ -330,10 +330,23 @@ Mortar in a real cliff zone and checks it can reach the lane -- a terrain correc
 puts three towers somewhere they can stand but not shoot from would be worse than leaving
 them where they were, because it would look right everywhere except in play.
 
-Water is still unbuildable, and that is recorded rather than fixed. No tower in this
-tranche is filed under Water. The roster is 20 of roughly 40 and the maps are faithful to
-a game that has water towers, so riverbend's shallows stay and wait for one instead of
-being deleted to make a check pass.
+Water was excused on the reasoning that the roster is a tranche and a water tower would
+arrive in a later one. Asking the wiki settled it, and the answer was the other way
+round. The category listings are not in the rendered page -- Fandom loads them through a
+script, so the static document has the heading and none of the list -- but its API
+answers directly: `Category:Ground` has 76 members, `Category:Cliff` has six,
+`Category:Water` and `Category:Air` have none at all.
+
+There is no water placement in the source game. So riverbend's shallows were not a zone
+waiting for a tower; they were a promise nothing could ever keep, drawn on the map and
+lit up green every time a player went to place something. The zone is gone.
+
+That last part was a second defect on its own. The placement overlay highlighted EVERY
+zone whatever was being carried, so a player holding a Scout was shown the cliff as
+somewhere to put it and refused on the click, with nothing having said it would be. That
+was survivable while all twenty towers allowed the same terrain and stopped being
+survivable the moment four of them did not. It now highlights only the ground the tower
+in hand can stand on, and Gatling Gun, which is filed under both, lights up the lot.
 
 ### Boss abilities are on the page too, in the prose
 
