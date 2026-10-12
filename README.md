@@ -29,12 +29,12 @@ targeting, watch waves arrive, and win or lose.
 
 | | |
 | --- | --- |
-| Towers | 12, every upgrade level, real costs and statistics |
+| Towers | 20, every upgrade level, real costs and statistics |
 | Enemies | 10, including 3 bosses |
 | Maps | 2 |
 | Difficulties | 6 |
 | Wave schedules | 12 |
-| Checks | 159 |
+| Checks | Run `npm run check` for the current result |
 
 <details>
 <summary><b>Every mechanic the engine carries</b></summary>
@@ -110,7 +110,7 @@ npm run check
 ```
 
 Type check, determinism check, data validation, site contract, documentation bundle,
-and 159 tests.
+and the complete local test suite.
 
 > [!NOTE]
 > **Continuous integration runs no tests and no lint**, by standing decision. It
@@ -121,10 +121,11 @@ and 159 tests.
 
 ## Known gaps
 
-Recorded rather than hidden. `src/render` and `src/ui` sit outside the TypeScript
-check and do not currently pass it; they are covered by 51 behaviour checks, which is
-not the same thing. Roughly thirty further towers and a great many more enemies exist
-in the source game and are absent here rather than approximated. The full list is in
+Recorded rather than hidden. All 43 current JavaScript modules in `src/render` and `src/ui` are
+included in the strict TypeScript check. The coverage test also rejects new regular `.js` files
+omitted from that check. The roster remains incomplete; seven named tower additions
+are blocked on mechanics or conflicting source data, and several enemy abilities and
+scatter effects remain unmodelled or unused. The full list is in
 [ROADMAP.md](ROADMAP.md).
 
 ## Licence and attribution

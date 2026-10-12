@@ -9,14 +9,17 @@
  * Rather than loosen the check until it goes quiet, or leave the whole directory
  * outside it indefinitely, `tsconfig.render.json` carries an explicit list of the files
  * that DO pass, and that list is a ratchet. A new file has to be clean. An existing
- * one gets cleaned when somebody touches it. The number can only go up.
+ * one gets cleaned when somebody touches it. The number can only go up. Now that all
+ * existing modules are checked, scanning both directories also catches new regular
+ * .js files (the module format used here)
+ * omitted from both hand-written lists.
  *
  * This check is what makes it a ratchet rather than a good intention: quietly removing
  * a file from the list to make a red check green is exactly the move it refuses.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -84,6 +87,21 @@ test('every file the ratchet has claimed is still in the TypeScript config', () 
     [],
     'these files were passing the check and have been removed from it: ' + dropped.join(', '),
   );
+});
+
+test('every regular render and interface .js file is included in the TypeScript check', () => {
+  const listed = new Set(config.files ?? []);
+  function modulesIn(directory) {
+    return readdirSync(ROOT + directory, { withFileTypes: true }).flatMap((entry) => {
+      const file = directory + '/' + entry.name;
+      if (entry.isDirectory()) return modulesIn(file);
+      return entry.isFile() && entry.name.endsWith('.js') ? [file] : [];
+    });
+  }
+  const modules = ['src/render', 'src/ui'].flatMap(modulesIn);
+  const missing = modules.filter((file) => !listed.has(file)).sort();
+  assert.deepEqual(missing, [],
+    'these modules exist but escape the TypeScript check: ' + missing.join(', '));
 });
 
 test('every file the config claims actually exists', () => {

@@ -10,61 +10,49 @@ parity with Roblox Tower Defense Simulator. Plain ES modules with JSDoc types, c
 by TypeScript with no transpile step, so one copy of the code runs in Node checks, a
 browser and the desktop shell.
 
-## State
-
-**It plays.** A match runs end to end: place towers, upgrade them, sell them, change
-targeting, survive waves, win or lose. Verified by launching the real shell on an
-off-screen desktop and capturing the window, not by reading source.
-
-**It ships.** Every push to `main` publishes a uniquely tagged non-draft release with a
-real unsigned installer. The installer has been downloaded from the published URL and
-confirmed to be 119,225,856 bytes with a valid Windows executable header.
-
-**The site is live** at `https://ding-ding-projects.github.io/tower-defense-desktop/`,
-published by its own workflow, with a download button pointing at a verified release
-asset.
-
-| | |
-| --- | --- |
-| Towers | 12, every upgrade level, sourced statistics |
-| Enemies | 10, including 3 bosses |
-| Maps | 2 |
-| Difficulties | 6 |
-| Wave schedules | 12 |
-| Checks | 159, all passing |
-| Lines | ~21,000 across 173 files, per the committed counter |
-
 ## Verification state
 
-- `npm run check` runs the type check, the determinism check, data validation, the
-  site contract, the documentation bundle and 159 tests. All pass.
-- **Continuous integration runs no tests and no lint**, by standing decision. It
-  builds, packages, publishes and attaches evidence. Both workflows are green.
-- Determinism is proven by replaying the same seed and command log twice and comparing
-  a state hash sampled every second, not by asserting it.
-- Several guards have been deliberately broken, watched go red, and restored: the
-  determinism grep, the state hash's coverage of the generator, the documentation
-  bundle, and the download-link rule in four separate ways.
+Fresh local verification on 2026-10-12 started from main
+`488faad216fe2f6c99eb683c5baa0be4d312fd72`: `npm run check` passed all three TypeScript
+projects, determinism, data validation, site and documentation checks, and 462 tests.
+The coverage guard added in this update contributes one further test. Run the command
+again after changes rather than relying on a frozen test count.
+
+All 43 current JavaScript modules under `src/render` and `src/ui` are included in the strict
+TypeScript check. `tests/ui/typecheck-ratchet.test.js` protects the historical list
+and scans both directories for regular `.js` files, so a new file of that format
+cannot silently escape the check. Symlinks and other module extensions are not
+covered by this guard; neither is present in these directories.
+An intentionally unlisted module passed the old guard and failed the new guard;
+the temporary module was removed afterward.
+
+The current data manifest contains 20 towers, 10 enemies, 2 maps, 6 difficulties and
+12 wave schedules. The local checks include headless match and seeded replay checks.
+They do not establish that the current Windows installer launches or plays correctly.
+
+Earlier work recorded real-shell captures and a published unsigned installer download.
+Those are historical evidence, not fresh native validation of this update. Windows
+packaging, installation, current release assets and live deployment were not rerun in
+this Linux verification. Continuous integration runs no tests and no lint by standing
+decision; checks must run locally before a push.
 
 ## Open work
 
-Five roadmap items remain, and they are listed in `ROADMAP.md` rather than implied.
+`ROADMAP.md` records the current gaps. The following summarizes the committed
+roadmap and `docs/data-sources.md`; external Roblox/wiki sources were not refreshed
+or independently reverified in this update. In particular:
 
-The two that matter most to a next owner:
+- Seven named tower additions remain blocked on missing mechanics or conflicting
+  source data; the shipped roster is incomplete.
+- `shieldPhase` and `heal` have no shipped enemy user, and Mortar/Ranger scatter
+  effects remain unmodelled.
+- A recording of the real built program remains outstanding.
+- Five source-mechanics questions remain unresolved in `docs/data-sources.md`.
+  The sixth, sell refund, is recorded there as one third, truncated, rather than the
+  old 70 percent engine default.
 
-1. **`src/render` and `src/ui` are outside the TypeScript check** and do not pass it:
-   JSDoc generics on a constructor, a canvas context used without a null check, a pool
-   whose element type does not flow through. They are covered by 51 behaviour checks,
-   which is not the same thing. Bringing them in is real work.
-2. **Roughly thirty further towers and many more enemies exist in the source game and
-   are absent here**, deliberately, rather than approximated. Adding one is a data row
-   plus a line in the hand-written manifest in `src/data/loader.js`, which fails loudly
-   if a file is added and the manifest is not.
-
-Six statistics could not be sourced and are recorded as unresolved in
-`docs/data-sources.md`, with engine defaults shipped in their place and labelled as
-such: extra targeting modes, the enemy mitigation model, mark-and-consume pairings,
-area damage falloff, what Hardcore changes, and the sell refund percentage.
+Passing local checks does not close the full playable-release issue or replace the
+required native Windows validation.
 
 ## Things that will bite you
 
@@ -83,7 +71,8 @@ area damage falloff, what Hardcore changes, and the sell refund percentage.
 
 ## Next owner
 
-The engine is done; the roster is the work. Pick a tower, run
+Check the open mechanics and source-data blockers in `ROADMAP.md` before adding a
+tower. For an addition the current schema can represent, run
 `node tools/fetch-wiki-stats.mjs <Name>`, add its entry to the overlay in
 `tools/generate-data-rows.mjs`, run `node tools/generate-data-rows.mjs`, add the import
 to `src/data/loader.js`, and run `npm run check`. If that sequence ever needs a change
